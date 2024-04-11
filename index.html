@@ -1,96 +1,358 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script defer src="/_vercel/insights/script.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"
-    />
-    <title>Vercel HTML Starter</title>
-    <meta
-      name="description"
-      content="High-performance HTML based website template."
-    />
-  </head>
-  <body>
-    <h1>Vercel HTML Starter</h1>
-    <p>
-      This template is a simple, but powerful single
-      <code>index.html</code> file deployed to
-      <a href="https://vercel.com">Vercel</a>. When your site is deployed, all
-      static assets (like HTML, JavaScript, CSS, images, and more) are deployed
-      globally to every
-      <a href="https://vercel.com/docs/concepts/edge-network/overview"
-        >Vercel Edge Network</a
-      >
-      region.
-    </p>
-    <h2>Simple, privacy-friendly analytics</h2>
-    <p>
-      Want to understand your visitor traffic? Vercel Analytics gives you
-      first-party, privacy-friendly traffic analytics for your HTML site. This
-      template is already configured using the following script:
-    </p>
-    <pre><code>&lt;script defer src="/_vercel/insights/script.js"&gt;&lt;/script&gt;</code></pre>
-    <p>
-      Learn more about
-      <a href="https://vercel.com/analytics">Vercel Analytics</a>.
-    </p>
-    <h2>Integrated with git</h2>
-    <p>
-      Deploying updates to your site is as simple as
-      <code>git push</code> thanks to Vercel's advanced
-      <a href="https://vercel.com/docs/concepts/git">Git Integration</a>.
-      Support for GitHub, GitLab, Bitbucket is zero-configuration, and with the
-      flexible Vercel CLI and API, you can integrate with any tool possible.
-    </p>
-    <p>
-      Learn more about
-      <a href="https://vercel.com/docs/concepts/git">Git Integration</a>.
-    </p>
-    <h2>Fast <code>gzip</code> compression</h2>
-    <p>
-      To help ensure the smallest possible file sizes for your static assets,
-      the Vercel Edge Network compresses files by default using
-      <code>gzip</code>. You can also optionally use
-      <code>brotli</code> compressesion if you prefer.
-    </p>
-    <p>
-      Learn more about
-      <a href="https://vercel.com/docs/concepts/edge-network/compression"
-        >compression</a
-      >.
-    </p>
-    <h2>Advanced routing configuration</h2>
-    <p>
-      Vercel gives you a variety of ways to configure the routing of your
-      website. For example, adding redirects, rewrites, or headers to your page.
-      While you can use <code>vercel.json</code> to define these through JSON,
-      you can also express your routing configuration as code using
-      <a href="https://vercel.com/docs/concepts/functions/edge-middleware"
-        >Vercel Edge Middleware</a
-      >.
-    </p>
-    <p>
-      Middleware runs before the
-      <a href="https://vercel.com/docs/concepts/edge-network/caching"
-        >Vercel Edge Network Cache</a
-      >, so you can configure routing exactly as your application needs. For
-      example, this template uses <code>middleware.js</code> defined in the root
-      of the repository to add additional security headers to the site:
-    </p>
-    <pre><code>referrer-policy: origin-when-cross-origin
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-content-type-options: nosniff
-x-dns-prefetch-control: on
-x-frame-options: DENY</code></pre>
-    <p>
-      Learn more about
-      <a href="https://vercel.com/docs/concepts/functions/edge-middleware"
-        >Vercel Edge Middleware</a
-      >.
-    </p>
-  </body>
+<html>
+<head>
+ <title>Diversão</title>   <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 10px;
+        }
+
+        .card {
+            flex: 0 0 calc(25% - 20px);
+            margin: 10px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            color: #f5f5f5;
+        }
+
+        .dark-card {
+            background-color: #333;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/pt-br.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/i18next/dist/umd/i18next.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dataHoraAtualElement = document.getElementById('dataHoraAtual');
+            const diaSemanaElement = document.getElementById('diaSemana');
+
+            const dataAtual = moment();
+            const diaSemanaAtual = moment().format('dddd');
+
+            const dataFormatada = dataAtual.format('LL');
+            const horaFormatada = dataAtual.format('LTS');
+
+            dataHoraAtualElement.textContent = `Data e Hora Atuais: ${dataFormatada} ${horaFormatada}`;
+            diaSemanaElement.textContent = `Dia da semana: ${diaSemanaAtual}`;
+
+            get_user_location();
+        });
+
+        function get_user_location() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(show_position);
+            } else {
+                console.log('Geolocalização não suportada pelo navegador.');
+            }
+        }
+
+        function show_position(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            var apiKey = 'b60b9a33388f4d4dab341839231505';
+            var weatherUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${latitude},${longitude}`;
+            var tideUrl = `https://api.weatherapi.com/v1/tide.json?key=${apiKey}&q=${latitude},${longitude}`;
+            var alertaUrl = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=-8.809984340527787, -35.19990193681771&days=5&aqi=no&alerts=yes`;
+            var i18nextConfig = {
+                lng: 'en',
+                fallbackLng: 'en',
+                resources: {
+                    en: {
+                        translation: {
+                            'No weather alerts at the moment in your city.': 'Sem alertas meteorológicos no momento na sua cidade.',
+                            'Clear': 'Céu limpo',
+                            'Sunny': 'Ensolarado',
+                            'Partly cloudy': 'Parcialmente nublado',
+                            'Cloudy': 'Nublado',
+                            'Overcast': 'Encoberto',
+                            'Mist': 'Neblina',
+                            'Patchy rain possible': 'Possibilidade de chuva',
+                            'Patchy snow possible': 'Possibilidade de neve',
+                            'Patchy sleet possible': 'Possibilidade de aguanieve',
+                            'Patchy freezing drizzle possible': 'Possibilidade de chuvisco congelante',
+                            'Thundery outbreaks possible': 'Possibilidade de trovoadas',
+                            'Blowing snow': 'Nevasca',
+                            'Blizzard': 'Tempestade de neve',
+                            'Fog': 'Nevoeiro',
+                            'Freezing fog': 'Nevoeiro congelante',
+                            'Patchy light drizzle': 'Possibilidade de chuvisco',
+                            'Light drizzle': 'Chuvisco fraco',
+                            'Freezing drizzle': 'Chuvisco congelante',
+                            'Heavy freezing drizzle': 'Chuvisco congelante pesado',
+                            'Patchy light rain': 'Possibilidade de chuva fraca',
+                            'Light rain': 'Chuva fraca',
+                            'Moderate rain at times': 'Chuva moderada às vezes',
+                            'Moderate rain': 'Chuva moderada',
+                            'Heavy rain at times': 'Chuva pesada às vezes',
+                            'Heavy rain': 'Chuva pesada',
+                            'Light freezing rain': 'Chuva congelante fraca',
+                            'Moderate or heavy freezing rain': 'Chuva congelante moderada ou pesada',
+                            'Light sleet': 'Aguanieve fraca',
+                            'Moderate or heavy sleet': 'Aguanieve moderada ou pesada',
+                            'Patchy light snow': 'Possibilidade de neve fraca',
+                            'Light snow': 'Neve fraca',
+                            'Patchy moderate snow': 'Possibilidade de neve moderada',
+                            'Moderate snow': 'Neve moderada',
+                            'Patchy heavy snow': 'Possibilidade de neve pesada',
+                            'Heavy snow': 'Neve pesada',
+                            'Ice pellets': 'Granizo',
+                            'Light rain shower': 'Aguaceiro fraco',
+                            'Moderate or heavy rain shower': 'Aguaceiro moderado ou pesado',
+                            'Torrential rain shower': 'Aguaceiro torrencial',
+                            'Light sleet showers': 'Aguaceiro de aguanieve fraco',
+                            'Moderate or heavy sleet showers': 'Aguaceiro de aguanieve moderado ou pesado',
+                            'Light snow showers': 'Aguaceiro de neve fraco',
+                            'Moderate or heavy snow showers': 'Aguaceiro de neve moderado ou pesado',
+                            'Light showers of ice pellets': 'Aguaceiro de granizo fraco',
+                            'Moderate or heavy showers of ice pellets': 'Aguaceiro de granizo moderado ou pesado',
+                            'Patchy light rain with thunder': 'Possibilidade de chuva fraca com trovão',
+                            'Moderate or heavy rain with thunder': 'Chuva moderada ou pesada com trovão',
+                            'Patchy light snow with thunder': 'Possibilidade de neve fraca com trovão',
+                            'Moderate or heavy snow with thunder': 'Neve moderada ou pesada com trovão'
+                        }
+                    },
+                    pt: {
+                        translation: {
+                            'No weather alerts at the moment in your city.': 'Sem alertas meteorológicos no momento na sua cidade.',
+                            'Clear': 'Céu limpo',
+                            'Sunny': 'Ensolarado',
+                            'Partly cloudy': 'Parcialmente nublado',
+                            'Cloudy': 'Nublado',
+                            'Overcast': 'Encoberto',
+                            'Mist': 'Neblina',
+                            'Patchy rain possible': 'Possibilidade de chuva',
+                            'Patchy snow possible': 'Possibilidade de neve',
+                            'Patchy sleet possible': 'Possibilidade de aguanieve',
+                            'Patchy freezing drizzle possible': 'Possibilidade de chuvisco congelante',
+                            'Thundery outbreaks possible': 'Possibilidade de trovoadas',
+                            'Blowing snow': 'Nevasca',
+                            'Blizzard': 'Tempestade de neve',
+                            'Fog': 'Nevoeiro',
+                            'Freezing fog': 'Nevoeiro congelante',
+                            'Patchy light drizzle': 'Possibilidade de chuvisco',
+                            'Light drizzle': 'Chuvisco fraco',
+                            'Freezing drizzle': 'Chuvisco congelante',
+                            'Heavy freezing drizzle': 'Chuvisco congelante pesado',
+                            'Patchy light rain': 'Possibilidade de chuva fraca',
+                            'Light rain': 'Chuva fraca',
+                            'Moderate rain at times': 'Chuva moderada às vezes',
+                            'Moderate rain': 'Chuva moderada',
+                            'Heavy rain at times': 'Chuva pesada às vezes',
+                            'Heavy rain': 'Chuva pesada',
+                            'Light freezing rain': 'Chuva congelante fraca',
+                            'Moderate or heavy freezing rain': 'Chuva congelante moderada ou pesada',
+                            'Light sleet': 'Aguanieve fraca',
+                            'Moderate or heavy sleet': 'Aguanieve moderada ou pesada',
+                            'Patchy light snow': 'Possibilidade de neve fraca',
+                            'Light snow': 'Neve fraca',
+                            'Patchy moderate snow': 'Possibilidade de neve moderada',
+                            'Moderate snow': 'Neve moderada',
+                            'Patchy heavy snow': 'Possibilidade de neve pesada',
+                            'Heavy snow': 'Neve pesada',
+                            'Ice pellets': 'Granizo',
+                            'Light rain shower': 'Aguaceiro fraco',
+                            'Moderate or heavy rain shower': 'Aguaceiro moderado ou pesado',
+                            'Torrential rain shower': 'Aguaceiro torrencial',
+                            'Light sleet showers': 'Aguaceiro de aguanieve fraco',
+                            'Moderate or heavy sleet showers': 'Aguaceiro de aguanieve moderado ou pesado',
+                            'Light snow showers': 'Aguaceiro de neve fraco',
+                            'Moderate or heavy snow showers': 'Aguaceiro de neve moderado ou pesado',
+                            'Light showers of ice pellets': 'Aguaceiro de granizo fraco',
+                            'Moderate or heavy showers of ice pellets': 'Aguaceiro de granizo moderado ou pesado',
+                            'Patchy light rain with thunder': 'Possibilidade de chuva fraca com trovão',
+                            'Moderate or heavy rain with thunder': 'Chuva moderada ou pesada com trovão',
+                            'Patchy light snow with thunder': 'Possibilidade de neve fraca com trovão',
+                            'Moderate or heavy snow with thunder': 'Neve moderada ou pesada com trovão'
+                        }
+                    }
+                }
+            };
+
+            function getWeatherData() {
+                axios.get(weatherUrl)
+                    .then(function (response) {
+                        const data = response.data;
+
+                        const weatherElement = document.getElementById('weather');
+                        const locationElement = document.getElementById('location');
+                        const temperatureElement = document.getElementById('temperature');
+                        const weatherIconElement = document.getElementById('weatherIcon');
+                        const alertElement = document.getElementById('alert');
+
+                        const location = data.location.name;
+                        const temperature = data.current.temp_c;
+                        const weatherText = data.current.condition.text;
+                        const weatherIcon = data.current.condition.icon;
+
+                        locationElement.textContent = `Localização: ${location}`;
+                        temperatureElement.textContent = `Temperatura: ${temperature}°C`;
+                        weatherElement.textContent = `Condição climática: ${weatherText}`;
+                        weatherIconElement.setAttribute('src', weatherIcon);
+
+                        i18next.init(i18nextConfig, function (err, t) {
+                            const alertText = t('No weather alerts at the moment in your city.');
+                            alertElement.textContent = alertText;
+                        });
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+
+axios
+  .get(alertaUrl)
+  .then((response) => {
+    const alertData = response.data;
+    console.log('Alerta meteorológico:', alertData.alerts);
+    // Faça o que você precisa com o alerta meteorológico
+  })
+  .catch((error) => {
+    console.error('Erro ao obter os dados do alerta meteorológico:', error);
+  });
+
+                ;
+            }
+
+            getWeatherData();
+        }
+    </script>
+</head>
+<header class="bg-gray-900 text-white py-4">
+    <div class="container mx-auto text-center">
+        <h1 class="text-3xl font-bold">Frostmap</h1>
+    </div>
+  </header>
+
+<body>
+
+<div class="alert alert-success" role="alert">
+            <p id="alert"></p>
+</div>
+
+<div id="weatherapi-weather-widget-3"></div><script type='text/javascript' src='https://www.weatherapi.com/weather/widget.ashx?loc=277876&wid=3&tu=1&div=weatherapi-weather-widget-3' async></script><noscript><a href="https://www.weatherapi.com/weather/q/joao-pessoa-277876" alt="Hour by hour Joao Pessoa weather">10 day hour by hour Joao Pessoa weather</a></noscript>
+        <div class="card dark-card">
+            <h2 id="location"></h2>
+            <p id="temperature"></p>
+            <p id="weather"></p>
+    <div class="weather-icon-container">
+        <img id="weatherIcon" src="" alt="Weather Icon" style="width: 64px; height: 64px;">
+    </div>        </div>
+    
+        <div class="card dark-card">
+            <h2 id="diaSemana"></h2>
+
+            <h2 id="dataHoraAtual"></h2>
+        </div>
+
+    <div class="container">
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card dark-card">
+    <h5 class="card-title">Programação de Cinema na sua Cidade</h5>
+    <p class="card-text">Confira os filmes em cartaz e a programação de cinema na sua cidade.</p>
+    <!-- <a href="https://www.ingresso.com/filmes?city=joao-pessoa&partnership=home" target="_blank" class="btn btn-primary">Ingresso.com</a> -->
+
+    <a href="/cinema/" target="_blank" class="btn btn-success">Programação de Cinema</a>
+        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card dark-card">
+                <h5 class="card-title">Programação do Cine Bangue</h5>
+                <p class="card-text">Confira os filmes em cartaz e a programacao no Cine Bangue</p>
+                <!-- <a href="https://www.ingresso.com/filmes?city=joao-pessoa&partnership=home" target="_blank" class="btn btn-primary">Ingresso.com</a> -->
+            
+                <a href="/bangue/" target="_blank" class="btn btn-success">Programação do Cine Bangue</a>
+                    </div>
+                                </div>                    
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card dark-card">
+    <h5 class="card-title">Shows e Eventos em João Pessoa</h5>
+    <p class="card-text">Descubra os melhores shows e eventos que estão acontecendo na sua cidade.</p>
+    <!-- <a href="https://www.sympla.com.br/eventos/joao-pessoa-pb/show-musica-festa/esta-semana" target="_blank" class="btn btn-primary">Sympla</a> -->
+    <a href="/shows/" target="_blank" class="btn btn-success">Sympla</a>
+</div>
+                    </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card dark-card">
+    <h5 class="card-title">Eventos e Ingressos</h5>
+    <p class="card-text">Encontre eventos emocionantes e compre ingressos diretamente na Eventim.</p>
+    <!-- <a href="https://www.eventim.com.br/city/joao-pessoa-1816/" target="_blank" class="btn btn-primary">Eventim</a> -->
+    <a href="/shows/eventim.html" target="_blank" class="btn btn-success">Eventim</a>
+
+        </div>
+                    </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card dark-card">
+    <h5 class="card-title">Atrações em João Pessoa</h5>
+    <p class="card-text">Descubra as principais atrações turísticas em João Pessoa.</p>
+    <a href="https://www.tripadvisor.com.br/Attractions-g303428-Activities-Joao_Pessoa_State_of_Paraiba.html" class="btn btn-primary" target="_blank">TripAdivisor</a>
+        </div>
+                    </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card dark-card">
+    <h5 class="card-title">Tabela de Marés em João Pessoa</h5>
+    <p class="card-text">Confira a tabela de marés atualizada para João Pessoa, na Paraíba. </p>
+    <!-- <a href="https://tabuademares.com/br/paraiba/joao-pessoa#_tabela_mares" class="btn btn-primary" target="_blank">Ver Tabela de Marés</a> -->
+    <a href="/tabuamares/" class="btn btn-success" target="_blank">Ver Tabela de Marés</a>
+
+</div>
+                    </div>
+
+<div class="col-12 col-md-6 col-lg-4">
+    <div class="card dark-card">
+    <h5 class="card-title">Notícias</h5>
+    <p class="card-text">Confira as últimas notícias sobre o que esta acontecendo.</p>
+    <!-- <a href="https://news.google.com/topics/CAAqJQgKIh9DQkFTRVFvSUwyMHZNREUxWm5JU0JYQjBMVUpTS0FBUAE?ceid=BR:pt-419&oc=3" class="btn btn-primary" target="_blank">Ver Notícias</a> -->
+    <!-- <a href="https://mosaico.serveo.net/news/" class="btn btn-success" target="_blank">Ver Notícias</a> -->
+    <a href="/noticias/" class="btn btn-success" target="_blank">Ver Notícias</a>
+
+</div>
+            </div>
+
+<div class="col-12 col-md-6 col-lg-4">
+    <div class="card dark-card">
+    <h5 class="card-title">Notícias Joao Pessoa</h5>
+    <p class="card-text">Confira as últimas notícias sobre o que esta acontecendo em Joao Pessoa.</p>
+    <a href="https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSkwyMHZNREZvZVRsa0VnVndkQzFDVWlnQVAB?ceid=BR:pt-419&oc=3" class="btn btn-primary" target="_blank">Ver Notícias</a>
+</div>
+            </div>
+
+
+<div class="col-12 col-md-6 col-lg-4">
+    <div class="card dark-card">
+    <h5 class="card-title">Bares e Restaurantes</h5>
+    <p class="card-text">Bares e Restaurantes abertos em Joao Pessoa agora</p>
+    <!-- <a href="https://www.google.com/maps/search/bares+e+restaurantes+joao+pessoa/@-7.1354256,-34.8293001,15z/data=!4m4!2m3!5m1!2e1!6e5" class="btn btn-primary" target="_blank">Ver Bares e restaurantes</a> -->
+    <a href="/bares/" class="btn btn-success" target="_blank">Ver Bares e restaurantes</a>
+
+</div>
+            </div>
+
+</div>
+
+
+    </div>
+    <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0" target="_blank"></a>
+</body>
 </html>
