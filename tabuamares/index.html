@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tábua de Marés - João Pessoa</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="text-center mb-4" id="title"></h1>
+        <h2 class="text-center mb-4" id="month-year"></h2>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Dia</th>
+                    <th>1ª Maré</th>
+                    <th>2ª Maré</th>
+                    <th>3ª Maré</th>
+                    <th>4ª Maré</th>
+                </tr>
+            </thead>
+            <tbody id="tide-table"></tbody>
+        </table>
+        <div id="station-info"></div>
+    </div>
+
+    <script>
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const daysOfWeek = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+        const stationId = '8724113';  // ID da estação de João Pessoa
+
+        const titleElement = document.getElementById("title");
+        const monthYearElement = document.getElementById("month-year");
+        const tideTableBody = document.getElementById("tide-table");
+        const stationInfoElement = document.getElementById("station-info");
+
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);  // Set the time to the start of the day
+        const oneWeekLater = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);  // Add one week
+
+        const startTimestamp = Math.floor(currentDate.getTime() / 1000);  // Convert to UTC timestamp
+        const endTimestamp = Math.floor(oneWeekLater.getTime() / 1000);  // Convert to UTC timestamp
+
+        titleElement.textContent = `Tábua de Marés - João Pessoa`;
+        monthYearElement.textContent = `${monthNames[currentDate.getMonth()]} de ${currentDate.getFullYear()} - Semana de ${currentDate.getDate()} de ${monthNames[currentDate.getMonth()]}`;
+
+        const lat = -8.05;
+        const lon = -34.867;
+
+        const fetchTideData = async () => {
+    const apiKey = 'd242d458-ebf0-11ee-b17f-0242ac130002-d242d4b2-ebf0-11ee-b17f-0242ac130002';
+    const url = `https://api.stormglass.io/v2/tide/extremes/point?lat=${lat}&lng=${lon}&start=${startTimestamp}&end=${endTimestamp}`;
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': apiKey
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data);
+        const tideData = data.data || [];
+
+        // Ordenar os dados por data/hora
+        tideData.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+        tideTableBody.innerHTML = "";
+
+        const tideDataByDay = tideData.reduce((acc, tide) => {
+            const date = new Date(tide.time);
+            const day = date.getUTCDate();
+
+            if (!acc[day]) {
+                acc[day] = [];
+            }
+
+            acc[day].push(tide);
+            return acc;
+        }, {});
+
+        Object.keys(tideDataByDay).forEach(day => {
+            const tides = tideDataByDay[day];
+            const dayOfWeek = daysOfWeek[new Date(tides[0].time).getUTCDay()];
+            let row = `<tr><td>${dayOfWeek} ${day}</td>`;
+
+            tides.forEach(tide => {
+                const time = new Date(tide.time);
+                time.setHours(time.getUTCHours() - 3); // Adjust for GMT-3
+                const hours = `[ ${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')} ]`;
+                const height = tide.height.toFixed(1);
+                const type = tide.type === 'high' ? '<span class="mdi mdi-triangle" style="color: red;"></span>' : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
+                row += `<td>${hours} ${height} m ${type}</td>`;
+            });
+
+            // Se houver menos de 4 marés, adicione células vazias
+            while (tides.length < 4) {
+                row += '<td></td>';
+                tides.push({});
+            }
+
+            row += '</tr>';
+            tideTableBody.innerHTML += row;
+        });
+
+        // Exibir informações da estação
+        stationInfoElement.innerHTML = `<p>Datum: ${data.meta.datum}</p><p>Nome da Estação: ${data.meta.station.name.charAt(0).toUpperCase() + data.meta.station.name.slice(1)}</p>`;
+    } catch (error) {
+        console.error('Erro ao obter dados da API:', error);
+    }
+};
+
+fetchTideData();
+
+    </script>
+</body>
+</html>

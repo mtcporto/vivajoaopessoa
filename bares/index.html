@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bares e Restaurantes em João Pessoa Abertos Agora</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <style>
+    #map {
+      height: 400px;
+    }
+    .header {
+      background-color: black;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    .table thead th {
+      background-color: #343a40;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Bares e Restaurantes em João Pessoa Abertos Agora</h1>
+      </div>
+<div class="container">
+
+  <div id="map" class="mt-4"></div>
+  <table class="table mt-4">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Endereço</th>
+        <th>Bairro</th>
+        <th>Tipo</th>
+      </tr>
+    </thead>
+    <tbody id="restaurants-list">
+      <!-- Aqui os dados dos bares e restaurantes serão inseridos via JavaScript -->
+    </tbody>
+  </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.min.js"></script>
+
+<script>
+  const AUTH_TOKEN = 'fsq3r0F0Q/z2Cu3Q+SJbvJ2a3LV4TPzX1+3IHqm27gJDgPg=';
+
+  async function fetchPlacesFromFoursquare() {
+    const url = new URL('https://api.foursquare.com/v3/places/search');
+    url.searchParams.append('near', 'João Pessoa');
+    url.searchParams.append('categories', '13065,13003'); // Restaurantes e Bares
+    url.searchParams.append('limit', '50');
+    url.searchParams.append('open_now', 'true');
+    url.searchParams.append('sort', 'rating');
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': AUTH_TOKEN
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.results;
+    } catch (error) {
+      console.error('Erro ao buscar dados de bares e restaurantes:', error);
+      throw error;
+    }
+  }
+
+  async function processPlacesData() {
+    try {
+      const places = await fetchPlacesFromFoursquare();
+
+      if (!places || places.length === 0) {
+        console.log('Nenhum resultado encontrado.');
+        return;
+      }
+
+      // Limpar a lista de bares e restaurantes
+      const tableBody = document.getElementById("restaurants-list");
+      tableBody.innerHTML = "";
+
+      // Inicializar o mapa
+      const map = L.map('map').setView([-7.1195, -34.8450], 13); // Coordenadas de João Pessoa
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+      }).addTo(map);
+
+      // Criar um cluster de marcadores
+      const markers = L.markerClusterGroup();
+
+      // Iterar sobre os resultados e adicionar à tabela e ao mapa
+      places.forEach(function(place) {
+        const name = place.name;
+        const address = place.location.address || '';
+        const postTown = place.location.post_town || '';
+        const postcode = place.location.postcode || '';
+        const type = place.categories.some(c => c.id === 13065) ? 'restaurante' : 'bar';
+        const row = document.createElement("tr");
+        row.innerHTML = "<td>" + name + "</td>" +
+                        "<td>" + address + "</td>" +
+                        "<td>" + postTown + "</td>" +
+                        "<td>" + type + "</td>";
+        tableBody.appendChild(row);
+
+        // Adicionar marcador ao mapa
+        const icon = L.AwesomeMarkers.icon({
+          icon: type === 'restaurante' ? 'cutlery' : 'glass',
+          markerColor: type === 'restaurante' ? 'red' : 'blue',
+          prefix: 'fa'
+        });
+        const marker = L.marker([place.geocodes.main.latitude, place.geocodes.main.longitude], {icon: icon});
+        marker.bindPopup(`<b>${name}</b><br>Endereço: ${address}<br>Bairro: ${postTown}<br>Tipo: ${type}<br>CEP: ${postcode}`);
+        markers.addLayer(marker); // Adicionar o marcador ao cluster
+      });
+
+      map.addLayer(markers); // Adicionar o cluster ao mapa
+    } catch (error) {
+      console.error('Erro ao processar os dados:', error);
+    }
+  }
+
+  // Chamar a função para buscar e processar os dados
+  processPlacesData();
+</script>
+</body>
+</html>

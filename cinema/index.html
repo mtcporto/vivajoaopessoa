@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmes em João Pessoa</title>
+    <style>
+        /* Estilos opcionais para melhorar a apresentação */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+    /* Header styles */
+    header {
+      background-color: #000;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px; /* Espaçamento entre o header e os cards */
+    }
+        .event-container {
+            border: none;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            margin-bottom: 20px;
+            display: inline-block;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 180px; /* Ajustando a largura do card automaticamente */
+        }
+        .event-image {
+            width: 180px; /* Reduzindo a largura da imagem em cerca de 65% */
+            height: auto; /* Mantendo a proporção da altura */
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .event-title {
+            margin-top: 10px;
+            font-size: 13px;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word; /* Adicionando quebra de linha ao título */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            max-width: 150px; /* Definindo a largura máxima do título */
+        }
+        .icons-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            margin: 0 5px;
+        }
+        .event-container:not(:last-child) {
+            margin-right: 10px;
+        }
+        #eventContainer {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Filmes em cartaz - João Pessoa</h1>
+    </header>
+    <!-- Loop através dos eventos -->
+    <div id="eventContainer"></div>
+    <script src="script.js"></script>
+</body>
+</html>
