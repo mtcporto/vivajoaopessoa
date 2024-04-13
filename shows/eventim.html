@@ -41,7 +41,7 @@
   <script>
     // URL da página que você quer raspar
     const url = 'https://www.eventim.com.br/city/joao-pessoa-1816/';
-    const proxyUrl = '';
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
 
     fetch(proxyUrl + url)
       .then(response => response.text())
