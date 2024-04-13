@@ -36,7 +36,10 @@
     const PROXY_URL = '';
   
     fetch(PROXY_URL + url)
-      .then(response => response.text())
+  .then(response => {
+    console.log(response);
+    return response.text();
+  })
       .then(html => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
