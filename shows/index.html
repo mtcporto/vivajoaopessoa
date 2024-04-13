@@ -64,17 +64,16 @@
               const eventoDiv = document.createElement('div');
               eventoDiv.className = 'col-lg-4 col-md-6 col-sm-12 mb-4'; // Ajuste para dispositivos móveis
               eventoDiv.innerHTML = `
-                <a href="${link}" target="_blank" class="card-link">
-                  <div class="card">
-                    <img src="${foto}" class="card-img-top" alt="${nome}">
-                    <div class="card-body">
-                      <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
-                      <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
-                      <p class="card-text">${data}</p>
-                      <p class="card-text">${local}</p>
-                    </div>
+                <div class="card">
+                  <img src="${foto}" class="card-img-top" alt="${nome}">
+                  <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
+                    <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
+                    <p class="card-text">${data}</p>
+                    <p class="card-text">${local}</p>
+                    <a href="${link}" target="_blank" class="card-link">Saiba mais</a>
                   </div>
-                </a>
+                </div>
               `;
               eventosDiv.appendChild(eventoDiv);
             }
