@@ -50,19 +50,7 @@
   try {
     const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
     const idEvento = evento.getAttribute('data-bannerid');
-    const link = evento.querySelector('a').getAttribute('href');
-    document.addEventListener('DOMContentLoaded', (event) => {
-    const waitFor = require('waitfor');  // Or require('wait-for-elements');
-    const anchorSelector = '.EventCardstyle__CardLink-sc-1rkzctc-3';
-    waitFor(anchorSelector, {
-        timeout: 5000 // Adjust timeout as needed
-      }).then(() => {
-        // Code to process events will be executed here
-        processarEventos();
-      }).catch((error) => {
-        console.error('Error waiting for elements:', error);
-      });
-});
+    const link = `https://www.sympla.com.br/evento/${nome}/${idEvento}`;
 
     const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
     const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
