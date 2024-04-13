@@ -55,25 +55,28 @@
     
     console.log('Script iniciado');
 
-// Cria uma nova instância do observador com uma função de callback
-let observer = new MutationObserver((mutations) => {
-    console.log('MutationObserver chamado');
-    let element = document.querySelector('.EventCardstyle__CardLink-sc-1rkzctc-3');
-    console.log('Elemento selecionado:', element);
+    // Adicione um atraso antes de iniciar o MutationObserver
+    setTimeout(() => {
+        // Cria uma nova instância do observador com uma função de callback
+        let observer = new MutationObserver((mutations) => {
+            console.log('MutationObserver chamado');
+            let element = document.querySelector('.EventCardstyle__CardLink-sc-1rkzctc-3');
+            console.log('Elemento selecionado:', element);
 
-    if (element) {
-        let href = element.getAttribute('href');
-        let id = element.getAttribute('id');
-        console.log('href:', href);
-        console.log('id:', id);
-        // Uma vez que o elemento é encontrado e o href e id são logados, desconecte o observador
-        observer.disconnect();
-    }
-});
+            if (element) {
+                let href = element.getAttribute('href');
+                let id = element.getAttribute('id');
+                console.log('href:', href);
+                console.log('id:', id);
+                // Uma vez que o elemento é encontrado e o href e id são logados, desconecte o observador
+                observer.disconnect();
+            }
+        });
 
-// Começa a observar o documento com as configurações configuradas
-observer.observe(document, { childList: true, subtree: true });
-console.log('Observador iniciado');
+        // Começa a observar o documento com as configurações configuradas
+        observer.observe(document, { childList: true, subtree: true });
+        console.log('Observador iniciado');
+    }, 2000); // Atraso de 2 segundos
 
 
     const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
