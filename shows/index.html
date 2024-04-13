@@ -51,12 +51,15 @@
     const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
     const idEvento = evento.getAttribute('data-bannerid');
     const link = `https://www.sympla.com.br/evento/${nome}/${idEvento}`;
+    // Cria uma nova instância do observador com uma função de callback
     let observer = new MutationObserver((mutations) => {
         let element = document.querySelector('.EventCardstyle__CardLink-sc-1rkzctc-3');
         if (element) {
             let href = element.getAttribute('href');
-            console.log(href);
-            // Uma vez que o elemento é encontrado e o href é logado, desconecte o observador
+            let id = element.getAttribute('id');
+            console.log('href:', href);
+            console.log('id:', id);
+            // Uma vez que o elemento é encontrado e o href e id são logados, desconecte o observador
             observer.disconnect();
         }
     });
