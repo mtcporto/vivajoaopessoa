@@ -52,10 +52,7 @@
     if (linkElement) {
       const link = linkElement.getAttribute('href');
     const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
-    const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
-  }
-
-    
+    const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent; 
     // Verifica se o evento é em João Pessoa, PB
     if (local.includes('João Pessoa, PB')) {
       const datas = Array.from(evento.querySelectorAll('.sc-1sp59be-1.fZlvlB')).map(el => el.textContent);
@@ -75,6 +72,7 @@
       </a>`;
       eventosDiv.appendChild(eventoDiv);
     }
+  }
   } catch (error) {
     console.error(`Erro ao processar o evento: ${error}`);
   }
