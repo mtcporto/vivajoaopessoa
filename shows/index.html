@@ -51,7 +51,7 @@
     const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
     const idEvento = evento.getAttribute('data-bannerid');
     const link = evento.querySelector('a').getAttribute('href');
-    const anchorElement = evento.querySelector('a');
+    const anchorElement = evento.querySelector('.EventCardstyle__CardContainer-sc-1rkzctc-4 a');
       if (anchorElement) {
         const link = anchorElement.getAttribute('href');
         // ... (use the link)
