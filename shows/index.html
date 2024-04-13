@@ -52,15 +52,16 @@
     const idEvento = evento.getAttribute('data-bannerid');
     const link = evento.querySelector('a').getAttribute('href');
     document.addEventListener('DOMContentLoaded', (event) => {
-    let element = document.querySelector('.EventCardstyle__CardLink-sc-1rkzctc-3');
-
-    // Certifique-se de que o elemento existe antes de tentar acessar seus atributos
-    if (element) {
-        let href = element.getAttribute('href');
-        console.log(href);
-    } else {
-        console.log('Elemento não encontrado');
-    }
+    const waitFor = require('waitfor');  // Or require('wait-for-elements');
+    const anchorSelector = '.EventCardstyle__CardLink-sc-1rkzctc-3';
+    waitFor(anchorSelector, {
+        timeout: 5000 // Adjust timeout as needed
+      }).then(() => {
+        // Code to process events will be executed here
+        processarEventos();
+      }).catch((error) => {
+        console.error('Error waiting for elements:', error);
+      });
 });
 
     const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
