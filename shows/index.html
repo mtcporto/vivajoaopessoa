@@ -88,17 +88,17 @@
                   const eventoDiv = document.createElement('div');
                   eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
                   eventoDiv.innerHTML = `
-                    <a href="${link}" target="_blank" class="card-link">
-                      <div class="card">
+                    <div class="card">
+                      <a href="${link}" target="_blank" class="card-link">
                         <img src="${foto}" class="card-img-top" alt="${nome}">
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
-                          <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
-                          <p class="card-text">${data}</p>
-                          <p class="card-text">${local}</p>
-                        </div>
+                      </a>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
+                        <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
+                        <p class="card-text">${data}</p>
+                        <p class="card-text">${local}</p>
                       </div>
-                    </a>
+                    </div>
                   `;
                   eventosDiv.appendChild(eventoDiv);
                 }
@@ -107,6 +107,7 @@
               }
             }
           });
+
           eventosCount += 9;
           if (eventosCount < eventos.length) {
             document.querySelector("#loadMore").style.display = 'block';
@@ -121,4 +122,4 @@
     loadEvents();
   </script>
 </body>
-</html>  
+</html>
