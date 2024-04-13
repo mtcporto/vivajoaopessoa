@@ -2,13 +2,13 @@
 <html>
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eventos - Sympla</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
     .card-img-top {
       width: 100%;
-      height: auto;
+      height: 150px;
       object-fit: cover;
     }
     .card-link {
@@ -23,14 +23,32 @@
       font-size: 2em;
       margin-bottom: 20px;
     }
+    @media (max-width: 767px) {
+      .card-img-top {
+        height: 200px;
+      }
+    }
+    @media (min-width: 768px) and (max-width: 991px) {
+      .card-img-top {
+        height: 150px;
+      }
+    }
+    @media (min-width: 992px) {
+      .card-img-top {
+        height: 150px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="header">Shows e Eventos em João Pessoa - Sympla</div>
   <div class="container">
-    <div id="eventos" class="row"></div>
+    <div id="eventos" class="row">
+      <!-- Os eventos raspados serão inseridos aqui -->
+    </div>
   </div>
   <script>
+    // URL da página que você quer raspar
     const url = 'https://www.sympla.com.br/eventos/joao-pessoa-pb/show-musica-festa/esta-semana';
     const PROXY_URL = '';
 
@@ -40,6 +58,8 @@
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         const eventosDiv = document.getElementById('eventos');
+
+        // Substitua os seletores abaixo pelos corretos para a página que você quer raspar
         const eventos = doc.querySelectorAll('.EventCardstyle__CardContainer-sc-1rkzctc-4');
 
         eventos.forEach(evento => {
@@ -47,26 +67,29 @@
             const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
             const idEvento = evento.getAttribute('data-bannerid');
             const link = `https://www.sympla.com.br/evento/${nome}/${idEvento}`;
+
             const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
             const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
 
+            // Verifica se o evento é em João Pessoa, PB
             if (local.includes('João Pessoa, PB')) {
               const datas = Array.from(evento.querySelectorAll('.sc-1sp59be-1.fZlvlB')).map(el => el.textContent);
               const data = datas.join(' - ');
 
               const eventoDiv = document.createElement('div');
-              eventoDiv.className = 'col-lg-4 col-md-6 col-sm-12 mb-4';
+              eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
               eventoDiv.innerHTML = `
-                <div class="card">
-                  <img src="${foto}" class="card-img-top" alt="${nome}">
-                  <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
-                    <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
-                    <p class="card-text">${data}</p>
-                    <p class="card-text">${local}</p>
-                    <a href="${link}" target="_blank" class="card-link">Saiba mais</a>
+                <a href="${link}" target="_blank" class="card-link">
+                  <div class="card">
+                    <img src="${foto}" class="card-img-top" alt="${nome}">
+                    <div class="card-body">
+                      <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
+                      <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
+                      <p class="card-text">${data}</p>
+                      <p class="card-text">${local}</p>
+                    </div>
                   </div>
-                </div>
+                </a>
               `;
               eventosDiv.appendChild(eventoDiv);
             }
