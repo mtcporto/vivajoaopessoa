@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <title>Eventos - Sympla</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
     .card-img-top {
-      width: 287px;
-      height: 150px;
+      width: 100%;
+      height: auto;
       object-fit: cover; /* Isso irá cortar a imagem para preencher o espaço disponível */
     }
     .card-link {
@@ -47,40 +48,40 @@
         const eventos = doc.querySelectorAll('.EventCardstyle__CardContainer-sc-1rkzctc-4');
 
         eventos.forEach(evento => {
-  try {
-    const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
-    const idEvento = evento.getAttribute('data-bannerid');
-    const link = `https://www.sympla.com.br/evento/${nome}/${idEvento}`;
+          try {
+            const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
+            const idEvento = evento.getAttribute('data-bannerid');
+            const link = `https://www.sympla.com.br/evento/${nome}/${idEvento}`;
 
-    const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
-    const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
+            const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
+            const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
 
-    // Verifica se o evento é em João Pessoa, PB
-    if (local.includes('João Pessoa, PB')) {
-      const datas = Array.from(evento.querySelectorAll('.sc-1sp59be-1.fZlvlB')).map(el => el.textContent);
-      const data = datas.join(' - ');
+            // Verifica se o evento é em João Pessoa, PB
+            if (local.includes('João Pessoa, PB')) {
+              const datas = Array.from(evento.querySelectorAll('.sc-1sp59be-1.fZlvlB')).map(el => el.textContent);
+              const data = datas.join(' - ');
 
-      const eventoDiv = document.createElement('div');
-      eventoDiv.className = 'col-md-4';
-      eventoDiv.innerHTML = `
-        <a href="${link}" target="_blank" class="card-link">
-          <div class="card">
-            <img src="${foto}" class="card-img-top" alt="${nome}">
-            <div class="card-body">
-              <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
-              <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
-              <p class="card-text">${data}</p>
-              <p class="card-text">${local}</p>
-            </div>
-          </div>
-        </a>
-      `;
-      eventosDiv.appendChild(eventoDiv);
-    }
-  } catch (error) {
-    console.error(`Erro ao processar o evento: ${error}`);
-  }
-});
+              const eventoDiv = document.createElement('div');
+              eventoDiv.className = 'col-md-4 col-sm-6'; // Ajuste para dispositivos móveis
+              eventoDiv.innerHTML = `
+                <a href="${link}" target="_blank" class="card-link">
+                  <div class="card">
+                    <img src="${foto}" class="card-img-top" alt="${nome}">
+                    <div class="card-body">
+                      <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
+                      <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
+                      <p class="card-text">${data}</p>
+                      <p class="card-text">${local}</p>
+                    </div>
+                  </div>
+                </a>
+              `;
+              eventosDiv.appendChild(eventoDiv);
+            }
+          } catch (error) {
+            console.error(`Erro ao processar o evento: ${error}`);
+          }
+        });
       })
       .catch(console.error);
   </script>
