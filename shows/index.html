@@ -23,6 +23,13 @@
       font-size: 2em;
       margin-bottom: 20px;
     }
+    .card-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     @media (max-width: 767px) {
       .card-img-top {
         height: 200px;
@@ -43,62 +50,76 @@
 <body>
   <div class="header">Shows e Eventos em João Pessoa - Sympla</div>
   <div class="container">
-    <div id="eventos" class="row">
-      <!-- Os eventos raspados serão inseridos aqui -->
-    </div>
+    <div id="eventos" class="row"></div>
+    <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Eventos</button>
   </div>
   <script>
     // URL da página que você quer raspar
     const url = 'https://www.sympla.com.br/eventos/joao-pessoa-pb/show-musica-festa/esta-semana';
     const PROXY_URL = '';
+    let eventosCount = 0;
 
-    fetch(PROXY_URL + url)
-      .then(response => response.text())
-      .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const eventosDiv = document.getElementById('eventos');
+    function loadEvents() {
+      fetch(PROXY_URL + url)
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const eventosDiv = document.getElementById('eventos');
 
-        // Substitua os seletores abaixo pelos corretos para a página que você quer raspar
-        const eventos = doc.querySelectorAll('.EventCardstyle__CardContainer-sc-1rkzctc-4');
+          // Substitua os seletores abaixo pelos corretos para a página que você quer raspar
+          const eventos = doc.querySelectorAll('.EventCardstyle__CardContainer-sc-1rkzctc-4');
 
-        eventos.forEach(evento => {
-          try {
-            const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
-            const idEvento = evento.getAttribute('data-bannerid');
-            const link = `https://www.sympla.com.br/evento/${nome}/${idEvento}`;
+          eventos.forEach((evento, index) => {
+            if (index >= eventosCount && index < eventosCount + 9) {
+              try {
+                const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
+                const idEvento = evento.getAttribute('data-bannerid');
+                const link = `https://www.sympla.com.br/evento/${nome}/${idEvento}`;
 
-            const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
-            const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
+                const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
+                const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
 
-            // Verifica se o evento é em João Pessoa, PB
-            if (local.includes('João Pessoa, PB')) {
-              const datas = Array.from(evento.querySelectorAll('.sc-1sp59be-1.fZlvlB')).map(el => el.textContent);
-              const data = datas.join(' - ');
+                // Verifica se o evento é em João Pessoa, PB
+                if (local.includes('João Pessoa, PB')) {
+                  const datas = Array.from(evento.querySelectorAll('.sc-1sp59be-1.fZlvlB')).map(el => el.textContent);
+                  const data = datas.join(' - ');
 
-              const eventoDiv = document.createElement('div');
-              eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
-              eventoDiv.innerHTML = `
-                <a href="${link}" target="_blank" class="card-link">
-                  <div class="card">
-                    <img src="${foto}" class="card-img-top" alt="${nome}">
-                    <div class="card-body">
-                      <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
-                      <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
-                      <p class="card-text">${data}</p>
-                      <p class="card-text">${local}</p>
-                    </div>
-                  </div>
-                </a>
-              `;
-              eventosDiv.appendChild(eventoDiv);
+                  const eventoDiv = document.createElement('div');
+                  eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
+                  eventoDiv.innerHTML = `
+                    <a href="${link}" target="_blank" class="card-link">
+                      <div class="card">
+                        <img src="${foto}" class="card-img-top" alt="${nome}">
+                        <div class="card-body">
+                          <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
+                          <h5 class="card-title">${nome.replace(/-/g, ' ')}</h5>
+                          <p class="card-text">${data}</p>
+                          <p class="card-text">${local}</p>
+                        </div>
+                      </div>
+                    </a>
+                  `;
+                  eventosDiv.appendChild(eventoDiv);
+                }
+              } catch (error) {
+                console.error(`Erro ao processar o evento: ${error}`);
+              }
             }
-          } catch (error) {
-            console.error(`Erro ao processar o evento: ${error}`);
+          });
+
+          eventosCount += 9;
+          if (eventosCount < eventos.length) {
+            document.querySelector("#loadMore").style.display = 'block';
+          } else {
+            document.querySelector("#loadMore").style.display = 'none';
           }
-        });
-      })
-      .catch(console.error);
+        })
+        .catch(console.error);
+    }
+
+    document.querySelector("#loadMore").addEventListener('click', loadEvents);
+    loadEvents();
   </script>
 </body>
 </html>
