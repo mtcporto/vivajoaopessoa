@@ -2,18 +2,17 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eventos - Eventim</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
     .card-img-top {
-      width: 100%;
+      width: 287px;
       height: 150px;
-      object-fit: cover;
+      object-fit: cover; /* Isso irá cortar a imagem para preencher o espaço disponível */
     }
     .card-link {
-      text-decoration: none;
-      color: inherit;
+      text-decoration: none; /* Remove o sublinhado */
+      color: inherit; /* Mantém a cor do texto constante */
     }
     .header {
       background-color: black;
@@ -23,10 +22,21 @@
       font-size: 2em;
       margin-bottom: 20px;
     }
-    @media (max-width: 575.98px) {
-      .col-md-4 {
-        flex: 0 0 100%;
-        max-width: 100%;
+
+    /* Media queries para cards responsivos */
+    @media (max-width: 767px) {
+      .card-img-top {
+        height: 200px;
+      }
+    }
+    @media (min-width: 768px) and (max-width: 991px) {
+      .card-img-top {
+        height: 150px;
+      }
+    }
+    @media (min-width: 992px) {
+      .card-img-top {
+        height: 150px;
       }
     }
   </style>
@@ -35,8 +45,7 @@
   <div class="header">Shows e Eventos em João Pessoa - Eventim</div>
   <div class="container">
     <div id="eventos" class="row">
-      <!-- Os eventos raspados serão inseridos aqui -->
-    </div>
+      </div>
   </div>
   <script>
     // URL da página que você quer raspar
@@ -51,7 +60,7 @@
         const eventosDiv = document.getElementById('eventos');
 
         // Substitua os seletores abaixo pelos corretos para a página que você quer raspar
-        const eventos = doc.querySelectorAll('.product-group-item');
+        const eventos = doc.querySelectorAll('product-group-item');
 
         eventos.forEach(evento => {
           try {
@@ -69,7 +78,7 @@
             const link = data['url'];
 
             const eventoDiv = document.createElement('div');
-            eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
+            eventoDiv.className = 'col-md-4';
             eventoDiv.innerHTML = `
               <a href="${link}" target="_blank" class="card-link">
                 <div class="card">
@@ -80,7 +89,7 @@
                     <p class="card-text">${datas}</p>
                     <p class="card-text">${local}</p>
                   </div>
-                </div>
+                </div><br>
               </a>
             `;
             eventosDiv.appendChild(eventoDiv);
