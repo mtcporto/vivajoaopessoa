@@ -50,8 +50,14 @@
   try {
     const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
     const idEvento = evento.getAttribute('data-bannerid');
-    const link = evento.querySelector('a').getAttribute('href');
-
+    const anchorElement = evento.querySelector('a');
+      if (anchorElement) {
+        const link = anchorElement.getAttribute('href');
+        // ... (use the link)
+      } else {
+        console.error("Event card missing anchor tag:", evento);
+        // Handle cases where the anchor tag is missing (e.g., skip the event)
+      }
     const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
     const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
 
