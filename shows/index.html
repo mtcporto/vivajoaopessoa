@@ -49,8 +49,10 @@
         eventos.forEach(evento => {
   try {
     const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
-    const idEvento = evento.getAttribute('data-bannerid');
+    const urlEvento = evento.querySelector('a').href;
+    const idEvento = urlEvento.split('/').pop();
     const link = `https://www.sympla.com.br/evento/${nome}/${idEvento}`;
+
 
     const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
     const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
