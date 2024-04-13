@@ -45,12 +45,17 @@
 
         // Substitua os seletores abaixo pelos corretos para a página que você quer raspar
         const eventos = doc.querySelectorAll('.EventCardstyle__CardContainer-sc-1rkzctc-4');
-eventos.forEach(evento => {
+        eventos.forEach(evento => {
   try {
     const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
-    const link = evento.querySelector('.EventCardstyle__CardLink-sc-1rkzctc-3').getAttribute('href');
+    const linkElement = evento.querySelector('.EventCardstyle__CardLink-sc-1rkzctc-3');
+    if (linkElement) {
+      const link = linkElement.getAttribute('href');
     const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
     const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
+  }
+
+    
     // Verifica se o evento é em João Pessoa, PB
     if (local.includes('João Pessoa, PB')) {
       const datas = Array.from(evento.querySelectorAll('.sc-1sp59be-1.fZlvlB')).map(el => el.textContent);
