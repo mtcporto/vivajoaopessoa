@@ -4,12 +4,13 @@ Diversao
 - Condição climática
 - Dia da semana
 - Data e Hora Atuais
-  - Programação de Cinema na sua Cidade
-  - Programação do Cine Bangue
-  - Shows e Eventos em João Pessoa
+  - Programação de Cinema
+  - Programação - Cine Bangue
+  - Shows e Eventos
   - Eventos e Ingressos
-  - Atrações em João Pessoa (*)
-  - Tabela de Marés em João Pessoa
-  - Notícias
-  - Notícias Joao Pessoa (*)
+  - Tábua de Marés
+  - Praias Impróprias
   - Bares e Restaurantes
+  - Notícias - Brasil
+  - Notícias Joao Pessoa (*)
+  - Atrações em João Pessoa
