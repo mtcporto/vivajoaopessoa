@@ -1,48 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
- <title>Diversão</title>   <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diversão</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .header {
+    .header {
       background-color: black;
       color: white;
-      text-align: center;
       padding: 10px;
-    }
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }    </style>
+</head>
+<body>
+    <header class="bg-gray-900 text-white py-4 header">
+        <div class="container mx-auto text-center">
+            <h1 class="text-3xl font-bold" style="text-align: center;">Diversão</h1>
+        </div>
+    </header>
 
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            align-items: flex-start;
-            padding: 10px;
+    <div class="container">
+        <div class="row" id="card-container"></div>
+    </div>
+
+    <script>
+        // JSON com as informações dos cards
+        const cardsData = [
+  {
+    "titulo": "Programação de Cinema",
+    "texto": "Confira os filmes em cartaz e a programação de cinema em João Pessoa.",
+    "link": "/cinema/",
+    "imagem": "cinema.jpeg"
+  },
+  {
+    "titulo": "Programação - Cine Bangue",
+    "texto": "Confira os filmes em cartaz e a programacao no Cine Bangue",
+    "link": "/bangue/",
+    "imagem": "cinema2.jpeg"
+  },
+  {
+    "titulo": "Shows e Eventos",
+    "texto": "Descubra os melhores shows e eventos que estão acontecendo em João Pessoa.",
+    "link": "/shows/",
+    "imagem": "shows.jpeg"
+  },
+  {
+    "titulo": "Eventos e Ingressos",
+    "texto": "Encontre eventos emocionantes  em João Pessoa.",
+    "link": "/shows/eventim.html",
+    "imagem": "shows2.jpeg"
+  },
+  {
+    "titulo": "Tábua de Marés",
+    "texto": "Confira a tábua de marés atualizada para João Pessoa, na Paraíba.",
+    "link": "/tabuamares/",
+    "imagem": "mares.jpeg"
+  },
+  {
+    "titulo": "Praias Impróprias",
+    "texto": "Praias Impróprias para Banho em João Pessoa.",
+    "link": "/qualidade/",
+    "imagem": "praiaImpropria.jpeg"
+  },
+  {
+    "titulo": "Bares e Restaurantes",
+    "texto": "Bares e Restaurantes abertos em João Pessoa agora",
+    "link": "/bares/",
+    "imagem": "bares.jpeg"
+  },
+  {
+    "titulo": "Notícias - Brasil",
+    "texto": "Confira as últimas notícias sobre o que está acontecendo no Brasil.",
+    "link": "/noticias/",
+    "imagem": "noticias.jpeg"
+  },
+  {
+    "titulo": "Notícias - João Pessoa",
+    "texto": "Confira as últimas notícias sobre o que está acontecendo em Joao Pessoa.",
+    "link": "https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSkwyMHZNREZvZVRsa0VnVndkQzFDVWlnQVAB?ceid=BR:pt-419&oc=3",
+    "imagem": "noticias2.jpeg"
+  },
+  {
+    "titulo": "Atrações em João Pessoa",
+    "texto": "Descubra as principais atrações turísticas em João Pessoa.",
+    "link": "https://www.tripadvisor.com.br/Attractions-g303428-Activities-Joao_Pessoa_State_of_Paraiba.html",
+    "imagem": "atracoes.jpeg"
+  }
+]
+;
+
+        // Função para criar os cards dinamicamente
+        function createCards() {
+            const container = document.getElementById('card-container');
+            container.innerHTML = '';
+
+            cardsData.forEach(card => {
+                const cardHTML = `
+                    <div class="col-md-4 col-sm-6 mb-4">
+                        <div class="card dark-card">
+                            <img src="${card.imagem}" class="card-img-top" alt="${card.titulo}">
+                            <div class="card-body">
+                                <h5 class="card-title">${card.titulo}</h5>
+                                <p class="card-text">${card.texto}</p>
+                                <a href="${card.link}" class="btn btn-success" target="_blank">Ver mais</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
         }
 
-        .card {
-            flex: 0 0 calc(25% - 20px);
-            margin: 10px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            color: #f5f5f5;
-        }
+        // Chama a função para criar os cards ao carregar a página
+        window.onload = createCards;
+    </script>
 
-        .dark-card {
-            background-color: #333;
-        }
-    </style>
+    <!-- <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0" target="_blank"></a> -->
+    
+    
+    
+<!-- <div class="alert alert-success" role="alert">
+            <p id="alert"></p>
+</div>
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/pt-br.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/i18next/dist/umd/i18next.min.js"></script>
+<div id="weatherapi-weather-widget-3"></div><script type='text/javascript' src='https://www.weatherapi.com/weather/widget.ashx?loc=277876&wid=3&tu=1&div=weatherapi-weather-widget-3' async></script><noscript><a href="https://www.weatherapi.com/weather/q/joao-pessoa-277876" alt="Hour by hour Joao Pessoa weather">10 day hour by hour Joao Pessoa weather</a></noscript>
+        <div class="card dark-card">
+            <h2 id="location"></h2>
+            <p id="temperature"></p>
+            <p id="weather"></p>
+    <div class="weather-icon-container">
+        <img id="weatherIcon" src="" alt="Weather Icon" style="width: 64px; height: 64px;">
+    </div>        </div>
+    
+        <div class="card dark-card">
+            <h2 id="diaSemana"></h2>
 
+            <h2 id="dataHoraAtual"></h2>
+        </div> -->    
+    
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const dataHoraAtualElement = document.getElementById('dataHoraAtual');
@@ -238,139 +336,5 @@ axios
             getWeatherData();
         }
     </script>
-</head>
-<header class="bg-gray-900 text-white py-4 header">
-    <div class="container mx-auto text-center">
-        <h1 class="text-3xl font-bold" style="text-align: center;">Diversão</h1>
-    </div>
-  </header>
-
-<body>
-
-<!-- <div class="alert alert-success" role="alert">
-            <p id="alert"></p>
-</div>
-
-<div id="weatherapi-weather-widget-3"></div><script type='text/javascript' src='https://www.weatherapi.com/weather/widget.ashx?loc=277876&wid=3&tu=1&div=weatherapi-weather-widget-3' async></script><noscript><a href="https://www.weatherapi.com/weather/q/joao-pessoa-277876" alt="Hour by hour Joao Pessoa weather">10 day hour by hour Joao Pessoa weather</a></noscript>
-        <div class="card dark-card">
-            <h2 id="location"></h2>
-            <p id="temperature"></p>
-            <p id="weather"></p>
-    <div class="weather-icon-container">
-        <img id="weatherIcon" src="" alt="Weather Icon" style="width: 64px; height: 64px;">
-    </div>        </div>
-    
-        <div class="card dark-card">
-            <h2 id="diaSemana"></h2>
-
-            <h2 id="dataHoraAtual"></h2>
-        </div> -->
-
-    <div class="container">
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card dark-card">
-    <h5 class="card-title">Programação de Cinema</h5>
-    <p class="card-text">Confira os filmes em cartaz e a programação de cinema em João Pessoa.</p>
-    <!-- <a href="https://www.ingresso.com/filmes?city=joao-pessoa&partnership=home" target="_blank" class="btn btn-primary">Ingresso.com</a> -->
-
-    <a href="/cinema/" target="_blank" class="btn btn-success">Programação de Cinema</a>
-        </div>
-                    </div>
-
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card dark-card">
-                <h5 class="card-title">Programação - Cine Bangue</h5>
-                <p class="card-text">Confira os filmes em cartaz e a programacao no Cine Bangue</p>
-                <!-- <a href="https://www.ingresso.com/filmes?city=joao-pessoa&partnership=home" target="_blank" class="btn btn-primary">Ingresso.com</a> -->
-            
-                <a href="/bangue/" target="_blank" class="btn btn-success">Programação do Cine Bangue</a>
-                    </div>
-                                </div>                    
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card dark-card">
-    <h5 class="card-title">Shows e Eventos</h5>
-    <p class="card-text">Descubra os melhores shows e eventos que estão acontecendo em João Pessoa.</p>
-    <!-- <a href="https://www.sympla.com.br/eventos/joao-pessoa-pb/show-musica-festa/esta-semana" target="_blank" class="btn btn-primary">Sympla</a> -->
-    <a href="/shows/" target="_blank" class="btn btn-success">Sympla</a>
-</div>
-                    </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card dark-card">
-    <h5 class="card-title">Eventos e Ingressos</h5>
-    <p class="card-text">Encontre eventos emocionantes  em João Pessoa.</p>
-    <!-- <a href="https://www.eventim.com.br/city/joao-pessoa-1816/" target="_blank" class="btn btn-primary">Eventim</a> -->
-    <a href="/shows/eventim.html" target="_blank" class="btn btn-success">Eventim</a>
-
-        </div>
-                    </div>
-
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card dark-card">
-    <h5 class="card-title">Tábua de Marés</h5>
-    <p class="card-text">Confira a tábua de marés atualizada para João Pessoa, na Paraíba. </p>
-    <!-- <a href="https://tabuademares.com/br/paraiba/joao-pessoa#_tabela_mares" class="btn btn-primary" target="_blank">Ver Tabela de Marés</a> -->
-    <a href="/tabuamares/" class="btn btn-success" target="_blank">Ver Tabela de Marés</a>
-
-</div>
-                    </div>
-
-
-<div class="col-12 col-md-6 col-lg-4">
-    <div class="card dark-card">
-    <h5 class="card-title">Praias Impróprias</h5>
-        <p class="card-text">Praias Impróprias para Banho em João Pessoa.</p>
-        <a href="/qualidade/" class="btn btn-success" target="_blank">Praias Impróprias</a>
-    </div>
-</div>
-
-<div class="col-12 col-md-6 col-lg-4">
-    <div class="card dark-card">
-    <h5 class="card-title">Bares e Restaurantes</h5>
-    <p class="card-text">Bares e Restaurantes abertos em João Pessoa agora</p>
-    <!-- <a href="https://www.google.com/maps/search/bares+e+restaurantes+joao+pessoa/@-7.1354256,-34.8293001,15z/data=!4m4!2m3!5m1!2e1!6e5" class="btn btn-primary" target="_blank">Ver Bares e restaurantes</a> -->
-    <a href="/bares/" class="btn btn-success" target="_blank">Ver Bares e restaurantes</a>
-
-</div>
-            </div>
-
-
-
-<div class="col-12 col-md-6 col-lg-4">
-    <div class="card dark-card">
-    <h5 class="card-title">Notícias - Brasil</h5>
-    <p class="card-text">Confira as últimas notícias sobre o que está acontecendo no Brasil.</p>
-    <!-- <a href="https://news.google.com/topics/CAAqJQgKIh9DQkFTRVFvSUwyMHZNREUxWm5JU0JYQjBMVUpTS0FBUAE?ceid=BR:pt-419&oc=3" class="btn btn-primary" target="_blank">Ver Notícias</a> -->
-    <!-- <a href="https://mosaico.serveo.net/news/" class="btn btn-success" target="_blank">Ver Notícias</a> -->
-    <a href="/noticias/" class="btn btn-success" target="_blank">Ver Notícias</a>
-
-</div>
-            </div>
-
-<div class="col-12 col-md-6 col-lg-4">
-    <div class="card dark-card">
-    <h5 class="card-title">Notícias - João Pessoa</h5>
-    <p class="card-text">Confira as últimas notícias sobre o que está acontecendo em Joao Pessoa.</p>
-    <a href="https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSkwyMHZNREZvZVRsa0VnVndkQzFDVWlnQVAB?ceid=BR:pt-419&oc=3" class="btn btn-primary" target="_blank">Ver Notícias</a>
-</div>
-            </div>
-
-
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card dark-card">
-                <h5 class="card-title">Atrações em João Pessoa</h5>
-                    <p class="card-text">Descubra as principais atrações turísticas em João Pessoa.</p>
-                    <a href="https://www.tripadvisor.com.br/Attractions-g303428-Activities-Joao_Pessoa_State_of_Paraiba.html" class="btn btn-primary" target="_blank">TripAdivisor</a>
-                </div>
-            </div>     
-
-</div>
-
-
-    </div>
-    <!-- <a href="https://www.weatherapi.com/" title="Free Weather API"><img src='//cdn.weatherapi.com/v4/images/weatherapi_logo.png' alt="Weather data by WeatherAPI.com" border="0" target="_blank"></a> -->
 </body>
 </html>
