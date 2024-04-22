@@ -55,14 +55,13 @@
   </div>
   <script>
     const url = 'https://www.eventim.com.br/city/joao-pessoa-1816/';
-    const PROXY_URL = 'https://cors.bridged.cc/';
+    const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
     let eventosCount = 0;
 
     function loadEvents() {
       fetch(PROXY_URL + url)
         .then(response => response.text())
         .then(html => {
-          console.log(html); // Adicione este console.log para verificar os dados recebidos
           const parser = new DOMParser();
           const doc = parser.parseFromString(html, 'text/html');
           const eventosDiv = document.getElementById('eventos');
