@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Interagir com o Worker do Cloudflare</title>
@@ -11,25 +11,29 @@
   <div id="response"></div>
 
   <script>
-    const workerUrl = 'https://tessela.mosaicoworkers.workers.dev/';
+    const workerUrl = 'YOUR_CLOUDFLARE_WORKER_URL'; // Replace with your actual URL
 
-    async function sendPrompt() {
+    function sendPrompt() {
       const prompt = document.getElementById('prompt').value;
       const messages = [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: prompt }
       ];
 
-      const response = await fetch(workerUrl, {
+      fetch(workerUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ messages })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('response').textContent = data.response;
+      })
+      .catch(error => {
+        console.error('Error:', error);
       });
-
-      const data = await response.json();
-      document.getElementById('response').textContent = data.response;
     }
   </script>
 </body>
