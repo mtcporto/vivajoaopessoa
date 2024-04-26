@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Interagir com o Worker do Cloudflare</title>
+</head>
+<body>
+  <h1>Chatbot com Meta-Llama-2-7B</h1>
+  <input type="text" id="prompt" placeholder="Digite sua mensagem...">
+  <button onclick="sendPrompt()">Enviar</button>
+  <div id="response"></div>
+
+  <script>
+    const workerUrl = 'https://worker-throbbing-silence-4264.mtcporto-1f5.workers.dev/';
+
+    async function sendPrompt() {
+      const prompt = document.getElementById('prompt').value;
+      const messages = [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: prompt }
+      ];
+
+      const response = await fetch(workerUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ messages })
+      });
+
+      const data = await response.json();
+      document.getElementById('response').textContent = data.response;
+    }
+  </script>
+</body>
+</html>
