@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eventos em Joinville/SC (Enjoy Ticket)</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    .card-img-top {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .card-link {
+      text-decoration: none;
+      color: inherit;
+    }
+    .header {
+      background-color: black;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .card-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fonte {
+      font-size: 0.8em;
+      color: #888;
+    }
+    @media (max-width: 767px) {
+      .card-img-top {
+        height: 200px;
+      }
+    }
+    @media (min-width: 768px) and (max-width: 991px) {
+      .card-img-top {
+        height: 150px;
+      }
+    }
+    @media (min-width: 992px) {
+      .card-img-top {
+        height: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">Shows e Eventos em Joinville/SC (Enjoy Ticket)</div>
+  <div class="container">
+    <div id="eventos" class="row"></div>
+  </div>
+  <script>
+    // URL da página que você quer raspar (Enjoy Ticket)
+    const url = 'https://www.enjoyticket.com.br/index.php';
+    const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+    let eventosCount = 0;
+
+    function loadEvents() {
+  fetch(PROXY_URL + url)
+    .then(response => response.text())
+    .then(html => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const eventosDiv = document.getElementById('eventos');
+
+      // Selectors específicos para Enjoy Ticket
+      const eventos = doc.querySelectorAll('.evento-box');
+      const titulosExistentes = Array.from(eventosDiv.querySelectorAll('.card-title')).map(el => el.textContent.trim());
+
+      eventos.forEach((evento, index) => {
+        if (index >= eventosCount && index < eventosCount + 9) {
+          try {
+            const tituloElement = evento.querySelector('.uk-text-bold');
+            const titulo = tituloElement.textContent.trim();
+
+            // Verifica se o título já existe
+            if (!titulosExistentes.includes(titulo)) {
+              const detailsElement = evento.querySelector('.uk-margin-small-top');
+              const detailsText = detailsElement.textContent.trim();
+
+              // Improved logic to handle location and date (assuming separated by a space)
+              const locationDate = detailsText.split(' ');
+              const location = locationDate[0];
+              const date = locationDate.slice(1).join(' '); // Join remaining elements for date
+
+              if (location.includes('Joinville/SC')) {
+                const linkElement = evento.querySelector('a');
+                const link = linkElement.getAttribute('href');
+                const linkCompleto = new URL(link, url).href;
+
+                const imageElement = evento.querySelector('img');
+                const imagemURL = imageElement ? 'https://www.enjoyticket.com.br/' + imageElement.getAttribute('src') : 'https://via.placeholder.com/300x200';
+
+                const eventoDiv = document.createElement('div');
+                eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
+                eventoDiv.innerHTML = `
+                  <div class="card">
+                    <a href="${linkCompleto}" class="card-link" target="_blank">
+                      <img src="${imagemURL}" class="card-img-top" alt="${titulo}">
+                      <div class="card-body">
+                        <p class="fonte">Fonte: Enjoy Ticket</p>
+                        <h5 class="card-title">${titulo}</h5>
+                        <p class="card-text">${date}</p>
+                        <p class="card-text">${location}</p>
+                      </div>
+                    </a>
+                  </div><br>
+                `;
+                eventosDiv.appendChild(eventoDiv);
+
+                // Adiciona o título à lista de títulos existentes
+                titulosExistentes.push(titulo);
+              }
+            }
+          } catch (error) {
+            console.error(`Erro ao processar o evento: ${error}`);
+          }
+        }
+      });
+
+      eventosCount += 9;
+    })
+    .catch(console.error);
+}
+
+loadEvents();
+  </script>
+</body>
+</html>
