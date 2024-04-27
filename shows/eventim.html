@@ -69,14 +69,32 @@
           const eventos = doc.querySelectorAll('product-group-item');
 
           eventos.forEach((evento, index) => {
-            if (index >= eventosCount && index < eventosCount + 9) {
-              try {
-                const script = evento.querySelector('script[type="application/ld+json"]');
-                const data = JSON.parse(script.textContent);
+  if (index >= eventosCount && index < eventosCount + 9) {
+    try {
+      const script = evento.querySelector('script[type="application/ld+json"]');
+      const data = JSON.parse(script.textContent);
 
-                const nome = data['name'];
-                const datas = data['startDate'] + ' - ' + data['endDate'];
+      const nome = data['name'];
+      const startDate = data['startDate']; // Get startDate here
+
+      const startDateObj = new Date(startDate); // Create startDateObj inside the loop
+
+      // Options for formatting (adjust as needed)
+      const options = {
+  weekday: 'short',
+  day: 'numeric',
+  month: 'numeric', // Use 'numeric' to display month as 08
+  year: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  timeZone: 'America/Sao_Paulo'
+};
+
+                
+    const formattedStartDate = startDateObj.toLocaleDateString('pt-BR', options);
+
                 const local = data['location']['address']['addressLocality'];
+                
                 const foto = data['image'][0];
                 const link = data['url'];
 
@@ -90,7 +108,7 @@
                     <div class="card-body">
                       <h6 class="card-subtitle mb-2 text-muted">Fonte: Eventim</h6>
                       <h5 class="card-title">${nome}</h5>
-                      <p class="card-text">${datas}</p>
+                      <p class="card-text">${formattedStartDate}</p>
                       <p class="card-text">${local}</p>
                     </div>
                   </div><br>
