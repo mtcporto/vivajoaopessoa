@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de João Pessoa</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .container {
+            padding: 0 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Guia de João Pessoa</h1>
+</div>
+
+<div class="container">
+    <!-- Os cards serão inseridos aqui pelo JavaScript -->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Substitua 'data.json' pelo caminho correto do seu arquivo JSON
+    fetch('data.json')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.querySelector('.container');
+            data.categorias.forEach(categoria => {
+                const categoryTitle = document.createElement('h1');
+                categoryTitle.innerText = categoria.tipo;
+                container.appendChild(categoryTitle);
+
+                const row = document.createElement('div');
+                row.className = 'row';
+
+                categoria.itens.forEach(item => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-4';
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <img src="${item.imagem}" class="card-img-top" alt="${item.nome}">
+                        <div class="card-body">
+                            <h5 class="card-title">${item.nome}</h5>
+                            <p class="card-text">${item.descrição}</p>
+                        </div>
+                    `;
+                    col.appendChild(card);
+                    row.appendChild(col);
+                });
+
+                container.appendChild(row);
+            });
+        });
+</script>
+
+</body>
+</html>
