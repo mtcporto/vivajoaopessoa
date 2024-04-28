@@ -184,35 +184,5 @@
             "imagem": "placeholder.jpg"
           }
         ]
-      }, 
-      {
-        "tipo": "monumentos",
-        "itens": [
-          {
-            "nome": "Hotel Globo",
-            "descrição": "Edifício histórico que oferece uma vista panorâmica do Rio Sanhauá.",
-            "imagem": "placeholder.jpg"
-          },
-          {
-            "nome": "Cruzeiro de São Francisco",
-            "descrição": "Localizado no Centro Cultural São Francisco, é um símbolo religioso e histórico.",
-            "imagem": "placeholder.jpg"
-          },
-          {
-            "nome": "Monumento Rosa dos Ventos",
-            "descrição": "Situado no Farol do Cabo Branco, simboliza a orientação geográfica da cidade.",
-            "imagem": "placeholder.jpg"
-          },
-          {
-            "nome": "Praça João Pessoa",
-            "descrição": "Praça que homenageia o ex-governador da Paraíba e está localizada em frente ao Palácio da Redenção.",
-            "imagem": "placeholder.jpg"
-          },
-          {
-            "nome": "Casarão dos Azulejos",
-            "descrição": "Construção do século XVIII, notável por sua fachada decorada com azulejos portugueses.",
-            "imagem": "placeholder.jpg"
-          }
-        ]
       }
-      
+      }
