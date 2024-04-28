@@ -37,8 +37,9 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    // Substitua 'data.json' pelo caminho correto do seu arquivo JSON
-    fetch('guia/data.json')
+const isVercel = process.env.NOW_REGION === 'vercel'; // Verifica se está no Vercel
+
+fetch(isVercel ? 'guia/data.json' : 'data.json')
         .then(response => response.json())
         .then(data => {
             const container = document.querySelector('.container');
