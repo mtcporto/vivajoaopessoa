@@ -10,32 +10,32 @@
               {
                   "nome": "MAG Shopping",
                   "descrição": "Localizado à beira-mar, oferece uma boa variedade de lojas e uma vista incrível.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Tambía Shopping",
                   "descrição": "Situado no centro da cidade, é conhecido por sua conveniência e variedade de serviços.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Shopping Sul",
                   "descrição": "Oferece uma experiência de compras agradável com diversas lojas e opções de alimentação.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Mangabeira Shopping",
                   "descrição": "Um shopping moderno e espaçoso, com uma grande seleção de lojas e atividades de lazer.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Pátio Altiplano Shopping",
                   "descrição": "Um centro de compras e lazer com uma variedade de lojas e serviços para a comunidade local.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Liv Mall",
                   "descrição": "Um espaço moderno e sofisticado, oferecendo uma experiência de compras premium com lojas exclusivas e serviços de alta qualidade.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               }
           ]
       },
@@ -45,32 +45,32 @@
               {
                   "nome": "Praia de Tambaú",
                   "descrição": "Muito movimentada e com excelente infraestrutura, é um dos cartões-postais da cidade.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Praia de Cabo Branco",
                   "descrição": "Famosa por suas águas esverdeadas e tranquilas, é ideal para famílias e esportistas.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Praia de Manaíra",
                   "descrição": "Uma praia urbana, conhecida pelos melhores restaurantes da região, embora o mar seja impróprio para banho.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Praia do Bessa",
                   "descrição": "Conhecida por ser calma e limpa, é uma ótima opção para quem busca tranquilidade.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Praia do Macaco",
                   "descrição": "Localizada em Intermares, é um conhecido ponto de surf, atraindo surfistas de diversos níveis.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Praia de Tambaba",
                   "descrição": "Situada no município do Conde, é uma das praias de naturismo mais famosas do Brasil.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               }
           ]
       },
@@ -80,27 +80,27 @@
               {
                   "nome": "Catedral Basílica de Nossa Senhora das Neves",
                   "descrição": "Construída em 1586, é um dos mais antigos e importantes monumentos religiosos da cidade.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Igreja de São Francisco",
                   "descrição": "Parte do Centro Cultural São Francisco, é um importante conjunto de arte barroca da Paraíba.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Mosteiro de São Bento",
                   "descrição": "Conjunto em estilo barroco, construído no século XVII pelos monges Beneditinos.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Igreja da Misericórdia",
                   "descrição": "Localizada no Centro Histórico, é conhecida por sua arquitetura e valor histórico.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Igreja de Nossa Senhora do Carmo",
                   "descrição": "Parte do Complexo Carmelita, é um conjunto arquitetônico construído pelos carmelitas no século XVI.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               }
           ]
       },
@@ -110,22 +110,22 @@
               {
                   "nome": "Teatro Pedra do Reino",
                   "descrição": "Parte do Centro de Convenções da cidade, conhecido por sua excelente acústica e grandeza.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Theatro Santa Roza",
                   "descrição": "Um dos mais antigos do Brasil, com arquitetura esplêndida e restaurado para preservar sua história.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Teatro Paulo Pontes",
                   "descrição": "Espaço cultural que oferece uma variedade de espetáculos e eventos artísticos.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Teatro Ariano Suassuna",
                   "descrição": "Localizado no Colégio Diocesano Pio X, é um espaço moderno para apresentações diversas.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               }
           ]
       },
@@ -135,22 +135,22 @@
               {
                   "nome": "Centro Cultural São Francisco",
                   "descrição": "Um complexo que inclui a Igreja de São Francisco e o Convento de Santo Antônio, com um rico acervo de arte sacra.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Estação Cabo Branco",
                   "descrição": "Desenhada por Oscar Niemeyer, é um espaço de ciência, cultura e arte, com exposições e eventos educativos.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Casa do Artista Popular",
                   "descrição": "Museu dedicado ao artesanato paraibano, com peças representativas da rica cultura artesanal do estado.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Museu e Cripta de Epitácio Pessoa",
                   "descrição": "Localizado no Palácio do Governo, é dedicado à memória do ex-presidente e sua contribuição para a história do Brasil.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               }
           ]
       },
@@ -160,27 +160,27 @@
               {
                   "nome": "Farol do Cabo Branco",
                   "descrição": "Marcando o ponto mais oriental das Américas, é um dos ícones da cidade.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Parque Sólon de Lucena",
                   "descrição": "Conhecido como Lagoa, é um local de lazer no coração da cidade com uma bela lagoa e áreas verdes.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Estação Cabo Branco",
                   "descrição": "Centro de ciência e arte projetado por Oscar Niemeyer.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Praça dos Três Poderes",
                   "descrição": "Local histórico que abriga as sedes dos poderes Executivo, Legislativo e Judiciário.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Centro Histórico",
                   "descrição": "Área que preserva a arquitetura e a história da cidade, com várias construções do período colonial.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               }
           ]
       },
@@ -190,27 +190,27 @@
               {
                   "nome": "Hotel Globo",
                   "descrição": "Edifício histórico que oferece uma vista panorâmica do Rio Sanhauá.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Cruzeiro de São Francisco",
                   "descrição": "Localizado no Centro Cultural São Francisco, é um símbolo religioso e histórico.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Monumento Rosa dos Ventos",
                   "descrição": "Situado no Farol do Cabo Branco, simboliza a orientação geográfica da cidade.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Praça João Pessoa",
                   "descrição": "Praça que homenageia o ex-governador da Paraíba e está localizada em frente ao Palácio da Redenção.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               },
               {
                   "nome": "Casarão dos Azulejos",
                   "descrição": "Construção do século XVIII, notável por sua fachada decorada com azulejos portugueses.",
-                  "imagem": "placeholder.jpg"
+                  "imagem": "https://picsum.photos/seed/picsum/200"
               }
           ]
       }
