@@ -28,13 +28,21 @@
             background-color: #fff;
             border-radius: 10px;
             overflow: hidden;
-            width: 180px; /* Ajustando a largura do card automaticamente */
         }
         .event-image {
-            width: 180px; /* Reduzindo a largura da imagem em cerca de 65% */
-            height: auto; /* Mantendo a proporção da altura */
-            border-radius: 10px;
-            cursor: pointer;
+  width: 250px;
+  height: auto;
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: visible; /* Add this */
+}
+
+@media only screen and (max-width: 400px) {
+  .event-image {
+    width: 300px !important; /* Add !important to override other styles */
+  }
+
+
         }
         .event-title {
             margin-top: 10px;
@@ -47,6 +55,7 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             max-width: 150px; /* Definindo a largura máxima do título */
+            text-align: center;
         }
         .icons-container {
             display: flex;
