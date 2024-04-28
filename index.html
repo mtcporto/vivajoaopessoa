@@ -6,6 +6,11 @@
     <title>Diversão</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css">
     <style>
+    @media (max-width: 768px) {
+        #weatherapi-weather-widget-3 {
+            width: 100% !important;
+        }
+    }        
     .header {
       background-color: black;
       color: white;
@@ -21,6 +26,11 @@
             <h1 class="text-3xl font-bold" style="text-align: center;">Diversão</h1>
         </div>
     </header>
+
+    <div class="container">
+        <div id="weatherapi-weather-widget-3" style="width: 1115px; height: 50%; margin: 0 auto 20px;"></div>
+        <script type='text/javascript' src='https://www.weatherapi.com/weather/widget.ashx?loc=277876&wid=3&tu=1&div=weatherapi-weather-widget-3' async></script><noscript><a href="https://www.weatherapi.com/weather/q/joao-pessoa-277876" alt="Hour by hour Joao Pessoa weather">Previsão do tempo de João Pessoa para 10 dias, por hora</a></noscript>     
+
 
     <div class="container">
         <div class="row" id="card-container"></div>
