@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guia de João Pessoa</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
         body {
-            padding-top: 20px;
             padding-bottom: 20px;
         }
         .header {
@@ -15,6 +15,7 @@
             color: white;
             padding: 10px 0;
             text-align: center;
+            margin-bottom: 20px;
         }
         .card {
             margin-bottom: 20px;
@@ -22,12 +23,20 @@
         .container {
             padding: 0 15px;
         }
+        .instagram-icon, .map-icon {
+            margin-right: 5px;
+        }
+        img { 
+          width: 288px;
+          height: 300px;
+          object-fit: cover;
+        }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>Guia de João Pessoa</h1>
+    <h1>Bares e Restaurantes</h1>
 </div>
 
 <div class="container">
@@ -37,36 +46,39 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-   fetch('https://diversao.pages.dev/guia/data.json') // Use a URL completa para o arquivo JSON no Cloudflare
+   fetch('data.json') // Ajuste para o caminho correto do arquivo JSON
         .then(response => response.json())
         .then(data => {
             const container = document.querySelector('.container');
-            data.categorias.forEach(categoria => {
-                const categoryTitle = document.createElement('h1');
-                categoryTitle.innerText = categoria.tipo;
-                container.appendChild(categoryTitle);
-
-                const row = document.createElement('div');
-                row.className = 'row';
-
-                categoria.itens.forEach(item => {
-                    const col = document.createElement('div');
-                    col.className = 'col-md-4';
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <img src="${item.imagem}" class="card-img-top" alt="${item.nome}">
-                        <div class="card-body">
-                            <h5 class="card-title">${item.nome}</h5>
-                            <p class="card-text">${item.descrição}</p>
-                        </div>
-                    `;
-                    col.appendChild(card);
-                    row.appendChild(col);
-                });
-
-                container.appendChild(row);
+            const row = document.createElement('div');
+            row.className = 'row';
+            data.estabelecimentos.forEach(estabelecimento => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4';
+                const card = document.createElement('div');
+                card.className = 'card';
+                const instagramLink = estabelecimento.instagram ? `https://www.instagram.com/${estabelecimento.instagram}` : '#';
+                const mapLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(estabelecimento.endereco)}`;
+                card.innerHTML = `
+                    <img src="${estabelecimento.foto}" class="card-img-top" alt="${estabelecimento.nome}">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                           ${estabelecimento.nome}
+                        </h5>
+                        <p class="card-text">
+                            <a href="${mapLink}" target="_blank" class="map-icon">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </a>
+                            <a href="${instagramLink}" target="_blank" class="instagram-icon">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </p>
+                    </div>
+                `;
+                row.appendChild(col);
+                col.appendChild(card);
             });
+            container.appendChild(row);
         });
 </script>
 
