@@ -43,7 +43,6 @@
                 card.innerHTML = `
                     <img src="${news.image}" class="card-img-top" alt="Imagem da notícia">
                     <div class="card-body">
-                        <p class="card-text"><small class="text-muted">Fonte: ${news.source}</small></p>
                         <h5 class="card-title">${news.title}</h5>
                         <p class="card-text"><small class="text-muted">Publicado em: ${new Date(news.published).toLocaleString('pt-BR')}</small></p>
                         <a href="${news.url}" class="btn btn-primary">Ler notícia</a>
