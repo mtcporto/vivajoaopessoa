@@ -1,0 +1,44 @@
+.card-weather {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 10px;
+    width: 1120px;
+    font-family: Arial, Helvetica, sans-serif;
+    border-radius: 10px;
+    background: linear-gradient(to bottom left, #023a58, #48cae4);
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  .card-weather:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+  }
+  .current-weather-icon {
+    font-size: 80px; /* Se estiver usando uma fonte de ícones */
+    vertical-align: middle;
+  }
+  .weather-icon {
+    font-size: 40px;
+    vertical-align: middle;
+    margin-bottom: 10px;
+  }
+  .week {
+    display: flex;
+    justify-content: space-evenly; /* Distribui os itens uniformemente */
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .day {
+    text-align: center;
+  }
+  .weather-icons, .temperatures {
+    display: flex;
+    justify-content: space-evenly; /* Distribui os itens uniformemente */
+    align-items: center;
+    width: auto;
+  }
+  .left-spacing {
+    margin-left: 30px;
+    /* margin-left: 150px; */ 
+  
+  }
