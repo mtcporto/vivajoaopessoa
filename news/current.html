@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notícias Atuais</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+            padding-right: 20px;
+            padding-left: 20px;
+        }
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Notícias Atuais
+    </div>
+
+    <div id="news-container" class="container">
+        <!-- Os cards de notícias serão inseridos aqui -->
+    </div>
+
+    <script>
+        var url = 'https://api.currentsapi.services/v1/latest-news?language=pt&apiKey=Fd7ulPKPjTqWCN01YpYZ-vEfZLTl8WQ1XkQEdlVQHivjiji7';
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const newsContainer = document.getElementById('news-container');
+            data.news.forEach(news => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
+                    <img src="${news.image}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">${news.title}</h5>
+                        <p class="card-text"><small class="text-muted">Publicado em: ${new Date(news.published).toLocaleDateString('pt-BR')}</small></p>
+                        <a href="${news.url}" class="btn btn-primary">Ler notícia</a>
+                    </div>
+                `;
+                newsContainer.appendChild(card);
+            });
+        })
+        .catch(error => console.error('Erro ao buscar notícias:', error));
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
