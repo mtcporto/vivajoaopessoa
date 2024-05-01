@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viva João Pessoa</title>
+    <title>Diversão</title>
+    <link rel="stylesheet" type="text/css" href="/clima/weather.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css">
     <style>
-    @media (max-width: 768px) {
-        #weatherapi-weather-widget-3 {
-            width: 100% !important;
-        }
-    }        
+@media (max-width: 768px) {
+    .card-weather {
+        width: 100% !important;
+    }
+}
     .header {
       background-color: black;
       color: white;
@@ -23,19 +25,27 @@
 <body>
     <header class="bg-gray-900 text-white py-4 header">
         <div class="container mx-auto text-center">
-            <h1 class="text-3xl font-bold" style="text-align: center;">Viva João Pessoa</h1>
+            <h1 class="text-3xl font-bold" style="text-align: center;">Diversão</h1>
         </div>
     </header>
 
     <div class="container">
-        <div id="weatherapi-weather-widget-3" style="width: 1115px; height: 50%; margin: 0 auto 20px;"></div>
-        <script type='text/javascript' src='https://www.weatherapi.com/weather/widget.ashx?loc=277876&wid=3&tu=1&div=weatherapi-weather-widget-3' async></script><noscript><a href="https://www.weatherapi.com/weather/q/joao-pessoa-277876" alt="Hour by hour Joao Pessoa weather">Previsão do tempo de João Pessoa para 10 dias, por hora</a></noscript>     
+        <div id="weather-info">
+            <div class="card-weather">
+                <h2 id="location-name" class="left-spacing"></h2>
+                <p><i class="wi current-weather-icon left-spacing"></i></p>
+                <p><h1 id="current-temperature" class="left-spacing"></h1></p>
+              <div class="forecast">
+                <div class="week"></div>
+                <div class="weather-icons"></div>
+                <div class="temperatures"></div>
+              </div>
+            </div>
+          </div>
 
-
-    <div class="container">
         <div class="row" id="card-container"></div>
-    </div>
 
+    </div>
     <script>
         // JSON com as informações dos cards
         const cardsData = [
