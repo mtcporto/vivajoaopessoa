@@ -1,10 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    // const apiUrl = 'https://api-content.ingresso.com/v0/events/city/32/partnership/marcotulio';
-    // const endpointUrl = proxyUrl + encodeURIComponent(apiUrl);
     const url = 'https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/events/city/32/partnership/marcotulio';
-    // Fazendo a requisição à API usando o proxy
-    // fetch(endpointUrl)
+
     fetch(url)
         .then(response => response.json())
         .then(data => {
