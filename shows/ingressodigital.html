@@ -61,7 +61,6 @@
     let eventosCount = 0;
 
     function loadEvents() {
-      // fetch(PROXY_URL + url)
       fetch(url)
         .then(response => response.text())
         .then(html => {

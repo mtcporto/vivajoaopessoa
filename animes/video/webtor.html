@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>A Cura</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        #player {
+            width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <video controls src="https://archive.org/download/cure_20211214/cure_20211214_archive.torrent" poster="https://image.tmdb.org/t/p/original/nYiknvDX37PYwXTRA1KvvvhjNkV.jpg" width="100%" id="player" data-title="A Cura">
+                </video>
+            </div>
+
+        </div>
+        <div class="col-md-6" id="movieInfo">
+            <!-- Movie information will be inserted here -->
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@webtor/embed-sdk-js/dist/index.min.js" charset="utf-8" async></script>
+    <script>
+// API key for TMDb
+const apiKey = '6655c36ae61cd1554fff7fe2b431ccf7';
+
+// Objeto com traduções
+const translations = {
+  'Director': 'Diretor',
+  'Writer': 'Roteirista',
+  // Adicione outras traduções conforme necessário
+};
+
+// Função para buscar o filme pelo título e ano
+async function searchMovieByTitleAndYear(title, year) {
+  const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${title}&year=${year}&language=pt-BR`);
+  const data = await response.json();
+
+  // Verifica se há resultados
+  if (data.results.length === 0) {
+    return null;
+  }
+
+  // Obtém a ID do filme
+  const movieId = data.results[0].id;
+  return movieId;
+}
+
+// Função para buscar as informações detalhadas do filme usando a ID
+async function getMovieDetails(movieId) {
+  const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=pt-BR`);
+  const data = await response.json();
+  return data;
+}
+
+// Função para traduzir cargos
+function translateJobs(crew) {
+  if (!crew || !Array.isArray(crew)) {
+    return '';
+  }
+
+  return crew.map(member => {
+    const job = translations[member.job] || member.job;
+    return `${member.name} (${job})`;
+  }).join(', ');
+}
+
+// Função para renderizar as informações do filme
+async function renderMovieInfo(title, year) {
+  const movieId = await searchMovieByTitleAndYear(title, year);
+  if (!movieId) {
+    document.getElementById('movieInfo').innerHTML = `
+      <h1>${title} (${year})</h1>
+      <p>Informações não encontradas na base de dados.</p>
+    `;
+    return;
+  }
+
+  const movieDetails = await getMovieDetails(movieId);
+
+  // Check if genres exist
+  const genres = movieDetails.genres ? movieDetails.genres.map(genre => genre.name).join(', ') : 'N/A';
+
+  // Format runtime
+  const runtimeHours = Math.floor(movieDetails.runtime / 60);
+  const runtimeMinutes = movieDetails.runtime % 60;
+  const runtime = `${runtimeHours}h ${runtimeMinutes}m`;
+
+  // Traduzir equipe técnica
+  const crew = translateJobs(movieDetails.crew);
+
+  // Insert movie information into the page
+  document.getElementById('movieInfo').innerHTML = `
+    <h1>${movieDetails.title} (${movieDetails.release_date.split('-')[0]})</h1>
+    <p>${Math.round(movieDetails.vote_average * 10)}% - ${genres} - ${runtime || 'N/A'}</p>
+    <button onclick="window.open('${movieDetails.homepage}', '_blank');">Site Oficial</button>
+    <h2>Sinopse</h2>
+    <p>${movieDetails.overview}</p>
+    <h2>Direção</h2>
+    <p>Kiyoshi Kurosawa</p>
+  `;
+}
+
+// Call the function when the page loads
+window.onload = async function() {
+  try {
+    await renderMovieInfo('A Cura', 1997);
+  } catch (error) {
+    console.error('Erro ao renderizar as informações do filme:', error);
+    document.getElementById('movieInfo').innerHTML = `
+      <h1>A Cura (1997)</h1>
+      <p>Ocorreu um erro ao buscar as informações do filme.</p>
+    `;
+  }
+};
+
+    </script>
+</body>
+</html>
