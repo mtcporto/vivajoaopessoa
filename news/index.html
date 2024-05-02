@@ -86,16 +86,25 @@
         fetch(newsApiUrl)
             .then(response => {
                 if (response.status === 426) {
+                    console.error('Erro 426: Upgrade Required para a API NewsAPI.org');
                     return { articles: [] }; // Retorna um array vazio para evitar interrupção no processamento
                 }
                 return response.ok ? response.json() : { articles: [] };
             })
     ]).then(([currentsData, newsData, newsApiData]) => {
-        const combinedNews = [
+        let combinedNews = [
             ...(currentsData.news || []),
             ...(newsData.results || []),
             ...(newsApiData.articles || [])
         ];
+
+        // Ordenando as notícias pela data de publicação mais recente
+        combinedNews.sort((a, b) => {
+            let dateA = new Date(a.publishedAt || a.published || a.pubDate);
+            let dateB = new Date(b.publishedAt || b.published || b.pubDate);
+            return dateB - dateA; // Ordena do mais recente para o mais antigo
+        });
+
         combinedNews.forEach(news => {
             const card = createCard(news);
             newsContainer.appendChild(card);
