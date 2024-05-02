@@ -122,11 +122,8 @@
   </div>
 
   <script>
-    // const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
     const url = 'https://cors.mosaicoworkers.workers.dev/sudema.pb.gov.br/qualidade-do-ambiente/qualidade-dos-mares';
-  
-    // fetch(PROXY_URL + 'https://sudema.pb.gov.br/qualidade-do-ambiente/qualidade-dos-mares')
-    fetch(url)
+      fetch(url)
 
       .then(response => response.text())
       .then(html => {
