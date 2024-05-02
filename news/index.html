@@ -20,6 +20,11 @@
         .card {
             margin-bottom: 20px;
         }
+        .card-img-top {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -32,26 +37,45 @@
     </div>
 
     <script>
-        var url = 'https://newsdata.io/api/1/news?apikey=pub_24083303090369c3d75b30fbd770eebd12ce9&country=br&category=entertainment,top,environment,science,technology';
-        fetch(url)
-        .then(response => response.json())
-        .then(data => {
+        function createCard(news) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            const imageUrl = news.urlToImage || news.image_url || news.image || 'https://via.placeholder.com/150';
+            card.innerHTML = `
+                <img src="${imageUrl}" class="card-img-top" alt="Imagem da notícia">
+                <div class="card-body">
+                    <h5 class="card-title">${news.title}</h5>
+                    <p class="card-text"><small class="text-muted">Publicado em: ${new Date(news.publishedAt || news.published || news.pubDate).toLocaleString('pt-BR')}</small></p>
+                    <a href="${news.url || news.link}" class="btn btn-primary">Ler notícia</a>
+                </div>
+            `;
+            return card;
+        }
+
+        function fetchNews() {
             const newsContainer = document.getElementById('news-container');
-            data.results.forEach(news => {
-                const card = document.createElement('div');
-                card.classList.add('card');
-                card.innerHTML = `
-                    <img src="${news.image_url}" class="card-img-top" alt="Imagem da notícia">
-                    <div class="card-body">
-                        <h5 class="card-title">${news.title}</h5>
-                        <p class="card-text"><small class="text-muted">Publicado em: ${new Date(news.pubDate).toLocaleString('pt-BR')}</small></p>
-                        <a href="${news.link}" class="btn btn-primary">Ler notícia</a>
-                    </div>
-                `;
-                newsContainer.appendChild(card);
-            });
-        })
-        .catch(error => console.error('Erro ao buscar notícias:', error));
+            const currentsApiUrl = 'https://api.currentsapi.services/v1/latest-news?language=pt&apiKey=Fd7ulPKPjTqWCN01YpYZ-vEfZLTl8WQ1XkQEdlVQHivjiji7';
+            const newsDataApiUrl = 'https://newsdata.io/api/1/news?apikey=pub_24083303090369c3d75b30fbd770eebd12ce9&country=br&category=entertainment,top,environment,science,technology';
+            const newsApiUrl = 'https://newsapi.org/v2/top-headlines?country=br&category=entertainment,general,health,science,technology&apiKey=13ac1ea75e734b659f2dca3b3c0ecfcc';
+
+            Promise.all([
+                fetch(currentsApiUrl).then(response => response.json()),
+                fetch(newsDataApiUrl).then(response => response.json()),
+                fetch(newsApiUrl).then(response => response.json())
+            ]).then(([currentsData, newsData, newsApiData]) => {
+                const combinedNews = [
+                    ...(currentsData.news || []),
+                    ...(newsData.results || []),
+                    ...(newsApiData.articles || [])
+                ];
+                combinedNews.forEach(news => {
+                    const card = createCard(news);
+                    newsContainer.appendChild(card);
+                });
+            }).catch(error => console.error('Erro ao buscar notícias:', error));
+        }
+
+        fetchNews();
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
