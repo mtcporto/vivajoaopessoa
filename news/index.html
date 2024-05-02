@@ -79,7 +79,6 @@
         fetch(newsApiUrl)
             .then(response => {
                 if (response.status === 426) {
-                    console.error('Erro 426: Upgrade Required para a API NewsAPI.org');
                     return { articles: [] }; // Retorna um array vazio para evitar interrupção no processamento
                 }
                 return response.ok ? response.json() : { articles: [] };
