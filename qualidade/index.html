@@ -31,24 +31,20 @@
   
       /* Estilos para o modo claro */
       body {
-        background-color: #f8f8f8;
-        color: #333;
-      }
+            padding-bottom: 20px;
+        }
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
   
       .container {
         background-color: #fff;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
       }
   
-      header {
-        position: relative;
-        background-color: #333;
-        color: #f8f8f8;
-        padding: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
 
       @media (max-width: 640px) {
   .hidden.sm\:table-cell {
@@ -63,14 +59,10 @@
   </style>
 </head>
 <body>
-  <header>
+
     <div class="mx-auto flex justify-between items-center">
       <h1 class="text-3xl font-bold" >Praias Impróprias para Banho</h1>
     </div>
-    <div>
-      <p id="dateTime" class="mb-4"></p>
-    </div>
-  </header>
   <div class="container">
     <span id="intro-text" style="margin-bottom: 30px;"></span><br>
 
