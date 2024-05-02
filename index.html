@@ -8,12 +8,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css">
     <style>
+/* Para telas menores que 768px */
 @media (max-width: 768px) {
     .card-weather {
         width: 100% !important;
     }
 }
-    .header {
+
+/* Para telas maiores que 768px */
+@media (min-width: 769px) {
+    .card-weather {
+        width: 100%; /* ou a largura que você deseja que o card tenha */
+        margin: 0 auto; /* para centralizar o card se ele for menor que a largura da tela */
+    }
+}
+
+
+.header {
       background-color: black;
       color: white;
       padding: 10px;
@@ -30,20 +41,21 @@
     </header>
 
     <div class="container">
-        <div id="weather-info">
-            <div class="card-weather">
-                <h2 id="location-name" class="left-spacing"></h2>
-                <p><i class="wi current-weather-icon left-spacing"></i></p>
-                <p><h1 id="current-temperature" class="left-spacing"></h1></p>
-              <div class="forecast">
-                <div class="week"></div>
-                <div class="weather-icons"></div>
-                <div class="temperatures"></div>
-              </div>
+
+      <div id="weather-info" style="margin-bottom: 20px;">
+          <div class="card-weather">
+              <h2 id="location-name" class="left-spacing"></h2>
+              <p><i class="wi current-weather-icon left-spacing"></i></p>
+              <p><h1 id="current-temperature" class="left-spacing"></h1></p>
+            <div class="forecast">
+              <div class="week"></div>
+              <div class="weather-icons"></div>
+              <div class="temperatures"></div>
             </div>
           </div>
+        </div>
 
-        <div class="row" id="card-container"></div>
+      <div class="row" id="card-container"></div>
 
     </div>
     <script>
