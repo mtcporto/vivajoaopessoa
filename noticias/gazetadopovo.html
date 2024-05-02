@@ -41,7 +41,7 @@
     let newsCount = 0;
 
     function loadNews() {
-      fetch(PROXY_URL + RSS_URL)
+      fetch(url)
         .then(response => response.text())
         .then(str => {
           const parser = new DOMParser();
