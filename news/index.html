@@ -102,7 +102,7 @@
         combinedNews.sort((a, b) => {
             let dateA = new Date(a.publishedAt || a.published || a.pubDate);
             let dateB = new Date(b.publishedAt || b.published || b.pubDate);
-            return dateB - dateA; // Ordena do mais recente para o mais antigo
+            return dateA - dateB; // Ordena do mais recente para o mais antigo
         });
 
         combinedNews.forEach(news => {
