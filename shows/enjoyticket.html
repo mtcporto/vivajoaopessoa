@@ -57,15 +57,10 @@
     <div id="eventos" class="row"></div>
   </div>
   <script>
-    // URL da página que você quer raspar (Enjoy Ticket)
-    // const url = 'https://www.enjoyticket.com.br/index.php';
-    // const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
     const url = 'https://cors.mosaicoworkers.workers.dev/www.enjoyticket.com.br/index.php';
-
     let eventosCount = 0;
 
     function loadEvents() {
-  // fetch(PROXY_URL + url)
   fetch(url)
     .then(response => response.text())
     .then(html => {
