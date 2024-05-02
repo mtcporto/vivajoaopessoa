@@ -27,7 +27,7 @@
         const url = 'https://cors.mosaicoworkers.workers.dev/www.erai-raws.info/episodes/feed/?res=SD&type=magnet&subs%5B0%5D=us&subs%5B1%5D=br&d157edc6b50f28b2776442c03d067d56';
 
 
-        fetch(PROXY_URL + url)
+        fetch(url)
             .then(response => response.text())
             .then(data => {
                 let parser = new DOMParser();
