@@ -31,35 +31,6 @@ function populatePage(data) {
             });
             eventDiv.appendChild(imageElement);
         }
-        // // Adicionando o score do Rotten Tomatoes usando ícones simplificados
-        // if (event.rottenTomatoe) {
-        //     var rottenTomatoesElement = document.createElement('div');
-        //     rottenTomatoesElement.classList.add('icons-container');
-        //     // Ícone de tomate
-        //     var tomatoIcon = document.createElement('img');
-        //     tomatoIcon.src = 'link-para-o-icone-do-tomate';
-        //     tomatoIcon.alt = 'Tomate';
-        //     tomatoIcon.classList.add('icon');
-        //     rottenTomatoesElement.appendChild(tomatoIcon);
-        //     // Percentual de críticos
-        //     var criticsPercent = document.createElement('span');
-        //     criticsPercent.classList.add('text-xs', 'text-white');
-        //     criticsPercent.textContent = event.rottenTomatoe.criticsScore + '%';
-        //     rottenTomatoesElement.appendChild(criticsPercent);
-        //     // Ícone de pipoca
-        //     var popcornIcon = document.createElement('img');
-        //     popcornIcon.src = 'link-para-o-icone-da-pipoca';
-        //     popcornIcon.alt = 'Pipoca';
-        //     popcornIcon.classList.add('icon');
-        //     rottenTomatoesElement.appendChild(popcornIcon);
-        //     // Percentual de audiência
-        //     var audiencePercent = document.createElement('span');
-        //     audiencePercent.classList.add('text-xs', 'text-white');
-        //     audiencePercent.textContent = event.rottenTomatoe.audienceScore + '%';
-        //     rottenTomatoesElement.appendChild(audiencePercent);
-        //     eventDiv.appendChild(rottenTomatoesElement);
-        // }
-        // Adicionando o título do evento
         var titleElement = document.createElement('h2');
         titleElement.classList.add('event-title');
         titleElement.textContent = event.title;
