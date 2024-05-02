@@ -74,23 +74,30 @@
             const newsApiUrl = 'https://newsapi.org/v2/top-headlines?country=br&category=entertainment,general,health,science,technology&apiKey=13ac1ea75e734b659f2dca3b3c0ecfcc';
 
             Promise.all([
-            fetch(currentsApiUrl).then(response => response.ok ? response.json() : { news: [] }),
-            fetch(newsDataApiUrl).then(response => response.ok ? response.json() : { results: [] }),
-            fetch(newsApiUrl).then(response => response.ok ? response.json() : { articles: [] })
-        ]).then(([currentsData, newsData, newsApiData]) => {
-            const combinedNews = [
-                ...(currentsData.news || []),
-                ...(newsData.results || []),
-                ...(newsApiData.articles || [])
-            ];
-            combinedNews.forEach(news => {
-                const card = createCard(news);
-                newsContainer.appendChild(card);
-            });
-        }).catch(error => console.error('Erro ao buscar notícias:', error));
-    }
+        fetch(currentsApiUrl).then(response => response.ok ? response.json() : { news: [] }),
+        fetch(newsDataApiUrl).then(response => response.ok ? response.json() : { results: [] }),
+        fetch(newsApiUrl)
+            .then(response => {
+                if (response.status === 426) {
+                    console.error('Erro 426: Upgrade Required para a API NewsAPI.org');
+                    return { articles: [] }; // Retorna um array vazio para evitar interrupção no processamento
+                }
+                return response.ok ? response.json() : { articles: [] };
+            })
+    ]).then(([currentsData, newsData, newsApiData]) => {
+        const combinedNews = [
+            ...(currentsData.news || []),
+            ...(newsData.results || []),
+            ...(newsApiData.articles || [])
+        ];
+        combinedNews.forEach(news => {
+            const card = createCard(news);
+            newsContainer.appendChild(card);
+        });
+    }).catch(error => console.error('Erro ao buscar notícias:', error));
+}
 
-    fetchNews();
+fetchNews();
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
