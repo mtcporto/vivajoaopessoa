@@ -32,10 +32,12 @@
     <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Notícias</button>
   </div>
   <script>
-    // URL do feed RSS
-    const RSS_URL = `https://www.gazetadopovo.com.br/feed/rss/republica.xml`;
-    // URL do proxy
-    const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+    // // URL do feed RSS
+    // const RSS_URL = `https://www.gazetadopovo.com.br/feed/rss/republica.xml`;
+    // // URL do proxy
+    // const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+    const url = 'https://cors.mosaicoworkers.workers.dev/www.gazetadopovo.com.br/feed/rss/republica.xml';
+
     let newsCount = 0;
 
     function loadNews() {
