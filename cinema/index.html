@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Filmes em João Pessoa</title>
     <style>
-        /* Estilos opcionais para melhorar a apresentação */
         body {
-            font-family: Arial, sans-serif;
+            padding-bottom: 20px;
         }
-    /* Header styles */
-    header {
-      background-color: #000;
-      color: #fff;
-      text-align: center;
-      margin-bottom: 20px; /* Espaçamento entre o header e os cards */
-    }
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         .event-container {
             border: none;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
@@ -28,12 +28,12 @@
             overflow: hidden;
         }
         .event-image {
-  width: 250px;
-  height: auto;
-  border-radius: 10px;
-  cursor: pointer;
-  overflow: visible; /* Add this */
-}
+        width: 250px;
+        height: auto;
+        border-radius: 10px;
+        cursor: pointer;
+        overflow: visible; /* Add this */
+        }
 
 @media only screen and (max-width: 400px) {
   .event-image {
@@ -77,9 +77,9 @@
     </style>
 </head>
 <body>
-    <header>
+    <div class="header">
         <h1>Filmes em cartaz - João Pessoa</h1>
-    </header>
+    </div>
     <!-- Loop através dos eventos -->
     <div id="eventContainer"></div>
     <script src="script.js"></script>
