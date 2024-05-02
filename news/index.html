@@ -24,6 +24,13 @@
             height: 180px;
             object-fit: cover;
         }
+        .card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
         /* Adicionando estilos responsivos para telas maiores */
         @media (min-width: 768px) {
             .card-columns {
