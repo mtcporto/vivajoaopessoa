@@ -68,7 +68,7 @@
                 <div class="card-body">
                     <h6 class="card-title">${news.title}</h6>
                     <p class="card-text"><small class="text-muted">Publicado em: ${new Date(news.publishedAt || news.published || news.pubDate).toLocaleString('pt-BR')}</small></p>
-                    <a href="${news.url || news.link}" class="btn btn-primary">Ler notícia</a>
+                    <a href="${news.url || news.link}" target="_blank" class="btn btn-primary">Ler notícia</a>
                 </div>
             `;
             return card;
