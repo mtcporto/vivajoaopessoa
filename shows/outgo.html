@@ -58,14 +58,10 @@
     <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Eventos</button>
   </div>
   <script>
-    // URL da página que você quer raspar
-    // const url = 'https://www.outgo.com.br/eventos/PB';
-    // const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
     const url = 'https://cors.mosaicoworkers.workers.dev/www.outgo.com.br/eventos/PB';
     let eventosCount = 0;
 
     function loadEvents() {
-      // fetch(PROXY_URL + url)
       fetch(url)      
         .then(response => response.text())
         .then(html => {

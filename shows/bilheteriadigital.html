@@ -57,14 +57,10 @@
     <div id="eventos" class="row"></div>
   </div>
   <script>
-    // URL da página que você quer raspar
-    // const url = 'https://www.bilheteriadigital.com/PB';
-    // const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
     const url = 'https://cors.mosaicoworkers.workers.dev/www.bilheteriadigital.com/PB';
     let eventosCount = 0;
 
     function loadEvents() {
-      // fetch(PROXY_URL + url)
       fetch(url)
 
         .then(response => response.text())
