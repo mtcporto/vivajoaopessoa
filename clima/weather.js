@@ -167,4 +167,23 @@ function aggregateForecastByDay(hourlyData) {
   });
 
   return dailyForecast;
+
+  function loadAirQualityData() {
+    fetch(airQualityApiUrl)
+      .then(response => response.json())
+      .then(data => {
+        const uvIndex = data.current.uv_index;
+        const usAqi = data.hourly.us_aqi[0]; // Supondo que você queira o US AQI atual
+  
+        // Atualize a UI com informações do índice UV
+        const uvIndexElement = document.getElementById('uv-index');
+        uvIndexElement.textContent = `Índice UV: ${uvIndex} - ${getUvIndexCategory(uvIndex)}`;
+  
+        // Atualize a UI com informações de qualidade do ar
+        const airQualityElement = document.getElementById('air-quality');
+        airQualityElement.textContent = `Qualidade do Ar (US AQI): ${usAqi} - ${getAqiCategory(usAqi)}`;
+      })
+      .catch(error => console.error(error));
+  }
+  
 }
