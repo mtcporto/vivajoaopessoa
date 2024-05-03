@@ -1,4 +1,7 @@
 const apiUrl = 'https://api.open-meteo.com/v1/gfs?latitude=-7.115&longitude=-34.8631&current_weather=true&hourly=temperature_2m,weather_code&timezone=America%2FSao_Paulo';
+
+const airQualityApiUrl = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-7.115&longitude=-34.8631&current=uv_index,uv_index_clear_sky&hourly=uv_index,uv_index_clear_sky,european_aqi,us_aqi&timezone=America%2FSao_Paulo&domains=cams_global';
+
 const weatherDescriptions = {
   0: 'Céu limpo',
   1: 'Principalmente ensolarado',
@@ -94,7 +97,7 @@ function loadWeatherData() {
 }
 
 loadWeatherData();
-
+loadAirQualityData();
 
 function loadAirQualityData() {
   fetch(airQualityApiUrl)
@@ -114,8 +117,6 @@ function loadAirQualityData() {
     .catch(error => console.error(error));
 }
 
-// Chame esta função junto com loadWeatherData() para carregar os dados quando a página for carregada.
-loadAirQualityData();
 
 function getWeatherIcon(code) {
   const icons = {
