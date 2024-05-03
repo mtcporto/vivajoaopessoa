@@ -156,12 +156,13 @@ function loadWeatherData() {
         temperatureSpan.textContent = `${forecastDay.temperature.toFixed(1)} °C`;
         temperatures.appendChild(temperatureSpan);
       });
+      loadWeatherData();
+      loadAirQualityData();
     })
     .catch(error => console.error(error));
 }
 
-loadWeatherData();
-loadAirQualityData();
+
 
 function loadAirQualityData() {
   fetch(airQualityApiUrl)
