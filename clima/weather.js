@@ -33,6 +33,40 @@ const weatherDescriptions = {
   99: 'Trovoada com granizo pesado'
 };
 
+function getWeatherIcon(code) {
+  const icons = {
+    0: 'wi-day-sunny',
+    1: 'wi-day-sunny-overcast',
+    2: 'wi-day-cloudy',
+    3: 'wi-cloudy',
+    45: 'wi-fog',
+    48: 'wi-fog',
+    51: 'wi-rain',
+    53: 'wi-rain',
+    55: 'wi-rain',
+    56: 'wi-rain-mix',
+    57: 'wi-rain-mix',
+    61: 'wi-snow',
+    63: 'wi-snow',
+    65: 'wi-snow',
+    66: 'wi-snow',
+    67: 'wi-snow',
+    71: 'wi-snow',
+    73: 'wi-snow',
+    75: 'wi-snow',
+    77: 'wi-snow',
+    80: 'wi-showers',
+    81: 'wi-showers',
+    82: 'wi-showers',
+    85: 'wi-rain-mix',
+    86: 'wi-rain-mix',
+    95: 'wi-thunderstorm',
+    96: 'wi-thunderstorm',
+    99: 'wi-thunderstorm'
+        };
+        return icons[code] || 'wi-na';
+        }
+
 function updateCurrentTemperature() {
 fetch(apiUrl)
 .then(response => response.json())
@@ -118,39 +152,7 @@ function loadAirQualityData() {
 }
 
 
-function getWeatherIcon(code) {
-  const icons = {
-    0: 'wi-day-sunny',
-    1: 'wi-day-sunny-overcast',
-    2: 'wi-day-cloudy',
-    3: 'wi-cloudy',
-    45: 'wi-fog',
-    48: 'wi-fog',
-    51: 'wi-rain',
-    53: 'wi-rain',
-    55: 'wi-rain',
-    56: 'wi-rain-mix',
-    57: 'wi-rain-mix',
-    61: 'wi-snow',
-    63: 'wi-snow',
-    65: 'wi-snow',
-    66: 'wi-snow',
-    67: 'wi-snow',
-    71: 'wi-snow',
-    73: 'wi-snow',
-    75: 'wi-snow',
-    77: 'wi-snow',
-    80: 'wi-showers',
-    81: 'wi-showers',
-    82: 'wi-showers',
-    85: 'wi-rain-mix',
-    86: 'wi-rain-mix',
-    95: 'wi-thunderstorm',
-    96: 'wi-thunderstorm',
-    99: 'wi-thunderstorm'
-        };
-        return icons[code] || 'wi-na';
-        }
+
 
 function getForecastForNextFiveDays(hourlyData) {
   const dailyForecast = aggregateForecastByDay(hourlyData);
