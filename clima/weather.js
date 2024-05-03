@@ -1,7 +1,4 @@
 const apiUrl = 'https://api.open-meteo.com/v1/gfs?latitude=-7.115&longitude=-34.8631&current_weather=true&hourly=temperature_2m,weather_code&timezone=America%2FSao_Paulo';
-
-const airQualityApiUrl = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-7.115&longitude=-34.8631&current=uv_index,uv_index_clear_sky&hourly=uv_index,uv_index_clear_sky,european_aqi,us_aqi&timezone=America%2FSao_Paulo&domains=cams_global';
-
 const weatherDescriptions = {
   0: 'Céu limpo',
   1: 'Principalmente ensolarado',
@@ -32,70 +29,6 @@ const weatherDescriptions = {
   96: 'Trovoada com chuva pesada',
   99: 'Trovoada com granizo pesado'
 };
-
-function getWeatherIcon(code) {
-  const icons = {
-    0: 'wi-day-sunny',
-    1: 'wi-day-sunny-overcast',
-    2: 'wi-day-cloudy',
-    3: 'wi-cloudy',
-    45: 'wi-fog',
-    48: 'wi-fog',
-    51: 'wi-rain',
-    53: 'wi-rain',
-    55: 'wi-rain',
-    56: 'wi-rain-mix',
-    57: 'wi-rain-mix',
-    61: 'wi-snow',
-    63: 'wi-snow',
-    65: 'wi-snow',
-    66: 'wi-snow',
-    67: 'wi-snow',
-    71: 'wi-snow',
-    73: 'wi-snow',
-    75: 'wi-snow',
-    77: 'wi-snow',
-    80: 'wi-showers',
-    81: 'wi-showers',
-    82: 'wi-showers',
-    85: 'wi-rain-mix',
-    86: 'wi-rain-mix',
-    95: 'wi-thunderstorm',
-    96: 'wi-thunderstorm',
-    99: 'wi-thunderstorm'
-        };
-        return icons[code] || 'wi-na';
-        }
-
-        function getUvIndexCategory(uvIndex) {
-          if (uvIndex < 3) {
-            return 'Baixo';
-          } else if (uvIndex < 6) {
-            return 'Moderado';
-          } else if (uvIndex < 8) {
-            return 'Alto';
-          } else if (uvIndex < 11) {
-            return 'Muito Alto';
-          } else {
-            return 'Extremo';
-          }
-        }
-        
-        function getAqiCategory(aqi) {
-          if (aqi <= 50) {
-            return 'Boa';
-          } else if (aqi <= 100) {
-            return 'Moderada';
-          } else if (aqi <= 150) {
-            return 'Insalubre para grupos sensíveis';
-          } else if (aqi <= 200) {
-            return 'Insalubre';
-          } else if (aqi <= 300) {
-            return 'Muito Insalubre';
-          } else {
-            return 'Perigosa';
-          }
-        }
 
 function updateCurrentTemperature() {
 fetch(apiUrl)
@@ -156,34 +89,47 @@ function loadWeatherData() {
         temperatureSpan.textContent = `${forecastDay.temperature.toFixed(1)} °C`;
         temperatures.appendChild(temperatureSpan);
       });
-      loadWeatherData();
-      loadAirQualityData();
     })
     .catch(error => console.error(error));
 }
 
-
-
-function loadAirQualityData() {
-  fetch(airQualityApiUrl)
-    .then(response => response.json())
-    .then(data => {
-      const uvIndex = data.current.uv_index;
-      const usAqi = data.hourly.us_aqi[0]; // Supondo que você queira o US AQI atual
-
-      // Atualize a UI com informações do índice UV
-      const uvIndexElement = document.getElementById('uv-index');
-      uvIndexElement.textContent = `Índice UV: ${uvIndex} - ${getUvIndexCategory(uvIndex)}`;
-
-      // Atualize a UI com informações de qualidade do ar
-      const airQualityElement = document.getElementById('air-quality');
-      airQualityElement.textContent = `Qualidade do Ar (US AQI): ${usAqi} - ${getAqiCategory(usAqi)}`;
-    })
-    .catch(error => console.error(error));
-}
+loadWeatherData();
 
 
 
+function getWeatherIcon(code) {
+  const icons = {
+    0: 'wi-day-sunny',
+    1: 'wi-day-sunny-overcast',
+    2: 'wi-day-cloudy',
+    3: 'wi-cloudy',
+    45: 'wi-fog',
+    48: 'wi-fog',
+    51: 'wi-rain',
+    53: 'wi-rain',
+    55: 'wi-rain',
+    56: 'wi-rain-mix',
+    57: 'wi-rain-mix',
+    61: 'wi-snow',
+    63: 'wi-snow',
+    65: 'wi-snow',
+    66: 'wi-snow',
+    67: 'wi-snow',
+    71: 'wi-snow',
+    73: 'wi-snow',
+    75: 'wi-snow',
+    77: 'wi-snow',
+    80: 'wi-showers',
+    81: 'wi-showers',
+    82: 'wi-showers',
+    85: 'wi-rain-mix',
+    86: 'wi-rain-mix',
+    95: 'wi-thunderstorm',
+    96: 'wi-thunderstorm',
+    99: 'wi-thunderstorm'
+        };
+        return icons[code] || 'wi-na';
+        }
 
 function getForecastForNextFiveDays(hourlyData) {
   const dailyForecast = aggregateForecastByDay(hourlyData);
