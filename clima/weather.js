@@ -67,6 +67,36 @@ function getWeatherIcon(code) {
         return icons[code] || 'wi-na';
         }
 
+        function getUvIndexCategory(uvIndex) {
+          if (uvIndex < 3) {
+            return 'Baixo';
+          } else if (uvIndex < 6) {
+            return 'Moderado';
+          } else if (uvIndex < 8) {
+            return 'Alto';
+          } else if (uvIndex < 11) {
+            return 'Muito Alto';
+          } else {
+            return 'Extremo';
+          }
+        }
+        
+        function getAqiCategory(aqi) {
+          if (aqi <= 50) {
+            return 'Boa';
+          } else if (aqi <= 100) {
+            return 'Moderada';
+          } else if (aqi <= 150) {
+            return 'Insalubre para grupos sensíveis';
+          } else if (aqi <= 200) {
+            return 'Insalubre';
+          } else if (aqi <= 300) {
+            return 'Muito Insalubre';
+          } else {
+            return 'Perigosa';
+          }
+        }
+
 function updateCurrentTemperature() {
 fetch(apiUrl)
 .then(response => response.json())
