@@ -118,6 +118,7 @@ function loadWeatherData() {
   fetch(apiUrl)
     .then(response => response.json())
     .then(data => {
+      loadAirQualityData();
       console.log('Dados meteorológicos:', data); // Adicione esta linha
       const currentWeather = data.current_weather;
       const hourlyData = data.hourly;
@@ -157,7 +158,6 @@ function loadWeatherData() {
         temperatureSpan.textContent = `${forecastDay.temperature.toFixed(1)} °C`;
         temperatures.appendChild(temperatureSpan);
       });
-      loadAirQualityData();
     })
     .catch(error => console.error(error));
 }
