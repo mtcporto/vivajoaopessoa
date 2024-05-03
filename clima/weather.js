@@ -63,55 +63,55 @@ function getWeatherIcon(code) {
     95: 'wi-thunderstorm',
     96: 'wi-thunderstorm',
     99: 'wi-thunderstorm'
-        };
-        return icons[code] || 'wi-na';
-        }
+  };
+  return icons[code] || 'wi-na';
+}
 
-        function getUvIndexCategory(uvIndex) {
-          if (uvIndex < 3) {
-            return 'Baixo';
-          } else if (uvIndex < 6) {
-            return 'Moderado';
-          } else if (uvIndex < 8) {
-            return 'Alto';
-          } else if (uvIndex < 11) {
-            return 'Muito Alto';
-          } else {
-            return 'Extremo';
-          }
-        }
-        
-        function getAqiCategory(aqi) {
-          if (aqi <= 50) {
-            return 'Boa';
-          } else if (aqi <= 100) {
-            return 'Moderada';
-          } else if (aqi <= 150) {
-            return 'Insalubre para grupos sensíveis';
-          } else if (aqi <= 200) {
-            return 'Insalubre';
-          } else if (aqi <= 300) {
-            return 'Muito Insalubre';
-          } else {
-            return 'Perigosa';
-          }
-        }
+function getUvIndexCategory(uvIndex) {
+  if (uvIndex < 3) {
+    return 'Baixo';
+  } else if (uvIndex < 6) {
+    return 'Moderado';
+  } else if (uvIndex < 8) {
+    return 'Alto';
+  } else if (uvIndex < 11) {
+    return 'Muito Alto';
+  } else {
+    return 'Extremo';
+  }
+}
+
+function getAqiCategory(aqi) {
+  if (aqi <= 50) {
+    return 'Boa';
+  } else if (aqi <= 100) {
+    return 'Moderada';
+  } else if (aqi <= 150) {
+    return 'Insalubre para grupos sensíveis';
+  } else if (aqi <= 200) {
+    return 'Insalubre';
+  } else if (aqi <= 300) {
+    return 'Muito Insalubre';
+  } else {
+    return 'Perigosa';
+  }
+}
 
 function updateCurrentTemperature() {
-fetch(apiUrl)
-.then(response => response.json())
-.then(data => {
-  const currentWeather = data.current_weather;
-  const currentWeatherIcon = document.querySelector('.current-weather-icon');
-  const classesToRemove = Array.from(currentWeatherIcon.classList).filter(className => className.startsWith('wi-'));
-  currentWeatherIcon.classList.remove(...classesToRemove);
-  currentWeatherIcon.classList.add('wi', getWeatherIcon(currentWeather.weathercode));
-  currentWeatherIcon.title = weatherDescriptions[currentWeather.weathercode];
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      const currentWeather = data.current_weather;
+      const currentWeatherIcon = document.querySelector('.current-weather-icon');
+      const classesToRemove = Array.from(currentWeatherIcon.classList).filter(className => className.startsWith('wi-'));
+      currentWeatherIcon.classList.remove(...classesToRemove);
+      currentWeatherIcon.classList.add('wi', getWeatherIcon(currentWeather.weathercode));
+      currentWeatherIcon.title = weatherDescriptions[currentWeather.weathercode];
 
-  const currentTemperature = document.querySelector('#current-temperature');
-  currentTemperature.textContent = `${currentWeather.temperature} °C`;
-})
-.catch(error => console.error(error));
+      const currentTemperature = document.querySelector('#current-temperature');
+      currentTemperature.textContent = `${currentWeather.temperature} °C`;
+    })
+    .catch(error => console.error(error));
 }
 
 function loadWeatherData() {
@@ -156,14 +156,11 @@ function loadWeatherData() {
         temperatureSpan.textContent = `${forecastDay.temperature.toFixed(1)} °C`;
         temperatures.appendChild(temperatureSpan);
       });
-      loadWeatherData();
+
       loadAirQualityData();
     })
     .catch(error => console.error(error));
 }
-
-
-
 function loadAirQualityData() {
   fetch(airQualityApiUrl)
     .then(response => response.json())
@@ -181,9 +178,6 @@ function loadAirQualityData() {
     })
     .catch(error => console.error(error));
 }
-
-
-
 
 function getForecastForNextFiveDays(hourlyData) {
   const dailyForecast = aggregateForecastByDay(hourlyData);
@@ -223,5 +217,7 @@ function aggregateForecastByDay(hourlyData) {
   });
 
   return dailyForecast;
-  
 }
+
+// Chame as funções depois de defini-las
+loadWeatherData();
