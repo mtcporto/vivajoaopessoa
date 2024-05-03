@@ -53,40 +53,47 @@ function loadWeatherData() {
     .then(data => {
       const currentWeather = data.current_weather;
       const hourlyData = data.hourly;
+      const weatherInfo = document.querySelector('#weather-info .card');
 
-      // Atualiza a temperatura atual
+      // Informações do dia atual
+      const locationName = document.querySelector('#location-name');
+      locationName.textContent = 'João Pessoa';
+
       updateCurrentTemperature();
+      setInterval(updateCurrentTemperature, 3600000); // Atualizar a cada hora (3600000 ms)
 
-      // Atualiza a previsão para o dia atual e os próximos dias
-      const forecastData = getForecastForNextFiveDays(hourlyData);
-      const today = new Date();
-      const daysOfWeek = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-      const currentDayElement = document.getElementById('current-day');
-      const currentWeatherIconElement = document.getElementById('current-weather-icon');
-      const currentTemperatureSpan = document.getElementById('current-temperature-span');
-
-      // Define o dia atual
-      currentDayElement.textContent = daysOfWeek[today.getDay()];
-      currentWeatherIconElement.classList.add('wi', getWeatherIcon(currentWeather.weathercode));
-      currentTemperatureSpan.textContent = `${currentWeather.temperature.toFixed(1)} °C`;
-
-      // Continua com a previsão para os próximos dias
+      // Próximos 5 dias
       const weekDays = document.querySelector('.week');
       const weatherIcons = document.querySelector('.weather-icons');
       const temperatures = document.querySelector('.temperatures');
 
+      const forecastData = getForecastForNextFiveDays(hourlyData);
+
+      const daysOfWeek = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+      const today = new Date();
+      const startDayIndex = (today.getDay() + 1) % 7;
+
       forecastData.forEach((forecastDay, index) => {
-        // ... restante do código para preencher os próximos dias
+        const dayIndex = (startDayIndex + index) % 7;
+        const daySpan = document.createElement('span');
+        daySpan.classList.add('day');
+        daySpan.textContent = daysOfWeek[dayIndex];
+        weekDays.appendChild(daySpan);
+
+        const weatherIcon = document.createElement('i');
+        weatherIcon.classList.add('wi', forecastDay.icon, 'weather-icon');
+        weatherIcon.title = weatherDescriptions[forecastDay.weather];
+        weatherIcons.appendChild(weatherIcon);
+
+        const temperatureSpan = document.createElement('span');
+        temperatureSpan.textContent = `${forecastDay.temperature.toFixed(1)} °C`;
+        temperatures.appendChild(temperatureSpan);
       });
     })
     .catch(error => console.error(error));
 }
 
-// Não esqueça de chamar a função loadWeatherData
 loadWeatherData();
-
-
-
 
 function getWeatherIcon(code) {
   const icons = {
@@ -160,5 +167,60 @@ function aggregateForecastByDay(hourlyData) {
   });
 
   return dailyForecast;
+
+
+  const airQualityApiUrl = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-7.115&longitude=-34.8631&current=uv_index,uv_index_clear_sky&hourly=uv_index,uv_index_clear_sky,european_aqi,us_aqi&timezone=America%2FSao_Paulo&domains=cams_global';
+
+  function loadAirQualityData() {
+    fetch(airQualityApiUrl)
+      .then(response => response.json())
+      .then(data => {
+        const uvIndex = data.current.uv_index;
+        const usAqi = data.hourly.us_aqi[0]; // Supondo que você queira o US AQI atual
   
-}
+        // Atualize a UI com informações do índice UV
+        const uvIndexElement = document.createElement('p');
+        uvIndexElement.textContent = `Índice UV: ${uvIndex} - ${getUvIndexCategory(uvIndex)}`;
+        document.querySelector('#weather-info .card-weather').appendChild(uvIndexElement);
+  
+        // Atualize a UI com informações de qualidade do ar
+        const airQualityElement = document.createElement('p');
+        airQualityElement.textContent = `Qualidade do Ar (US AQI): ${usAqi} - ${getAqiCategory(usAqi)}`;
+        document.querySelector('#weather-info .card-weather').appendChild(airQualityElement);
+      })
+      .catch(error => console.error(error));
+  }
+  
+  function getUvIndexCategory(uvIndex) {
+    if (uvIndex < 3) {
+      return 'Baixo';
+    } else if (uvIndex < 6) {
+      return 'Moderado';
+    } else if (uvIndex < 8) {
+      return 'Alto';
+    } else if (uvIndex < 11) {
+      return 'Muito Alto';
+    } else {
+      return 'Extremo';
+    }
+  }
+  
+  function getAqiCategory(aqi) {
+    if (aqi <= 50) {
+      return 'Boa';
+    } else if (aqi <= 100) {
+      return 'Moderada';
+    } else if (aqi <= 150) {
+      return 'Insalubre para grupos sensíveis';
+    } else if (aqi <= 200) {
+      return 'Insalubre';
+    } else if (aqi <= 300) {
+      return 'Muito Insalubre';
+    } else {
+      return 'Perigosa';
+    }
+  }
+  
+  // Chame esta função junto com loadWeatherData() para carregar os dados quando a página for carregada.
+  loadAirQualityData();
+}  
