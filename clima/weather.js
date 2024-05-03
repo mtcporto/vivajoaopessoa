@@ -55,7 +55,7 @@ function loadWeatherData() {
       const hourlyData = data.hourly;
 
       // Atualiza a temperatura atual
-      updateCurrentTemperature();
+      updateCurrentTemperature(currentWeather);
 
       // Atualiza a previsão para o dia atual e os próximos dias
       const forecastData = getForecastForNextFiveDays(hourlyData);
@@ -67,7 +67,7 @@ function loadWeatherData() {
 
       // Define o dia atual
       currentDayElement.textContent = daysOfWeek[today.getDay()];
-      currentWeatherIconElement.classList.add('wi', getWeatherIcon(currentWeather.weathercode));
+      currentWeatherIconElement.className = 'wi ' + getWeatherIcon(currentWeather.weathercode);
       currentTemperatureSpan.textContent = `${currentWeather.temperature.toFixed(1)} °C`;
 
       // Continua com a previsão para os próximos dias
