@@ -157,7 +157,7 @@ function loadWeatherData() {
         temperatureSpan.textContent = `${forecastDay.temperature.toFixed(1)} °C`;
         temperatures.appendChild(temperatureSpan);
       });
-
+      loadAirQualityData();
     })
     .catch(error => console.error(error));
 }
@@ -222,4 +222,3 @@ function aggregateForecastByDay(hourlyData) {
 
 // Chame as funções depois de defini-las
 loadWeatherData();
-loadAirQualityData();
