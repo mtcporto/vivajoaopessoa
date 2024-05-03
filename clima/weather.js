@@ -118,6 +118,7 @@ function loadWeatherData() {
   fetch(apiUrl)
     .then(response => response.json())
     .then(data => {
+      console.log('Dados meteorológicos:', data); // Adicione esta linha
       const currentWeather = data.current_weather;
       const hourlyData = data.hourly;
       const weatherInfo = document.querySelector('#weather-info .card');
@@ -157,7 +158,6 @@ function loadWeatherData() {
         temperatures.appendChild(temperatureSpan);
       });
 
-      loadAirQualityData();
     })
     .catch(error => console.error(error));
 }
@@ -165,6 +165,7 @@ function loadAirQualityData() {
   fetch(airQualityApiUrl)
     .then(response => response.json())
     .then(data => {
+      console.log('Dados de qualidade do ar:', data); // Adicione esta linha
       const uvIndex = data.current.uv_index;
       const usAqi = data.hourly.us_aqi[0]; // Supondo que você queira o US AQI atual
 
@@ -221,3 +222,4 @@ function aggregateForecastByDay(hourlyData) {
 
 // Chame as funções depois de defini-las
 loadWeatherData();
+loadAirQualityData();
