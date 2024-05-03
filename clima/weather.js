@@ -88,7 +88,6 @@ loadWeatherData();
 
 
 
-
 function getWeatherIcon(code) {
   const icons = {
     0: 'wi-day-sunny',
