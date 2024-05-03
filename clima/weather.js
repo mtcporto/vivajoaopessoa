@@ -53,47 +53,38 @@ function loadWeatherData() {
     .then(data => {
       const currentWeather = data.current_weather;
       const hourlyData = data.hourly;
-      const weatherInfo = document.querySelector('#weather-info .card');
 
-      // Informações do dia atual
-      const locationName = document.querySelector('#location-name');
-      locationName.textContent = 'João Pessoa';
-
+      // Atualiza a temperatura atual
       updateCurrentTemperature();
-      setInterval(updateCurrentTemperature, 3600000); // Atualizar a cada hora (3600000 ms)
 
-      // Próximos 5 dias
+      // Atualiza a previsão para o dia atual e os próximos dias
+      const forecastData = getForecastForNextFiveDays(hourlyData);
+      const today = new Date();
+      const daysOfWeek = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+      const currentDayElement = document.getElementById('current-day');
+      const currentWeatherIconElement = document.getElementById('current-weather-icon');
+      const currentTemperatureSpan = document.getElementById('current-temperature-span');
+
+      // Define o dia atual
+      currentDayElement.textContent = daysOfWeek[today.getDay()];
+      currentWeatherIconElement.classList.add('wi', getWeatherIcon(currentWeather.weathercode));
+      currentTemperatureSpan.textContent = `${currentWeather.temperature.toFixed(1)} °C`;
+
+      // Continua com a previsão para os próximos dias
       const weekDays = document.querySelector('.week');
       const weatherIcons = document.querySelector('.weather-icons');
       const temperatures = document.querySelector('.temperatures');
 
-      const forecastData = getForecastForNextFiveDays(hourlyData);
-
-      const daysOfWeek = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-      const today = new Date();
-      const startDayIndex = (today.getDay() + 1) % 7;
-
       forecastData.forEach((forecastDay, index) => {
-        const dayIndex = (startDayIndex + index) % 7;
-        const daySpan = document.createElement('span');
-        daySpan.classList.add('day');
-        daySpan.textContent = daysOfWeek[dayIndex];
-        weekDays.appendChild(daySpan);
-
-        const weatherIcon = document.createElement('i');
-        weatherIcon.classList.add('wi', forecastDay.icon, 'weather-icon');
-        weatherIcon.title = weatherDescriptions[forecastDay.weather];
-        weatherIcons.appendChild(weatherIcon);
-
-        const temperatureSpan = document.createElement('span');
-        temperatureSpan.textContent = `${forecastDay.temperature.toFixed(1)} °C`;
-        temperatures.appendChild(temperatureSpan);
+        // ... restante do código para preencher os próximos dias
       });
     })
     .catch(error => console.error(error));
 }
 
+// Não esqueça de chamar a função loadWeatherData
 loadWeatherData();
+
 
 
 
