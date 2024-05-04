@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css">
     <style>
-.header {
+    .header {
       background-color: black;
       color: white;
       padding: 10px;
@@ -26,22 +26,23 @@
 
     <div class="container">
 
-      <div id="weather-info" style="margin-bottom: 20px;">
-          <div class="card-weather">
-              <h2 id="location-name" class="left-spacing"></h2>
-              <p><i class="wi current-weather-icon left-spacing"></i></p>
-              <p><h1 id="current-temperature" class="left-spacing"></h1></p>
-            <div class="forecast">
-              <div class="week"></div>
-              <div class="weather-icons"></div>
-              <div class="temperatures"></div>
+        <div id="weather-info" style="margin-bottom: 20px;">
+            <div class="card-weather">
+                <h2 id="location-name" class="left-spacing"></h2>
+                <p><i class="wi current-weather-icon left-spacing"></i></p>
+                <p><h1 id="current-temperature" class="left-spacing"></h1></p>
+              <div class="forecast">
+                <div class="week"></div>
+                <div class="weather-icons"></div>
+                <div class="temperatures"></div>
+              </div>
             </div>
           </div>
-        </div>
 
-      <div class="row" id="card-container"></div>
+        <div class="row" id="card-container"></div>
 
     </div>
+
     <script>
         // JSON com as informações dos cards
         const cardsData = [
@@ -56,40 +57,22 @@
     "texto": "Bares e Restaurantes abertos em João Pessoa agora",
     "link": "/bares/",
     "imagem": "bares.jpeg"
-  },            
+  },
+//   {
+//     "titulo": "Programação - Cine Bangue",
+//     "texto": "Confira os filmes em cartaz e a programacao no Cine Bangue",
+//     "link": "/bangue/",
+//     "imagem": "cinema2.jpeg"
+//   },
   {
-    "titulo": "Praias Impróprias",
-    "texto": "Praias Impróprias para Banho em João Pessoa.",
-    "link": "/qualidade/",
-    "imagem": "praiaImpropria.jpeg"
-  },            
-  // {
-  //   "titulo": "Programação - Cine Bangue",
-  //   "texto": "Confira os filmes em cartaz e a programacao no Cine Bangue",
-  //   "link": "/bangue/",
-  //   "imagem": "cinema2.jpeg"
-  // },
-  {
-    "titulo": "Eventos e Ingressos - Sympla",
+    "titulo": "Shows e Eventos",
     "texto": "Descubra os melhores shows e eventos que estão acontecendo em João Pessoa.",
     "link": "/shows/",
     "imagem": "shows.jpeg"
   },
   {
-    "titulo": "Eventos e Ingressos - Outgo",
-    "texto": "Descubra os melhores shows e eventos que estão acontecendo em João Pessoa.",
-    "link": "/shows/outgo.html",
-    "imagem": "shows2.jpeg"
-  },
-  {
-    "titulo": "Eventos e Ingressos - Bilheteria Digital",
-    "texto": "Descubra os melhores shows e eventos que estão acontecendo em João Pessoa.",
-    "link": "/shows/bilheteriadigital.html",
-    "imagem": "shows2.jpeg"
-  },
-  {
-    "titulo": "Eventos e Ingressos - Eventim",
-    "texto": "Descubra os melhores shows e eventos que estão acontecendo em João Pessoa.",
+    "titulo": "Eventos e Ingressos",
+    "texto": "Encontre eventos emocionantes  em João Pessoa.",
     "link": "/shows/eventim.html",
     "imagem": "shows2.jpeg"
   },
@@ -100,6 +83,13 @@
     "imagem": "mares.jpeg"
   },
   {
+    "titulo": "Praias Impróprias",
+    "texto": "Praias Impróprias para Banho em João Pessoa.",
+    "link": "/qualidade/",
+    "imagem": "praiaImpropria.jpeg"
+  },
+
+  {
     "titulo": "Notícias - Brasil",
     "texto": "Confira as últimas notícias sobre o que está acontecendo no Brasil.",
     "link": "/noticias/",
@@ -108,13 +98,13 @@
   {
     "titulo": "Notícias - João Pessoa",
     "texto": "Confira as últimas notícias sobre o que está acontecendo em Joao Pessoa.",
-    "link": "/news/",
+    "link": "https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSkwyMHZNREZvZVRsa0VnVndkQzFDVWlnQVAB?ceid=BR:pt-419&oc=3",
     "imagem": "noticias2.jpeg"
   },
   {
     "titulo": "Atrações em João Pessoa",
     "texto": "Descubra as principais atrações turísticas em João Pessoa.",
-    "link": "/guia/",
+    "link": "https://www.tripadvisor.com.br/Attractions-g303428-Activities-Joao_Pessoa_State_of_Paraiba.html",
     "imagem": "atracoes.jpeg"
   }
 ]
@@ -145,6 +135,6 @@
         // Chama a função para criar os cards ao carregar a página
         window.onload = createCards;
     </script>
-<script src="/clima/weather.js"></script>
+   <script src="/clima/weather.js"></script>
 </body>
 </html>
