@@ -56,8 +56,8 @@ function loadWeatherData() {
       const weatherInfo = document.querySelector('#weather-info .card');
 
       // Informações do dia atual
-      const locationName = document.querySelector('#location-name');
-      locationName.textContent = 'João Pessoa';
+      // const locationName = document.querySelector('#location-name');
+      // locationName.textContent = 'João Pessoa';
 
       updateCurrentTemperature();
       setInterval(updateCurrentTemperature, 3600000); // Atualizar a cada hora (3600000 ms)
