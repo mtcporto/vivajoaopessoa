@@ -1,191 +1,159 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="pt-br">
+<head>
     <meta charset="UTF-8">
-    <title>WebTorrent video player</title>
+    <title>Lista de Filmes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.2/dist/plyr.css" />
     <style>
-      #output video {
-        width: 800px; /* 16:9 aspect ratio */
-        margin: 0 auto;
-    }
-    #output {
-        position: relative;
-      }
-      #progressBar {
-          height: 5px;
-          width: 0%;
-          background-color: #35b44f;
-          transition: width .4s ease-in-out;
-      }
-      body.is-seed .show-seed {
-          display: inline;
-      }
-      body.is-seed .show-leech {
-          display: none;
-      }
-      .show-seed {
-          display: none;
-      }
-      #status code {
-          font-size: 90%;
-          font-weight: 700;
-          margin-left: 3px;
-          margin-right: 3px;
-          border-bottom: 1px dashed rgba(255,255,255,0.3);
-      }
-
-      .is-seed #hero {
-          background-color: #154820;
-          transition: .5s .5s background-color ease-in-out;
-      }
-      #hero {
-          background-color: #2a3749;
-          width: 800px; /* 16:9 aspect ratio */
-        margin: 0 auto;
-      }
-      #status {
-          color: #fff;
-          font-size: 17px;
-          padding: 5px;
-      }
-      a:link, a:visited {
-          color: #30a247;
-          text-decoration: none;
-      }
+        body {
+            font-family: sans-serif;
+            background-color: white;
+            color: black;
+        }
+        .card {
+            width: 22rem; /* Aumenta a largura do card */
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+        .card-img-top {
+            width: 100%;
+            height: 15vw;
+            object-fit: cover;
+        }
+        .card-title, .card-text {
+            height: auto; /* Permite que mais texto seja exibido */
+            overflow: visible;
+        }
     </style>
-  </head>
-  <body>
-    <div id="hero">
-      <div id="output">
-        <div id="progressBar"></div>
-        <!-- The video player will be added here -->
-      </div>
-      <!-- Statistics -->
-      <div id="status">
-        <div>
-          <span class="show-leech">Downloading </span>
-          <span class="show-seed">Seeding </span>
-          <code>
-            <!-- Informative link to the torrent file -->
-            <a id="torrentLink" href="https://webtorrent.io/torrents/sintel.torrent">sintel.torrent</a>
-          </code>
-          <span class="show-leech"> from </span>
-          <span class="show-seed"> to </span>
-          <code id="numPeers">0 peers</code>.
+</head>
+<body>
+    <header>
+        <h1 class="text-center my-4">Lista de Filmes de Domínio Público e Creative Commons</h1>
+    </header>
+    <div class="container">
+        <div class="row" id="movieCards">
+            <!-- Movie cards will be inserted here -->
         </div>
-        <div>
-          <code id="downloaded"></code>
-          of <code id="total"></code>
-          — <span id="remaining"></span><br/>
-          &#x2198;<code id="downloadSpeed">0 b/s</code>
-          / &#x2197;<code id="uploadSpeed">0 b/s</code>
-        </div>
-      </div>
     </div>
-    <!-- Include the latest version of WebTorrent -->
     <script src="https://cdn.jsdelivr.net/npm/webtorrent@1.8.26/webtorrent.min.js"></script>
-
-    <!-- Moment is used to show a human-readable remaining time -->
-    <script src="https://momentjs.com/downloads/moment.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.2/dist/plyr.min.js"></script>
     <script>
-        // const torrentId = 'https://webtorrent.io/torrents/sintel.torrent'
-        // const torrentId = 'https://webtorrent.io/torrents/big-buck-bunny.torrent'
-        const torrentId = 'https://webtorrent.io/torrents/cosmos-laundromat.torrent'
-        // const torrentId = 'https://webtorrent.io/torrents/sintel.torrent'
-        // const torrentId = 'https://webtorrent.io/torrents/tears-of-steel.torrent'
+        // API key for TMDb
+        const apiKey = '6655c36ae61cd1554fff7fe2b431ccf7';
 
-      const client = new WebTorrent()
+        // Movie titles and torrent links
+        const movies = [
+            { title: 'Big Buck Bunny', torrent: 'https://webtorrent.io/torrents/big-buck-bunny.torrent' },
+            { title: 'Cosmos Laundromat', torrent: 'https://webtorrent.io/torrents/cosmos-laundromat.torrent' },
+            { title: 'Sintel', torrent: 'https://webtorrent.io/torrents/sintel.torrent' },
+            { title: 'Tears of Steel', torrent: 'https://webtorrent.io/torrents/tears-of-steel.torrent' }
+        ];
 
-      const trackers = [
-      'http://tracker.anirena.com:80/announce',
-      'udp://tracker-udp.anirena.com:80/announce',
-      'udp://open.stealth.si:80/announce',
-      'udp://tracker.opentrackr.org:1337/announce',
-      'udp://tracker.coppersurfer.tk:6969/announce',
-      'udp://exodus.desync.com:6969/announce',
-      'udp://tracker.torrent.eu.org:451/announce',
-      'http://tracker.acgnx.se/announce',
-      'http://nyaa.tracker.wf:7777/announce',
-      'udp://tracker.tiny-vps.com:6969/announce',
-      'http://open.acgnxtracker.com:80/announce',
-      'udp://tracker.internetwarriors.net:1337/announce',
-      'udp://9.rarbg.me:2710/announce',
-      'udp://tracker.leechers-paradise.org:6969/announce',
-      'udp://9.rarbg.to:2710/announce',
-      'http://anidex.moe:6969/announce',
-    ];
+        // Function to search for a movie by title
+        async function searchMovieByTitle(title) {
+            const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${title}&language=pt-BR`);
+            const data = await response.json();
 
-      // HTML elements
-      const $body = document.body
-      const $progressBar = document.querySelector('#progressBar')
-      const $numPeers = document.querySelector('#numPeers')
-      const $downloaded = document.querySelector('#downloaded')
-      const $total = document.querySelector('#total')
-      const $remaining = document.querySelector('#remaining')
-      const $uploadSpeed = document.querySelector('#uploadSpeed')
-      const $downloadSpeed = document.querySelector('#downloadSpeed')
+            // Check if there are results
+            if (data.results.length === 0) {
+                return null;
+            }
 
-      // Download the torrent
-client.add(torrentId, { trackers }, function (torrent) {
-
-        const validVideoExtensions = ['.mp4', '.mkv', '.avi', '.mov']
-
-        // Torrents can contain many files. Let's use the .mp4 file
-        const file = torrent.files.find(function (file) {
-        return validVideoExtensions.some(ext => file.name.endsWith(ext))
-        })
-
-        // Stream the file in the browser
-        file.appendTo('#output')
-
-        // Trigger statistics refresh
-        torrent.on('done', onDone)
-        setInterval(onProgress, 500)
-        onProgress()
-
-        // Statistics
-        function onProgress () {
-          // Peers
-          $numPeers.innerHTML = torrent.numPeers + (torrent.numPeers === 1 ? ' peer' : ' peers')
-
-          // Progress
-          const percent = Math.round(torrent.progress * 100 * 100) / 100
-          $progressBar.style.width = percent + '%'
-          $downloaded.innerHTML = prettyBytes(torrent.downloaded)
-          $total.innerHTML = prettyBytes(torrent.length)
-
-          // Remaining time
-          let remaining
-          if (torrent.done) {
-            remaining = 'Done.'
-          } else {
-            remaining = moment.duration(torrent.timeRemaining / 1000, 'seconds').humanize()
-            remaining = remaining[0].toUpperCase() + remaining.substring(1) + ' remaining.'
-          }
-          $remaining.innerHTML = remaining
-
-          // Speed rates
-          $downloadSpeed.innerHTML = prettyBytes(torrent.downloadSpeed) + '/s'
-          $uploadSpeed.innerHTML = prettyBytes(torrent.uploadSpeed) + '/s'
+            // Get the ID of the movie
+            const movieId = data.results[0].id;
+            return movieId;
         }
-        function onDone () {
-          $body.className += ' is-seed'
-          onProgress()
-        }
-      })
 
-      // Human readable bytes util
-      function prettyBytes(num) {
-        const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-        const neg = num < 0
-        if (neg) num = -num
-        if (num < 1) return (neg ? '-' : '') + num + ' B'
-        const exponent = Math.min(Math.floor(Math.log(num) / Math.log(1000)), units.length - 1)
-        const unit = units[exponent]
-        num = Number((num / Math.pow(1000, exponent)).toFixed(2))
-        return (neg ? '-' : '') + num + ' ' + unit
-      }
+        // Function to get detailed information about the movie using the ID
+        async function getMovieDetails(movieId) {
+            const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=pt-BR`);
+            const data = await response.json();
+            return data;
+        }
+
+        // Function to create a movie card
+        function createMovieCard(movieDetails, torrent) {
+            const card = document.createElement('div');
+            card.className = 'card m-2';
+            card.onclick = () => playMovie(torrent); /* Adiciona funcionalidade de clique ao card inteiro */
+            card.innerHTML = `
+                <img src="https://image.tmdb.org/t/p/w500${movieDetails.poster_path}" class="card-img-top" alt="${movieDetails.title}">
+                <div class="card-body">
+                    <h5 class="card-title">${movieDetails.title}</h5>
+                    <p class="card-text">${movieDetails.overview}</p>
+                </div>
+            `;
+            return card;
+        }
+
+        function playMovie(torrent) {
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '9999';
+
+            const videoElement = document.createElement('video');
+            videoElement.classList.add('plyr-video');
+            videoElement.controls = true;
+            videoElement.autoplay = true;
+            videoElement.playsinline = true;
+            videoElement.addEventListener('loadedmetadata', () => {
+                videoElement.requestFullscreen();
+            });
+            videoElement.addEventListener('exitFullscreen', () => {
+                videoElement.style.maxWidth = '80%';
+                videoElement.style.maxHeight = '80%';
+            });
+
+            modal.appendChild(videoElement);
+            document.body.appendChild(modal);
+
+            const client = new WebTorrent();
+            client.add(torrent, function (torrent) {
+                const file = torrent.files.find(function (file) {
+                    const extension = file.name.split('.').pop();
+                    return ['mp4', 'webm'].includes(extension);
+                });
+                if (file) {
+                    file.renderTo(videoElement, { autoplay: true }, () => {
+                        const player = new Plyr(videoElement);
+                    });
+                } else {
+                    console.error('Nenhum arquivo de vídeo encontrado');
+                }
+            });
+
+            videoElement.addEventListener('ended', function () {
+                document.body.removeChild(modal);
+            });
+        }
+
+        // Function to render movie cards
+        async function renderMovieCards() {
+            const movieCards = document.getElementById('movieCards');
+            for (const movie of movies) {
+                const movieId = await searchMovieByTitle(movie.title);
+                if (movieId) {
+                    const movieDetails = await getMovieDetails(movieId);
+                    const card = createMovieCard(movieDetails, movie.torrent);
+                    movieCards.appendChild(card);
+                }
+            }
+        }
+
+        // Call the function when the page loads
+        window.onload = renderMovieCards;
     </script>
-  </body>
+</body>
 </html>
