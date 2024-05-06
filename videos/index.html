@@ -2,13 +2,14 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Filmes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.2/dist/plyr.css" />
     <style>
         body, header {
-        margin: 0;
-        padding: 0;
+            margin: 0;
+            padding: 0;
         }
         header {
             background-color: black;
@@ -16,8 +17,8 @@
             margin-top: 0 !important;
         }
         header h1 {
-    margin-top: 0 !important;
-}
+            margin-top: 0 !important;
+        }
 
         body {
             font-family: sans-serif;
@@ -25,8 +26,9 @@
             color: black;
         }
         .card {
-            width: 18rem;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* Adicione esta linha */
+            width: 100%;
+            max-width: 18rem;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             transition: 0.3s;
             border: none;
             overflow: hidden;
@@ -36,7 +38,7 @@
             transform: scale(1.05);
         }
         .card-img-top {
-            width: 300px;
+            width: 100%;
             height: auto;
             object-fit: cover;
         }
@@ -51,8 +53,15 @@
             display: inline-block;
         }
         .badge {
-            font-size: 0.9rem; /* Ajuste este valor conforme necessário */
-            padding: .6em .6em; /* Ajuste este valor para alterar o tamanho do badge */
+            font-size: 0.9rem;
+            padding: .6em .6em;
+        }
+
+        /* Estilos para dispositivos móveis */
+        @media (max-width: 767px) {
+            .card {
+                max-width: none;
+            }
         }
     </style>
 </head>
@@ -73,15 +82,8 @@
 
         // Movie titles and torrent links
         const movies = [
-            // { title: 'Big Buck Bunny', torrent: 'https://webtorrent.io/torrents/big-buck-bunny.torrent' },
-            // { title: 'Big Buck Bunny', torrent: 'https://archive.org/download/big-buck-bunny-2008/big-buck-bunny-2008_archive.torrent' },
             { title: 'Cosmos Laundromat', torrent: 'https://webtorrent.io/torrents/cosmos-laundromat.torrent' },
             { title: 'Sintel', torrent: 'https://webtorrent.io/torrents/sintel.torrent' },
-            // { title: 'Tears of Steel', torrent: 'https://webtorrent.io/torrents/tears-of-steel.torrent' },
-            // { title: 'Tears of Steel', torrent: 'http://download.stefan.ubbink.org/ToS/tears_of_steel_1080p.mkv.torrent' },
-            // { title: 'Spring', torrent: 'https://archive.org/download/springblenderopenmoviedownloadlagump3.com/springblenderopenmoviedownloadlagump3.com_archive.torrent' },
-
-            
         ];
 
         // Function to search for a movie by title
@@ -109,8 +111,8 @@
         function createMovieCard(movieDetails, torrent) {
     const card = document.createElement('div');
     card.className = 'card m-2';
-    card.onclick = () => playMovie(torrent);
-    card.innerHTML = `
+    card.onclick = () => playMovie(torrent, movieDetails.title, movieDetails.release_date.split('-')[0]);
+        card.innerHTML = `
         <img src="https://image.tmdb.org/t/p/w500${movieDetails.poster_path}" class="card-img-top" alt="${movieDetails.title}">
         <div class="card-body">
             <h5 class="card-title">${movieDetails.title} <span class="badge badge-dark">${movieDetails.release_date.split('-')[0]}</span></h5>
@@ -120,7 +122,7 @@
 }
 
 
-        function playMovie(torrent) {
+function playMovie(torrent, title, year) {
     const modal = document.createElement('div');
     modal.style.position = 'fixed';
     modal.style.top = '0';
@@ -132,19 +134,35 @@
     modal.style.justifyContent = 'center';
     modal.style.alignItems = 'center';
     modal.style.zIndex = '9999';
+    modal.style.overflow = 'auto'; // Adicione esta linha para permitir o scroll no modal
+
 
     const videoElement = document.createElement('video');
     videoElement.classList.add('plyr-video');
     videoElement.controls = true;
     videoElement.autoplay = true;
     videoElement.playsinline = true;
+    videoElement.style.maxWidth = '100%'; // Adicione esta linha para ajustar o vídeo à largura do modal
+    videoElement.style.maxHeight = '90vh'; // A
     
-    // videoElement.addEventListener('loadedmetadata', () => {
-    //     // videoElement.requestFullscreen();
-    //     const textTrack = videoElement.textTracks[0];
-    //     textTrack.mode = 'showing';
-    //     textTrack.addCue(new VTTCue(0, 0.1, `${title} (${year})`));
-    // });
+// Crie o elemento de informação
+const infoElement = document.createElement('div');
+infoElement.textContent = `${title} (${year})`;
+infoElement.style.position = 'absolute';
+infoElement.style.top = '10px';
+infoElement.style.left = '10px';
+infoElement.style.color = 'white';
+infoElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+infoElement.style.padding = '10px';
+infoElement.style.borderRadius = '10px';
+infoElement.style.zIndex = '10000';
+
+    videoElement.addEventListener('loadedmetadata', () => {
+        const textTrack = videoElement.addTextTrack('metadata', 'Movie Info');
+        textTrack.mode = 'showing';
+        textTrack.addCue(new VTTCue(0, 0.1, `${title} (${year})`));
+    });
+
     videoElement.addEventListener('exitFullscreen', () => {
         videoElement.style.maxWidth = '80%';
         videoElement.style.maxHeight = '80%';
@@ -160,6 +178,7 @@
         document.body.removeChild(modal);
     });
 
+    modal.appendChild(infoElement);
     modal.appendChild(videoElement);
     modal.appendChild(closeButton);
     document.body.appendChild(modal);
@@ -170,27 +189,46 @@
         }
     });
 
-    const client = new WebTorrent();
+    const client = new WebTorrent({ wtp: false });
     client.add(torrent, function (torrent) {
-        let file;
-        if (torrent.name === 'Tears of Steel') {
-            file = torrent.files.find(file => file.name === 'Tears of Steel.webm');
-        } else if (torrent.name === 'Big Buck Bunny') {
-            file = torrent.files.find(file => file.name === 'Big Buck Bunny.mp4');
-        } else {
-            file = torrent.files.find(function (file) {
-                const extension = file.name.split('.').pop();
-                return ['mp4', 'webm'].includes(extension);
-            });
-        }
-
-        if (file) {
-    file.renderTo(videoElement, { autoplay: true });
-    const player = new Plyr(videoElement);
-} else {
-    console.error('Nenhum arquivo de vídeo encontrado');
-}
+    // Encontre o arquivo de vídeo
+    const videoFile = torrent.files.find(function (file) {
+        const extension = file.name.split('.').pop();
+        return ['mp4', 'webm', 'mov', 'avi'].includes(extension);
     });
+
+    // Encontre o arquivo de legenda
+    const subtitleFile = torrent.files.find(function (file) {
+        const extension = file.name.split('.').pop();
+        return ['vtt', 'srt'].includes(extension);
+    });
+    
+
+    if (videoFile) {
+        videoFile.renderTo(videoElement, { autoplay: true }, () => {
+            const player = new Plyr(videoElement);
+        });
+    } else {
+        console.error('Nenhum arquivo de vídeo encontrado');
+    }
+
+    if (subtitleFile) {
+        const caption = document.createElement('track');
+        caption.kind = 'captions';
+        caption.label = 'English';
+        caption.srclang = 'en';
+        caption.default = true;
+        videoElement.appendChild(caption);
+
+        subtitleFile.getBlobURL(function (err, url) {
+            if (err) throw err;
+            caption.src = url;
+        });
+    } else {
+        console.error('Nenhum arquivo de legenda encontrado');
+    }
+});
+
 
     videoElement.addEventListener('ended', function () {
         document.body.removeChild(modal);
@@ -211,6 +249,15 @@
                 }
             }
         }
+        window.addEventListener('error', function (event) {
+    if (event.message.includes('wss://tracker.fastcast.nz/') || event.message.includes('blob:')) {
+        // Ignore esses erros específicos
+        event.preventDefault();
+    } else {
+        // Trate outros erros como desejar
+        console.error(event.error);
+    }
+});
 
         // Call the function when the page loads
         window.onload = renderMovieCards;
