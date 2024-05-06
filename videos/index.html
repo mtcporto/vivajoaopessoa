@@ -6,33 +6,59 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.2/dist/plyr.css" />
     <style>
+        body, header {
+        margin: 0;
+        padding: 0;
+        }
+        header {
+            background-color: black;
+            color: white;
+            margin-top: 0 !important;
+        }
+        header h1 {
+    margin-top: 0 !important;
+}
+
         body {
             font-family: sans-serif;
             background-color: white;
             color: black;
         }
         .card {
-            width: 22rem; /* Aumenta a largura do card */
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            width: 18rem;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
             transition: 0.3s;
+            border: none;
+            overflow: hidden;
         }
         .card:hover {
-            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
         }
         .card-img-top {
-            width: 100%;
-            height: 15vw;
+            width: 300px;
+            height: auto;
             object-fit: cover;
         }
-        .card-title, .card-text {
-            height: auto; /* Permite que mais texto seja exibido */
-            overflow: visible;
+        .card-body {
+            padding: 1rem;
+            text-align: center;
+        }
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .badge {
+            font-size: 0.9rem; /* Ajuste este valor conforme necessário */
+            padding: .6em .6em; /* Ajuste este valor para alterar o tamanho do badge */
         }
     </style>
 </head>
 <body>
     <header>
-        <h1 class="text-center my-4">Lista de Filmes de Domínio Público e Creative Commons</h1>
+        <h1 class="text-center my-4">Blender Open Movies</h1>
     </header>
     <div class="container">
         <div class="row" id="movieCards">
@@ -47,10 +73,15 @@
 
         // Movie titles and torrent links
         const movies = [
-            { title: 'Big Buck Bunny', torrent: 'https://webtorrent.io/torrents/big-buck-bunny.torrent' },
+            // { title: 'Big Buck Bunny', torrent: 'https://webtorrent.io/torrents/big-buck-bunny.torrent' },
+            // { title: 'Big Buck Bunny', torrent: 'https://archive.org/download/big-buck-bunny-2008/big-buck-bunny-2008_archive.torrent' },
             { title: 'Cosmos Laundromat', torrent: 'https://webtorrent.io/torrents/cosmos-laundromat.torrent' },
             { title: 'Sintel', torrent: 'https://webtorrent.io/torrents/sintel.torrent' },
-            { title: 'Tears of Steel', torrent: 'https://webtorrent.io/torrents/tears-of-steel.torrent' }
+            // { title: 'Tears of Steel', torrent: 'https://webtorrent.io/torrents/tears-of-steel.torrent' },
+            // { title: 'Tears of Steel', torrent: 'http://download.stefan.ubbink.org/ToS/tears_of_steel_1080p.mkv.torrent' },
+            // { title: 'Spring', torrent: 'https://archive.org/download/springblenderopenmoviedownloadlagump3.com/springblenderopenmoviedownloadlagump3.com_archive.torrent' },
+
+            
         ];
 
         // Function to search for a movie by title
@@ -75,20 +106,19 @@
             return data;
         }
 
-        // Function to create a movie card
         function createMovieCard(movieDetails, torrent) {
-            const card = document.createElement('div');
-            card.className = 'card m-2';
-            card.onclick = () => playMovie(torrent); /* Adiciona funcionalidade de clique ao card inteiro */
-            card.innerHTML = `
-                <img src="https://image.tmdb.org/t/p/w500${movieDetails.poster_path}" class="card-img-top" alt="${movieDetails.title}">
-                <div class="card-body">
-                    <h5 class="card-title">${movieDetails.title}</h5>
-                    <p class="card-text">${movieDetails.overview}</p>
-                </div>
-            `;
-            return card;
-        }
+    const card = document.createElement('div');
+    card.className = 'card m-2';
+    card.onclick = () => playMovie(torrent);
+    card.innerHTML = `
+        <img src="https://image.tmdb.org/t/p/w500${movieDetails.poster_path}" class="card-img-top" alt="${movieDetails.title}">
+        <div class="card-body">
+            <h5 class="card-title">${movieDetails.title} <span class="badge badge-dark">${movieDetails.release_date.split('-')[0]}</span></h5>
+        </div>
+    `;
+    return card;
+}
+
 
         function playMovie(torrent) {
     const modal = document.createElement('div');
@@ -108,13 +138,18 @@
     videoElement.controls = true;
     videoElement.autoplay = true;
     videoElement.playsinline = true;
-    videoElement.addEventListener('loadedmetadata', () => {
-        videoElement.requestFullscreen();
-    });
+    
+    // videoElement.addEventListener('loadedmetadata', () => {
+    //     // videoElement.requestFullscreen();
+    //     const textTrack = videoElement.textTracks[0];
+    //     textTrack.mode = 'showing';
+    //     textTrack.addCue(new VTTCue(0, 0.1, `${title} (${year})`));
+    // });
     videoElement.addEventListener('exitFullscreen', () => {
         videoElement.style.maxWidth = '80%';
         videoElement.style.maxHeight = '80%';
     });
+
 
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Fechar';
@@ -137,17 +172,24 @@
 
     const client = new WebTorrent();
     client.add(torrent, function (torrent) {
-        const file = torrent.files.find(function (file) {
-            const extension = file.name.split('.').pop();
-            return ['mp4', 'webm'].includes(extension);
-        });
-        if (file) {
-            file.renderTo(videoElement, { autoplay: true }, () => {
-                const player = new Plyr(videoElement);
-            });
+        let file;
+        if (torrent.name === 'Tears of Steel') {
+            file = torrent.files.find(file => file.name === 'Tears of Steel.webm');
+        } else if (torrent.name === 'Big Buck Bunny') {
+            file = torrent.files.find(file => file.name === 'Big Buck Bunny.mp4');
         } else {
-            console.error('Nenhum arquivo de vídeo encontrado');
+            file = torrent.files.find(function (file) {
+                const extension = file.name.split('.').pop();
+                return ['mp4', 'webm'].includes(extension);
+            });
         }
+
+        if (file) {
+    file.renderTo(videoElement, { autoplay: true });
+    const player = new Plyr(videoElement);
+} else {
+    console.error('Nenhum arquivo de vídeo encontrado');
+}
     });
 
     videoElement.addEventListener('ended', function () {
