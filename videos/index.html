@@ -82,8 +82,10 @@
 
         // Movie titles and torrent links
         const movies = [
-            { title: 'Cosmos Laundromat', torrent: 'https://webtorrent.io/torrents/cosmos-laundromat.torrent' },
+            { title: 'Big Buck Bunny', torrent: 'https://api.allorigins.win/raw?url=https://d2rkvwn9o31ezi.cloudfront.net/Big%20Buck%20Bunny.torrent' },
             { title: 'Sintel', torrent: 'https://webtorrent.io/torrents/sintel.torrent' },
+            { title: 'Tears of Steel', torrent: 'https://api.allorigins.win/raw?url=https://d2rkvwn9o31ezi.cloudfront.net/Tears%20of%20Steel.torrent' },
+            { title: 'Cosmos Laundromat', torrent: 'https://webtorrent.io/torrents/cosmos-laundromat.torrent' },
         ];
 
         // Function to search for a movie by title
@@ -189,8 +191,16 @@ infoElement.style.zIndex = '10000';
         }
     });
 
-    const client = new WebTorrent({ wtp: false });
-    client.add(torrent, function (torrent) {
+    const client = new WebTorrent({
+    wtp: false,
+    tracker: {
+        wssServers: [
+            'wss://tracker.openwebtorrent.com',
+            'wss://tracker.btorrent.xyz',
+            'wss://tracker.webtorrent.dev'
+        ]
+    }
+});    client.add(torrent, function (torrent) {
     // Encontre o arquivo de vídeo
     const videoFile = torrent.files.find(function (file) {
         const extension = file.name.split('.').pop();
@@ -212,21 +222,21 @@ infoElement.style.zIndex = '10000';
         console.error('Nenhum arquivo de vídeo encontrado');
     }
 
-    if (subtitleFile) {
-        const caption = document.createElement('track');
-        caption.kind = 'captions';
-        caption.label = 'English';
-        caption.srclang = 'en';
-        caption.default = true;
-        videoElement.appendChild(caption);
+    // if (subtitleFile) {
+    //     const caption = document.createElement('track');
+    //     caption.kind = 'captions';
+    //     caption.label = 'English';
+    //     caption.srclang = 'en';
+    //     caption.default = true;
+    //     videoElement.appendChild(caption);
 
-        subtitleFile.getBlobURL(function (err, url) {
-            if (err) throw err;
-            caption.src = url;
-        });
-    } else {
-        console.error('Nenhum arquivo de legenda encontrado');
-    }
+    //     subtitleFile.getBlobURL(function (err, url) {
+    //         if (err) throw err;
+    //         caption.src = url;
+    //     });
+    // } else {
+    //     console.error('Nenhum arquivo de legenda encontrado');
+    // }
 });
 
 
@@ -249,15 +259,7 @@ infoElement.style.zIndex = '10000';
                 }
             }
         }
-        window.addEventListener('error', function (event) {
-    if (event.message.includes('wss://tracker.fastcast.nz/') || event.message.includes('blob:')) {
-        // Ignore esses erros específicos
-        event.preventDefault();
-    } else {
-        // Trate outros erros como desejar
-        console.error(event.error);
-    }
-});
+
 
         // Call the function when the page loads
         window.onload = renderMovieCards;
