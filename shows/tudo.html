@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eventos - Sympla</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    .card-img-top {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .card-link {
+      text-decoration: none;
+      color: inherit;
+    }
+    .header {
+      background-color: black;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .card-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @media (max-width: 767px) {
+      .card-img-top {
+        height: 200px;
+      }
+    }
+    @media (min-width: 768px) and (max-width: 991px) {
+      .card-img-top {
+        height: 150px;
+      }
+    }
+    @media (min-width: 992px) {
+      .card-img-top {
+        height: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">Shows e Eventos em João Pessoa - Sympla</div>
+  <div class="container">
+    <div id="eventos" class="row"></div>
+    <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Eventos</button>
+  </div>
+  <script>
+ // URLs das páginas que você quer raspar
+const urls = [
+  'https://cors-eventim.mosaicoworkers.workers.dev/api/city/joao-pessoa-1816/',
+  'https://www.sympla.com.br/eventos/joao-pessoa-pb/show-musica-festa/esta-semana'
+];
+
+let eventosCount = 0;
+
+function loadEvents(urlIndex) {
+  if (urlIndex >= urls.length) {
+    // Todas as URLs foram processadas
+    return;
+  }
+
+  fetch(urls[urlIndex])
+    .then(response => response.text())
+    .then(html => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const eventosDiv = document.getElementById('eventos');
+
+      // Substitua os seletores abaixo pelos corretos para a página que você quer raspar
+      const eventos = doc.querySelectorAll('product-group-item');
+
+      // Processa os eventos
+      // ...
+
+      eventosCount += 9;
+      if (eventosCount < eventos.length) {
+        document.querySelector("#loadMore").style.display = 'block';
+      } else {
+        document.querySelector("#loadMore").style.display = 'none';
+        // Carrega eventos da próxima URL
+        loadEvents(urlIndex + 1);
+      }
+    })
+    .catch(console.error);
+}
+
+document.querySelector("#loadMore").addEventListener('click', () => loadEvents(0));
+loadEvents(0);
+  </script>
+</body>
+</html>
