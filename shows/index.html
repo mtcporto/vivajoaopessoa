@@ -3,131 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eventos - Sympla</title>
+  <title>Eventos - João Pessoa</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <style>
-    .card-img-top {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-    }
-    .card-link {
-      text-decoration: none;
-      color: inherit;
-    }
-    .header {
-      background-color: black;
-      color: white;
-      padding: 10px;
-      text-align: center;
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
-    .card-text {
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    @media (max-width: 767px) {
-      .card-img-top {
-        height: 200px;
-      }
-    }
-    @media (min-width: 768px) and (max-width: 991px) {
-      .card-img-top {
-        height: 150px;
-      }
-    }
-    @media (min-width: 992px) {
-      .card-img-top {
-        height: 150px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="header">Shows e Eventos em João Pessoa - Sympla</div>
+  <div class="header">Shows e Eventos em João Pessoa</div>
   <div class="container">
     <div id="eventos" class="row"></div>
     <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Eventos</button>
   </div>
+  <script src="sympla.js"></script>
+  <script src="eventim.js"></script>
+  <script src="bilheteriadigital.js"></script>
+  <script src="outgo.js"></script>
   <script>
-    // URL da página que você quer raspar
-    const url = 'https://www.sympla.com.br/eventos/joao-pessoa-pb/show-musica-festa/esta-semana';
-    let eventosCount = 0;
+let eventosLoaded = 0;
 
-    function loadEvents() {
-      fetch(url)
-        .then(response => response.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const eventosDiv = document.getElementById('eventos');
+function loadEvents() {
+  const eventLoadPromises = [
+    loadSymplaEvents(),
+    loadEventimEvents(),
+    loadBilheteriaDigitalEvents(),
+    loadOutgoEvents(),
+  ];
 
-          // Substitua os seletores abaixo pelos corretos para a página que você quer raspar
-          const eventos = doc.querySelectorAll('.CustomGridstyle__CustomGridCardType-sc-1ce1n9e-2 a');
+  Promise.all(eventLoadPromises)
+    .then(() => {
+      eventosLoaded += 4; // Increment eventosLoaded after all events are loaded
+      // You can add any post-processing or UI updates here
+      console.log("All events loaded!");
+    })
+    .catch((error) => {
+      console.error("Error loading events:", error);
+    });
+}
 
-          eventos.forEach((evento, index) => {
-            if (index >= eventosCount && index < eventosCount + 9) {
-              try {
-                const nome = evento.querySelector('.EventCardstyle__EventTitle-sc-1rkzctc-7').textContent.toLowerCase().replace(/\s/g, '-').replace(/[áàãâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[íìîï]/g, 'i').replace(/[óòõôö]/g, 'o').replace(/[úùûü]/g, 'u').replace(/[ç]/g, 'c');
-                const idEvento = evento.getAttribute('id');
-                const linkElement = evento.querySelector('.EventCardstyle__CardLink-sc-1rkzctc-3');
-                const link = evento.getAttribute('href');
-                const title = evento.getAttribute('title');
+document.querySelector("#loadMore").addEventListener('click', loadEvents);
+loadEvents();
 
-//                 const link = evento.querySelector('a[href]').href;
-// if (linkElement) {
-// 	const link = linkElement.href;
-// 	// Rest of your code
-// } else {
-// 	console.error('Link element not found');
-// }
-
-const foto = evento.querySelector('.EventCardstyle__ImageContainer-sc-1rkzctc-1 img').src;
-                const local = evento.querySelector('.EventCardstyle__EventLocation-sc-1rkzctc-8').textContent;
-
-                // Verifica se o evento é em João Pessoa, PB
-                if (local.includes('João Pessoa, PB')) {
-                  const datas = Array.from(evento.querySelectorAll('.sc-1sp59be-1.fZlvlB')).map(el => el.textContent);
-                  const data = datas.join(' - ');
-                  const eventoDiv = document.createElement('div');
-                  eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
-                  eventoDiv.innerHTML = `
-                    <div class="card">
-                      <a href="${link}" target="_blank" class="card-link">
-                        <img src="${foto}" class="card-img-top" alt="${nome}">
-                      </a>
-                      <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">Fonte: Sympla</h6>
-                        <h5 class="card-title">${title}</h5>
-                        <p class="card-text">${data}</p>
-                        <p class="card-text">${local}</p>
-                      </div>
-                    </div><br>
-                  `;
-                  eventosDiv.appendChild(eventoDiv);
-                }
-              } catch (error) {
-                console.error(`Erro ao processar o evento: ${error}`);
-              }
-            }
-          });
-
-          eventosCount += 9;
-          if (eventosCount < eventos.length) {
-            document.querySelector("#loadMore").style.display = 'block';
-          } else {
-            document.querySelector("#loadMore").style.display = 'none';
-          }
-        })
-        .catch(console.error);
-    }
-
-    document.querySelector("#loadMore").addEventListener('click', loadEvents);
-    loadEvents();
   </script>
+</body>
+</html>
 </body>
 </html>
