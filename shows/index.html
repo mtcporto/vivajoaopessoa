@@ -17,6 +17,8 @@
   <script src="eventim.js"></script>
   <script src="bilheteriadigital.js"></script>
   <script src="outgo.js"></script>
+  <script src="ingressodigital.js"></script>
+
   <script>
 let eventosLoaded = 0;
 
@@ -26,6 +28,7 @@ function loadEvents() {
     loadEventimEvents(),
     loadBilheteriaDigitalEvents(),
     loadOutgoEvents(),
+    loadIngressoDigitalEvents(),
   ];
 
   Promise.all(eventLoadPromises)
