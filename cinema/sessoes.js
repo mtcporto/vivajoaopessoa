@@ -1,44 +1,116 @@
 // Função para criar o elemento do filme
 function createMovieElement(movieId, movieData) {
   const movieElement = document.createElement('div');
-  movieElement.classList.add('movie-container');
-
-  // Detalhes do filme
-  const movieTitle = document.createElement('h3');
-  movieTitle.textContent = movieData.title;
-  movieElement.appendChild(movieTitle);
+  movieElement.classList.add('card', 'top-level');
+  
 
   // Adicione a imagem do filme, se disponível
   if (movieData.images && movieData.images.length > 0) {
     const movieImage = document.createElement('img');
     movieImage.src = movieData.images[0].url;
     movieImage.alt = movieData.title;
+    movieImage.style.width = '350px'; // Define a largura da imagem
+    movieImage.classList.add('card-img-top'); // Adiciona a classe do Bootstrap
     movieElement.appendChild(movieImage);
   }
 
+// Cria o corpo do card
+const cardBody = document.createElement('div');
+cardBody.classList.add('card-body');
+movieElement.appendChild(cardBody);
+
+  // Detalhes do filme
+  const movieTitle = document.createElement('h5');
+  movieTitle.textContent = movieData.title;
+  movieTitle.classList.add('card-title'); // Adiciona a classe do Bootstrap
+  cardBody.appendChild(movieTitle);
+
   // Adicione detalhes adicionais do filme
   const movieDetails = document.createElement('p');
-  movieDetails.textContent = `Duração: ${movieData.duration}, Classificação: ${movieData.contentRating}, Gêneros: ${movieData.genres.join(', ')}`;
-  movieElement.appendChild(movieDetails);
+  movieDetails.textContent = ``;
+  movieDetails.classList.add('card-text'); // Adiciona a classe do Bootstrap
+  cardBody.appendChild(movieDetails);
 
-  // Loop através dos cinemas e exibir detalhes
-  for (let cinema in movieData.cinemas) {
-    const cinemaName = document.createElement('h4');
-    cinemaName.textContent = cinema;
-    movieElement.appendChild(cinemaName);
+
+  function getBadgeColor(rating) {
+    switch (rating) {
+      case 'Livre':
+        return 'badge-success';
+      case '10 anos':
+        return 'badge-primary';        
+      case '12 anos':
+        return 'badge-warning';
+      case '14 anos':
+        return 'badge-orange';
+      case '16 anos':
+        return 'badge-danger';
+      case '18 anos':
+        return 'badge-dark';
+      default:
+        return 'badge-secondary'; // Cor padrão para classificações desconhecidas
+    }
+  }
+  
+
+// Adicione a classificação como um badge
+const movieRating = document.createElement('span');
+movieRating.textContent = movieData.contentRating;
+movieRating.classList.add('badge', getBadgeColor(movieData.contentRating)); // Adiciona as classes do Bootstrap
+movieDetails.appendChild(movieRating);
+
+movieDetails.appendChild(document.createTextNode(` ${movieData.genres.join(', ')} - ${movieData.duration} min.`));
+
+// Cria o acordeão para as sessões
+const accordion = document.createElement('div');
+accordion.classList.add('accordion');
+accordion.id = `accordion${movieId}`;
+cardBody.appendChild(accordion);
+
+// Loop através dos cinemas e exibir detalhes
+let cinemaId = 0;
+for (let cinema in movieData.cinemas) {
+  const cinemaCard = document.createElement('div');
+  cinemaCard.classList.add('card');
+  accordion.appendChild(cinemaCard);
+
+
+    const cinemaHeader = document.createElement('div');
+    cinemaHeader.classList.add('card-header');
+    cinemaHeader.id = `heading${movieId}${cinemaId}`;
+    cinemaCard.appendChild(cinemaHeader);
+
+    const cinemaButton = document.createElement('button');
+    cinemaButton.classList.add('btn', 'btn-link');
+    cinemaButton.type = 'button';
+    cinemaButton.dataset.toggle = 'collapse';
+    cinemaButton.dataset.target = `#collapse${movieId}${cinemaId}`;
+    cinemaButton.textContent = cinema;
+    cinemaHeader.appendChild(cinemaButton);
+
+    const cinemaCollapse = document.createElement('div');
+    cinemaCollapse.id = `collapse${movieId}${cinemaId}`;
+    cinemaCollapse.classList.add('collapse');
+    cinemaCollapse.dataset.parent = `#accordion${movieId}`;
+    cinemaCard.appendChild(cinemaCollapse);
+
+    const cinemaBody = document.createElement('div');
+    cinemaBody.classList.add('card-body');
+    cinemaCollapse.appendChild(cinemaBody);
 
     movieData.cinemas[cinema].forEach(room => {
       const roomName = document.createElement('h5');
       roomName.textContent = room.name;
-      movieElement.appendChild(roomName);
+      cinemaBody.appendChild(roomName);
 
       room.sessions.forEach(session => {
         const sessionDetails = document.createElement('p');
         sessionDetails.classList.add('session-details');
-        sessionDetails.textContent = `${session.date} - ${session.time} - ${session.type} - ${session.language} - R$${session.price}`;
-        movieElement.appendChild(sessionDetails);
+        sessionDetails.textContent = `${session.date} - ${session.time} - ${session.type}`;
+        cinemaBody.appendChild(sessionDetails);
       });
     });
+
+    cinemaId++;
   }
 
   return movieElement;
@@ -80,8 +152,6 @@ fetch(urlCinemas)
                     date: session.date.dayAndMonth,
                     time: session.time,
                     type: session.types[0].name,
-                    language: session.language,
-                    price: session.price
                   }))
                 }));
               });
@@ -105,3 +175,4 @@ fetch(urlCinemas)
     }
   })
   .catch(error => console.error('Erro ao obter dados da API:', error));
+ 
