@@ -1,75 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filmes em João Pessoa</title>
-    <style>
-        /* Estilos opcionais para melhorar a apresentação */
-        body {
-            font-family: Arial, sans-serif;
-        }
-    /* Header styles */
-    header {
-      background-color: #000;
-      color: #fff;
-      padding: 10px;
-      text-align: center;
-      margin-bottom: 20px; /* Espaçamento entre o header e os cards */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Filmes em cartaz</title>
+<!-- CSS do Bootstrap -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+
+
+  <style>
+    /* Estilos opcionais para melhorar a apresentação */
+    body {
+        font-family: Arial, sans-serif;
     }
-        .event-container {
-            border: none;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-            display: inline-block;
-            text-align: center;
-            background-color: #fff;
-        }
-        .event-image {
-        width: 300px;
-        height: auto;
-        cursor: pointer;
-        overflow: visible; /* Add this */
-        }
+/* Header styles */
+header {
+  background-color: #000;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 20px; /* Espaçamento entre o header e os cards */
+}
+    .event-container {
+        border: none;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+        display: inline-block;
+        text-align: center;
+        background-color: #fff;
+    }
+    .event-image {
+    width: 300px;
+    height: auto;
+    cursor: pointer;
+    overflow: visible; /* Add this */
+    }
 
 @media only screen and (max-width: 400px) {
-  .event-image {
-    width: 300px !important; /* Add !important to override other styles */
+.event-image {
+width: 300px !important; /* Add !important to override other styles */
+}
+
+
+    }
+    .event-title {
+        font-size: 18px;
+        text-align: center;
+    }
+    .icons-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    .icon {
+        width: 20px;
+        height: 20px;
+        margin: 0 5px;
+    }
+    .event-container:not(:last-child) {
+        margin-right: 10px;
+    }
+    #eventContainer {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .badge {
+  font-size: 16px; /* Adjust as needed */
+}
+.card.top-level {
+  width: 350px; /* Ajuste para o valor desejado */
+  margin: 10px; /* Adiciona algum espaço ao redor dos cards */
+  display: inline-block; /* Faz os cards se alinharem lado a lado */
+  margin-left: 50px; /* Adiciona uma margem à esquerda de 50px */
+  margin-right: 50px; /* Adiciona uma margem à esquerda de 50px */
+
+}
+.card-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 50px; /* Espaço entre os cards */
+}
+.badge-orange {
+  color: #fff; /* Cor do texto */
+  background-color: #ff7f00; /* Cor de fundo */
+}
+/* Estilos para telas grandes (desktops, laptops) */
+@media (min-width: 992px) {
+  .accordion {
+    display: none; /* Oculta o acordeão */
   }
+}
 
 
-        }
-        .event-title {
-            font-size: 18px;
-            text-align: center;
-        }
-        .icons-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 10px;
-        }
-        .icon {
-            width: 20px;
-            height: 20px;
-            margin: 0 5px;
-        }
-        .event-container:not(:last-child) {
-            margin-right: 10px;
-        }
-        #eventContainer {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-    </style>
+</style>
 </head>
 <body>
-    <header>
-        <h1>Filmes em cartaz - João Pessoa</h1>
+  <header>
+    <h1>Filmes em cartaz</h1>
     </header>
-    <!-- Loop através dos eventos -->
-    <div id="eventContainer"></div>
-    <script src="script.js"></script>
+
+  <main>
+    <div class="card-container">
+      <section class="sessions-container"></section>      
+    </div>
+
+  </main>
+<!-- JS do Bootstrap e suas dependências (jQuery e Popper.js) -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="sessoes.js"></script>
 </body>
 </html>
