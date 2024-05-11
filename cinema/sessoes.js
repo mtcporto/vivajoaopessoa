@@ -6,14 +6,23 @@ function createMovieElement(movieId, movieData) {
 
   // Adicione a imagem do filme, se disponível
   if (movieData.images && movieData.images.length > 0) {
+    const movieImageLink = document.createElement('a'); // Cria um elemento de link
+    movieImageLink.href = movieData.siteURL; // Define o atributo href para a URL da página de detalhes do filme
+    movieImageLink.target = '_blank'; // Adiciona o atributo target
+
+
     const movieImage = document.createElement('img');
     movieImage.src = movieData.images[0].url;
     movieImage.alt = movieData.title;
     movieImage.style.width = '350px'; // Define a largura da imagem
     movieImage.classList.add('card-img-top'); // Adiciona a classe do Bootstrap
-    movieElement.appendChild(movieImage);
+
+    movieImageLink.appendChild(movieImage); // Adiciona a imagem ao link
+    movieElement.appendChild(movieImageLink); // Adiciona o link ao elemento do filme
+    console.log('movieImageLink',movieImageLink);
   }
 
+  
 // Cria o corpo do card
 const cardBody = document.createElement('div');
 cardBody.classList.add('card-body');
@@ -142,6 +151,7 @@ fetch(urlCinemas)
                     duration: movie.duration,
                     contentRating: movie.contentRating,
                     genres: movie.genres,
+                    siteURL: movie.siteURL, // Adicione esta linha
                     cinemas: {}
                   };
                 }
