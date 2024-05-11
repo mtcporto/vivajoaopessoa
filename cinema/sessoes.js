@@ -19,7 +19,6 @@ function createMovieElement(movieId, movieData) {
 
     movieImageLink.appendChild(movieImage); // Adiciona a imagem ao link
     movieElement.appendChild(movieImageLink); // Adiciona o link ao elemento do filme
-    console.log('movieImageLink',movieImageLink);
   }
 
   
@@ -28,11 +27,11 @@ const cardBody = document.createElement('div');
 cardBody.classList.add('card-body');
 movieElement.appendChild(cardBody);
 
-  // Detalhes do filme
-  const movieTitle = document.createElement('h5');
-  movieTitle.textContent = movieData.title;
-  movieTitle.classList.add('card-title'); // Adiciona a classe do Bootstrap
-  cardBody.appendChild(movieTitle);
+// Detalhes do filme
+const movieTitle = document.createElement('h5');
+movieTitle.textContent = movieData.title;
+movieTitle.classList.add('card-title'); // Adiciona a classe do Bootstrap
+cardBody.appendChild(movieTitle);
 
   // Adicione detalhes adicionais do filme
   const movieDetails = document.createElement('p');
@@ -68,6 +67,32 @@ movieRating.classList.add('badge', getBadgeColor(movieData.contentRating)); // A
 movieDetails.appendChild(movieRating);
 
 movieDetails.appendChild(document.createTextNode(` ${movieData.genres.join(', ')} - ${movieData.duration} min.`));
+
+// Adicione o botão de trailer, se a URL do trailer estiver disponível
+if (movieData.trailers && movieData.trailers.length > 0) {
+  const trailerButton = document.createElement('button');
+  trailerButton.innerHTML = '<i class="fa-solid fa-play"></i> Trailer';
+  trailerButton.classList.add('btn', 'btn-primary'); // Adiciona as classes do Bootstrap
+
+  var trailerUrl = movieData.trailers[0].embeddedUrl;
+  if (/Mobi|Android/i.test(navigator.userAgent)) {
+    // Se estiver em um dispositivo móvel, defina o botão para redirecionar para a URL do trailer
+    trailerButton.onclick = function() {
+      window.location.href = trailerUrl;
+    };
+  } else {
+    // Se não estiver em um dispositivo móvel, defina o botão para abrir o modal
+    trailerButton.dataset.toggle = 'modal';
+    trailerButton.dataset.target = '#trailerModal';
+    trailerButton.dataset.trailer = trailerUrl;
+  }
+
+  trailerButton.style.marginBottom = '20px'; // Adiciona uma margem inferior de 20px
+  cardBody.appendChild(trailerButton);
+}
+
+
+
 
 // Cria o acordeão para as sessões
 const accordion = document.createElement('div');
@@ -152,6 +177,7 @@ fetch(urlCinemas)
                     contentRating: movie.contentRating,
                     genres: movie.genres,
                     siteURL: movie.siteURL, // Adicione esta linha
+                    trailers: movie.trailers, // Adicione esta linha
                     cinemas: {}
                   };
                 }
@@ -185,4 +211,35 @@ fetch(urlCinemas)
     }
   })
   .catch(error => console.error('Erro ao obter dados da API:', error));
+
+
+  
+
+
+
+  $(document).ready(function() {
+    var player;
+  
+    $('#trailerModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget); // Botão que acionou o modal
+      var trailerUrl = 'https:' + button.data('trailer'); // Extrai a URL do trailer dos dados do botão
+  
+      var modal = $(this);
+      var trailerIframe = modal.find('#trailer');
+      trailerIframe.attr('src', trailerUrl);
+  
+      // Inicializa o Plyr
+      player = Plyr.setup(trailerIframe.get(0));
+    });
+  
+    $('#trailerModal').on('hide.bs.modal', function (event) {
+      var modal = $(this);
+      modal.find('#trailer').attr('src', ''); // Limpa a URL do trailer quando o modal é fechado
+  
+      if (player) {
+        player.destroy(); // Destroi o Plyr quando o modal é fechado
+      }
+    });
+  });
+  
  
