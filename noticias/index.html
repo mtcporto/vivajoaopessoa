@@ -3,40 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Menu de Notícias</title>
+  <title>Notícias</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .header {
-      background-color: black;
-      color: white;
-      text-align: center;
-      padding: 10px;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="header">
-    <h1>Menu de Notícias</h1>
+    <h1>Notícias</h1>
   </div>
   <div class="container py-5">
-    <div class="list-group">
-      <a href="/noticias/noticiasaominuto.html" class="list-group-item list-group-item-action" target="_blank">
-        <h5>Notícias ao Minuto</h5>
-        <p>Notícias ao Minuto é um portal de notícias português que cobre os principais acontecimentos em Portugal e no mundo.</p>
-      </a>
-      <a href="/noticias/uol.html" class="list-group-item list-group-item-action" target="_blank">
-        <h5>UOL</h5>
-        <p>UOL é o maior portal de conteúdo, tecnologia, serviços e meios de pagamentos digitais do Brasil.</p>
-      </a>
-            <a href="/noticias/cnn.html" class="list-group-item list-group-item-action" target="_blank">
-        <h5>CNN Brasil</h5>
-        <p>CNN Brasil</p>
-      </a>
-      <a href="/noticias/bbcbrasil.html" class="list-group-item list-group-item-action" target="_blank">
-        <h5>BBC Brasil</h5>
-        <p>BBC Brasil</p>
-      </a>      
-    </div>
+    <div class="row" id="newsCards"></div>
+    <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Notícias</button>
   </div>
+  <script src="cnnbrasil.js"></script>
+  <script src="bbcbrasil.js"></script>
+  <script src="uol.js"></script>
+  <script src="noticiasaominuto.js"></script>
+  <script>
+    let newsLoaded = 0;
+
+    function loadNews() {
+      const newsLoadPromises = [
+        loadCNNBrasilNews(),
+        loadBBCBrasilNews(),
+        loadUOLNews(),
+        loadNoticiasAoMinutoNews(),
+        // adicione mais funções conforme necessário
+      ];
+
+      Promise.all(newsLoadPromises)
+        .then(() => {
+          newsLoaded += 4; // Increment newsLoaded after all news are loaded
+          console.log("All news loaded!");
+        })
+        .catch((error) => {
+          console.error("Error loading news:", error);
+        });
+    }
+
+    document.querySelector("#loadMore").addEventListener('click', loadNews);
+    loadNews();
+  </script>
 </body>
 </html>
