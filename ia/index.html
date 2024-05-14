@@ -462,7 +462,7 @@ function sendMessage() {
   document.querySelector('.chat-container').innerHTML += `<div class="chat outgoing"><div class="chat-details"><p><strong>Você:</strong> ${userInput}</p></div></div>`;
   document.getElementById('chat-input').value = '';
 
-  fetch('https://jarvis.mosaicoworkers.workers.dev/', {
+  fetch('https://nova.mosaicoworkers.workers.dev/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt: userInput })
