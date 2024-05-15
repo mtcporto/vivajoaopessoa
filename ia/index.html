@@ -148,6 +148,9 @@ span.material-symbols-rounded {
   margin-left: 50px;
   max-width: 100%;
 }
+
+
+
 .chat .chat-details p {
   white-space: pre-wrap;
   font-size: 1.05rem;
@@ -312,15 +315,6 @@ span.material-symbols-rounded {
   .typing-container {
     padding: 15px 10px;
   }
-  /* .typing-textarea textarea {
-    height: 45px;
-    padding: 10px 40px 10px 10px;
-  } */
-  /* .typing-content span {
-    height: 45px;
-    width: 45px;
-    margin-left: 5px;
-  } */
   span.material-symbols-rounded {
     font-size: 1.25rem!important;
   }
@@ -357,11 +351,10 @@ span.material-symbols-rounded {
   const content = match ? match[1] : response;
 
   // Substitui títulos em negrito
-  response = response.replace(/^{"response":"/, '').replace(/"}/g, '');
+  response = response.replace(/^{"response":"/, '').replace(/"}/g, '').trim();
 
  // Envolver a resposta em um elemento div com as classes apropriadas
- return `<div class="chat incoming"><div class="chat-details"><p><strong>Nova:</strong> ${content.trim()}</p></div></div>`;
-
+ return `<div class="chat-details"><p><strong>Nova: </strong> ${response}</p></div>`;
 
   // Substitui listas ordenadas
   response = response.replace(orderedListRegex, (match, prefix, items) => {
@@ -416,51 +409,45 @@ const themeButton = document.querySelector("#theme-btn");
 const deleteButton = document.querySelector("#delete-btn");
 
 const loadDataFromLocalstorage = () => {
-    // Load saved chats and theme from local storage and apply/add on the page
     const themeColor = localStorage.getItem("themeColor");
-
     document.body.classList.toggle("light-mode", themeColor === "light_mode");
     themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
 
     const defaultText = `<div class="default-text">
                             <h1>Nova IA</h1>
                             <p>Comece a conversar e explore o poder da IA.<br> O histórico da sua conversa será mostrado aqui.</p>
-                        </div>`
+                        </div>`;
 
     chatContainer.innerHTML = localStorage.getItem("all-chats") || defaultText;
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
-    toggleDefaultText(); // Chame a função aqui
-}
-
-function toggleDefaultText() {
-  const defaultText = document.querySelector('.default-text');
-  if (chatContainer.innerHTML.trim() === '') {
-    defaultText.style.display = 'flex';
-  } else {
-    defaultText.style.display = 'none';
-  }
 }
 
 document.getElementById('delete-btn').addEventListener("click", () => {
-    // Remove the chats from local storage and call loadDataFromLocalstorage function
-    if(confirm("Are you sure you want to delete all the chats?")) {
+    if (confirm("Are you sure you want to delete all the chats?")) {
         localStorage.removeItem("all-chats");
         loadDataFromLocalstorage();
-        toggleDefaultText(); // Chame a função aqui também
     }
 });
 
 document.getElementById('theme-btn').addEventListener("click", () => {
-    // Toggle body's class for the theme mode and save the updated theme to the local storage 
     document.body.classList.toggle("light-mode");
     localStorage.setItem("themeColor", themeButton.innerText);
     themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
 });
 
-
 function sendMessage() {
   let userInput = document.getElementById('chat-input').value;
-  document.querySelector('.chat-container').innerHTML += `<div class="chat outgoing"><div class="chat-details"><p><strong>Você:</strong> ${userInput}</p></div></div>`;
+
+  if (userInput.trim() === '') return;
+
+  const outgoingChatDiv = createChatElement(userInput, "outgoing", "user");
+  chatContainer.appendChild(outgoingChatDiv);
+  chatContainer.scrollTo(0, chatContainer.scrollHeight);
+
+  if (chatContainer.querySelector(".default-text")) {
+    chatContainer.querySelector(".default-text").remove();
+  }
+
   document.getElementById('chat-input').value = '';
 
   fetch('https://nova.mosaicoworkers.workers.dev/', {
@@ -471,23 +458,39 @@ function sendMessage() {
   .then(response => response.json())
   .then(data => {
     const formattedResponse = formatResponse(data.response);
-    document.querySelector('.chat-container').innerHTML += formattedResponse;
-    document.querySelector('.chat-container').scrollTop = document.querySelector('.chat-container').scrollHeight;
-    toggleDefaultText(); // Chame a função aqui também
+    const incomingChatDiv = document.createElement("div");
+    incomingChatDiv.classList.add("chat", "incoming");
+    incomingChatDiv.innerHTML = formattedResponse;
+    chatContainer.appendChild(incomingChatDiv);
+    chatContainer.scrollTo(0, chatContainer.scrollHeight);
   })
   .catch(error => console.error('Erro:', error));
 }
-// Atualize os IDs abaixo para corresponder aos seus elementos HTML
+
+function createChatElement(content, className, sender) {
+  const chatDiv = document.createElement("div");
+  chatDiv.classList.add("chat", className);
+
+  let chatDetails;
+  if (sender === "user") {
+    chatDetails = `<div class="chat-details"><p><strong>Você:</strong> ${content}</p></div>`;
+  } else {
+    chatDetails = `<div class="chat-details"><p>${content}</p></div>`;
+  }
+
+  chatDiv.innerHTML = chatDetails;
+  return chatDiv;
+}
+
 document.getElementById('send-btn').addEventListener('click', sendMessage);
 document.getElementById('chat-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    sendMessage();
-  }
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+    }
 });
 
 loadDataFromLocalstorage();
-toggleDefaultText(); // Chame a função aqui também
   </script>
 </body>
 </html>
