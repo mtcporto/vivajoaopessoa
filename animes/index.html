@@ -2,86 +2,108 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Anime RSS Feed</title>
+    <title>Anime da Temporada</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
-        body {
-            padding-bottom: 20px;
-            font-family: Arial, sans-serif;
-        }
         .header {
             background-color: black;
             color: white;
-            padding: 10px 0;
+            padding: 10px;
             text-align: center;
             margin-bottom: 20px;
+        }
+        .card-container {
+            margin: 20px;
+        }
+        .card {
+            margin-bottom: 10px;
+        }
+        .card-img-top {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+        @media (max-width: 576px) {
+            .card {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            .card-img-top {
+                height: 975px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Anime RSS Feed</h1>
+    <div id="header" class="header">
+        <h1 id="header-title"></h1>
     </div>
-    <div id="card-container" class="row"></div>
+    <div id="card-container" class="row card-container"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/x2js/1.2.0/xml2json.min.js"></script>
     <script>
-   //     const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
-    //    let url = 'https://www.erai-raws.info/episodes/feed/?res=SD&type=magnet&subs%5B0%5D=us&subs%5B1%5D=br&d157edc6b50f28b2776442c03d067d56';
-        
-        const url = 'https://cors-animes.mosaicoworkers.workers.dev/api/episodes/feed/?type=magnet&d157edc6b50f28b2776442c03d067d56';
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        let season;
+        if (month < 3) {
+            season = 'WINTER';
+        } else if (month < 6) {
+            season = 'SPRING';
+        } else if (month < 9) {
+            season = 'SUMMER';
+        } else {
+            season = 'FALL';
+        }
 
-        //fetch(PROXY_URL + url)
-         fetch(url)
-            .then(response => response.text())
-            .then(data => {
-                let parser = new DOMParser();
-                let xmlDoc = parser.parseFromString(data, "text/xml");
-        
-                let items = xmlDoc.getElementsByTagName("item");
-                let cardContainer = document.getElementById('card-container');
-        
-                for (let i = 0; i < items.length; i++) {
-                    let card = document.createElement('div');
-                    card.className = 'card col-md-4';
-        
-                    let cardBody = document.createElement('div');
-                    cardBody.className = 'card-body';
-        
-                    // Extrai o título do anime e o número do episódio
-                    let fullTitle = items[i].getElementsByTagName("title")[0].childNodes[0].nodeValue;
-                    let titleParts = fullTitle.split(' - ');
-                    let episode = titleParts.pop().split(' ')[0];
-                    let title = titleParts.join(' - ').replace('[Magnet] ', '');
-        
-                    
-                    // Extrai o link do arquivo
-                    let link = items[i].getElementsByTagName("link")[0].childNodes[0].nodeValue;
-        
-                    let titleElement = document.createElement('h5');
-                    titleElement.className = 'card-title';
-                    titleElement.textContent = title + ' - Episódio ' + episode;
-        
-                    // Formata a data de publicação
-                    let pubDate = new Date(items[i].getElementsByTagName("pubDate")[0].childNodes[0].nodeValue);
-                    let formattedDate = pubDate.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
-        
-                    let pubDateElement = document.createElement('p');
-                    pubDateElement.className = 'card-text';
-                    pubDateElement.textContent = 'Data de Publicação: ' + formattedDate;
-        
-                    cardBody.appendChild(titleElement);
-                    cardBody.appendChild(pubDateElement);
-                    card.appendChild(cardBody);
-                    cardContainer.appendChild(card);
-        
-                    card.addEventListener('click', function() {
-                        window.location.href = '/animes/video/index.html?title=' + encodeURIComponent(title) + '&episode=' + encodeURIComponent(episode) + '&magnet=' + encodeURIComponent(link);
-                    });
+        document.getElementById('header-title').textContent = 'Temporada ' + season + ' ' + year;
+
+        const query = `
+            query {
+                Page(page: 1, perPage: 50) {
+                    media(season: ${season}, seasonYear: ${year}, format: TV) {
+                        title {
+                            romaji
+                            english
+                            native
+                        }
+                        coverImage {
+                            large
+                        }
+                    }
                 }
-            })
-            .catch(error => console.error(error));
+            }
+        `;
+
+        fetch('https://graphql.anilist.co', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: query }),
+        })
+        .then(response => response.json())
+        .then(result => {
+            let cardContainer = document.getElementById('card-container');
+
+            for (let anime of result.data.Page.media) {
+                let card = document.createElement('div');
+                card.className = 'card col-sm-12 col-lg-2';
+
+                let img = document.createElement('img');
+                img.className = 'card-img-top';
+                img.src = anime.coverImage.large;
+
+                let cardBody = document.createElement('div');
+                cardBody.className = 'card-body';
+
+                let title = document.createElement('h5');
+                title.className = 'card-title';
+                title.textContent = anime.title.english || anime.title.romaji;
+
+                cardBody.appendChild(title);
+                card.appendChild(img);
+                card.appendChild(cardBody);
+                cardContainer.appendChild(card);
+            }
+        });
     </script>
 </body>
 </html>
