@@ -356,7 +356,8 @@ span.material-symbols-rounded {
       </div>
     </div>
     
-      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>  <script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>  
+      <script>
     // Função para formatar a resposta
     function formatResponse(response) {
   // Expressões regulares
@@ -454,8 +455,27 @@ document.getElementById('theme-btn').addEventListener("click", () => {
     themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
 });
 
+
+// Adiciona um ouvinte de evento 'oninput' à caixa de texto
+document.getElementById('chat-input').oninput = function() {
+  // Limpa o placeholder quando o usuário começa a digitar
+  this.placeholder = '';
+};
+
 function sendMessage() {
   let userInput = document.getElementById('chat-input').value;
+
+  // Verificar se a entrada do usuário excede o limite de caracteres
+  if (userInput.length > 6144) {
+    // Limpa a caixa de entrada
+    document.getElementById('chat-input').value = '';
+
+    // Adiciona a mensagem de erro na caixa de entrada
+    document.getElementById('chat-input').placeholder = '⚠️ Limite máximo de caracteres atingido.';
+
+    return;
+  }
+
 
   if (userInput.trim() === '') return;
 
