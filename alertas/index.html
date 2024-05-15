@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Alertas meteorológicos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <style>
+        .card {
+            flex: 0 0 auto;
+            margin: 10px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-dark text-white p-3 text-center"><h1>Alertas meteorológicos</h1></header>
+    <div id="localizacao" class="container mt-3"></div>
+    <div class="container mt-3">
+        <h2>Pesquisar por cidade/estado</h2>
+        <form id="pesquisaForm">
+            <div class="form-group">
+                <label for="cidade">Cidade:</label>
+                <input type="text" class="form-control" id="cidade" placeholder="Digite a cidade">
+            </div>
+            <div class="form-group">
+                <label for="estado">Estado:</label>
+                <input type="text" class="form-control" id="estado" placeholder="Digite o estado">
+            </div>
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
+        </form>
+    </div>
+    <div id="avisos" class="container mt-3 d-flex flex-wrap justify-content-center"></div>
+
+    <script>
+        $(document).ready(function() {
+            var estados = {};
+            var cidadeUsuario, estadoUsuario;
+
+            function obterLocalizacao(latitude, longitude) {
+                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + latitude + '&lon=' + longitude;
+
+                $.getJSON(url, function(data) {
+                    if (data.address) {
+                        cidadeUsuario = data.address.city || data.address.town || data.address.village;
+                        estadoUsuario = data.address.state;
+
+                        $('#localizacao').html('<h2>Sua Localização</h2><p>' + cidadeUsuario + ', ' + estadoUsuario + '</p>');
+                    } else {
+                        console.log('Erro ao obter localização');
+                    }
+                });
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lon = position.coords.longitude;
+                    obterLocalizacao(lat, lon);
+                }, function() {
+                    console.log('Erro ao obter localização');
+                });
+            } else {
+                console.log('Geolocalização não é suportada por este navegador.');
+            }
+
+            $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
+                $(data).find("item").each(function() {
+                    var el = $(this);
+                    var link = el.find("link").text();
+                    $.get(link, function(alertData) {
+                        var alertEl = $(alertData);
+                        var inicio = new Date(alertEl.find('onset').text());
+                        var fim = new Date(alertEl.find('expires').text());
+                        var agora = new Date();
+                        agora.setHours(0, 0, 0, 0);
+                        var fimDia = new Date(agora);
+                        fimDia.setHours(23, 59, 59, 999);
+                        if (inicio >= agora || fim >= agora) {
+                            var aviso = alertEl.find('event').text();
+                            var severidade = alertEl.find('severity').text();
+                            switch (severidade) {
+                                case 'Severe':
+                                    severidade = 'Perigo';
+                                    break;
+                                case 'Extreme':
+                                    severidade = 'Grande Perigo';
+                                    break;
+                                case 'Moderate':
+                                    severidade = 'Perigo Potencial';
+                                    break;
+                                default:
+                                    severidade = 'Desconhecido';
+                            }
+                            var colorRisk = alertEl.find('parameter valueName:contains("ColorRisk")').next().text();
+                            var estado = alertEl.find('parameter valueName:contains("Estados")').next().text();
+                            var cidade = alertEl.find('parameter valueName:contains("Cidades")').next().text();
+
+                            if (!estados[estado]) {
+                                estados[estado] = [];
+                            }
+                            estados[estado].push({ aviso, severidade, inicio, fim, cidade, colorRisk });
+
+                            var avisoHtml = '<div class="card mb-3 d-none">';
+                            avisoHtml += '<div class="card-header" style="background-color:' + colorRisk + ';"><strong>' + aviso + '</strong></div>';
+                            avisoHtml += '<div class="card-body">';
+                            avisoHtml += '<p><strong>Severidade:</strong> ' + severidade + '</p>';
+                            avisoHtml += '<p><strong>Início:</strong> ' + inicio.toLocaleString('pt-BR') + '</p>';
+                            avisoHtml += '<p><strong>Fim:</strong> ' + fim.toLocaleString('pt-BR') + '</p>';
+                            avisoHtml += '<p><strong>Cidade:</strong> ' + cidade + '</p>';
+                            avisoHtml += '<p><strong>Estado:</strong> ' + estado + '</p>';
+                            avisoHtml += '</div></div>';
+
+                            $('#avisos').append(avisoHtml);
+                        }
+                    });
+                });
+            }).always(function() {
+                var estadosHtml = '<h2>Estados Afetados</h2>';
+                for (var estado in estados) {
+                    estadosHtml += '<h3>' + estado + '</h3>';
+                    estadosHtml += '<ul>';
+                    for (var i = 0; i < estados[estado].length; i++) {
+                        estadosHtml += '<li>' + estados[estado][i].aviso + ' - ' + estados[estado][i].severidade + '</li>';
+                    }
+                    estadosHtml += '</ul>';
+                }
+                $('#estados').html(estadosHtml);
+            });
+
+// Função para filtrar os cards com base na cidade e estado inseridos no formulário de pesquisa
+$('#pesquisaForm').submit(function(event) {
+    event.preventDefault();
+
+    var cidadePesquisada = $('#cidade').val().trim().toLowerCase();
+    var estadoPesquisado = $('#estado').val().trim().toLowerCase();
+
+    // Ocultar todos os cards
+    $('.card').addClass('d-none');
+
+    // Mostrar cards relacionados à pesquisa de cidade ou estado
+    for (var estado in estados) {
+        var estadoSigla = getEstadoSigla(estado);
+
+        for (var i = 0; i < estados[estado].length; i++) {
+            var alerta = estados[estado][i];
+            var cidadesAlerta = alerta.cidade.toLowerCase().split(',').map(function(cidade) {
+                return cidade.trim().split('-')[0].trim();
+            });
+
+            if ((cidadePesquisada && cidadesAlerta.includes(cidadePesquisada)) ||
+                (estadoPesquisado && (estado.toLowerCase().includes(estadoPesquisado) || estadoSigla.toLowerCase() === estadoPesquisado))) {
+
+                var $card = $('.card').eq(i);
+                $card.removeClass('d-none');
+
+                // Adicionar borda vermelha se for a localização do usuário
+                if ((cidadeUsuario && cidadesAlerta.includes(cidadeUsuario.toLowerCase())) ||
+                    (estadoUsuario && estadoUsuario.toLowerCase() === estado.toLowerCase())) {
+                    $card.addClass('border-danger');
+                }
+            }
+        }
+    }
+});
+
+
+// Função para obter a sigla do estado a partir do nome completo
+function getEstadoSigla(estado) {
+    var siglas = {
+        'Acre': 'AC',
+        'Alagoas': 'AL',
+        'Amapá': 'AP',
+        'Amazonas': 'AM',
+        'Bahia': 'BA',
+        'Ceará': 'CE',
+        'Distrito Federal': 'DF',
+        'Espírito Santo': 'ES',
+        'Goiás': 'GO',
+        'Maranhão': 'MA',
+        'Mato Grosso': 'MT',
+        'Mato Grosso do Sul': 'MS',
+        'Minas Gerais': 'MG',
+        'Pará': 'PA',
+        'Paraíba': 'PB',
+        'Paraná': 'PR',
+        'Pernambuco': 'PE',
+        'Piauí': 'PI',
+        'Rio de Janeiro': 'RJ',
+        'Rio Grande do Norte': 'RN',
+        'Rio Grande do Sul': 'RS',
+        'Rondônia': 'RO',
+        'Roraima': 'RR',
+        'Santa Catarina': 'SC',
+        'São Paulo': 'SP',
+        'Sergipe': 'SE',
+        'Tocantins': 'TO'
+    };
+
+    return siglas[estado] || '';
+}
+});
+</script>
+</body>
+</html>
