@@ -264,6 +264,25 @@ span.material-symbols-rounded {
 /* Reponsive Media Query */
 @media screen and (max-width: 600px) {
 
+  .chat-container .chat.outgoing .chat-details p {
+  background-color: var(--outgoing-chat-bg);
+  color: var(--text-color);
+  padding: 10px 20px;
+  border-radius: 20px;
+  margin-left: 10px;
+  max-width: 100%;
+}
+
+.chat-container .chat.incoming .chat-details p {
+  background-color: var(--incoming-chat-bg);
+  color: var(--text-color);
+  padding: 10px 20px;
+  border-radius: 20px;
+  margin-right: 10px;
+  margin-left: 10px;
+  max-width: 100%;
+}
+  
   .chat-container .chat .chat-details p {
     font-size: 0.9rem;
     padding: 8px 15px;
