@@ -42,7 +42,7 @@ function loadSTJNews() {
             const link = item.querySelector('link').textContent;
             const pubDate = convertDate(item.querySelector('pubDate').textContent);
   
-            let imgURL = "imagens/stj-logo.png";
+            let imgURL = "imagens/stjlogo.png";
             let contentEncoded = item.querySelector('content\\:encoded, encoded').textContent;
             const parser = new DOMParser();
             const contentDoc = parser.parseFromString(contentEncoded, 'text/html');
