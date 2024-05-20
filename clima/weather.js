@@ -172,16 +172,18 @@ function loadAirQualityData() {
       const usAqi = data.hourly.us_aqi[0];
 
       const airQualityInfoContainer = document.querySelector('#air-quality-info');
-      airQualityInfoContainer.innerHTML = `
-        <div class="air-quality-column">
-          <div>Índice UV</div>
-          <span class="badge ${getUvColorClass(uvIndex)}">${getUvIndexCategory(uvIndex)}</span>
-        </div>
-        <div class="air-quality-column">
-          <div>Qualidade do Ar</div>
-          <span class="badge ${getAqiColorClass(usAqi)}">${getAqiCategory(usAqi)}</span>
-        </div>
-      `;
+      if (airQualityInfoContainer) {
+        airQualityInfoContainer.innerHTML = `
+          <div class="air-quality-column">
+            <div>Índice UV</div>
+            <span class="badge ${getUvColorClass(uvIndex)}">${getUvIndexCategory(uvIndex)}</span>
+          </div>
+          <div class="air-quality-column">
+            <div>Qualidade do Ar</div>
+            <span class="badge ${getAqiColorClass(usAqi)}">${getAqiCategory(usAqi)}</span>
+          </div>
+        `;
+      }
     })
     .catch(error => console.error(error));
 }
