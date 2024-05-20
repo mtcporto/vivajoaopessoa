@@ -248,4 +248,6 @@ function getAqiColorClass(aqi) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadWeatherData);
+document.addEventListener('DOMContentLoaded', function() {
+  loadWeatherData();
+});
