@@ -76,13 +76,14 @@
     color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
-
-  .week, .weather-icons, .temperatures {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    margin: 0px;
-  }
+}
+@media (max-width: 768px) {
+.week, .weather-icons, .temperatures {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin: 0px;
+}
 }
 
 /* Para telas maiores que 768px */
@@ -107,7 +108,7 @@
     align-items: normal;
     margin-bottom: 10px;
     margin-top: 20px;
-    margin-left: 12%;
+    margin-left: 8%;
   }
 
   .current-weather-icon {
@@ -120,7 +121,7 @@
 
   .week, .weather-icons, .temperatures {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
     width: 100%;
     margin: 0px;
   }
