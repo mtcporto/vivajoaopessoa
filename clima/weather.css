@@ -111,10 +111,6 @@
     margin-left: 8%;
   }
 
-  .current-weather-icon {
-    font-size: 4rem;
-  }
-
   #current-temperature {
     margin-top: 10px;
   }
@@ -161,6 +157,7 @@
 .current-weather-icon {
   font-size: 80px;
   vertical-align: middle;
+  margin-bottom: 10px;
 }
 
 .weather-icon {
