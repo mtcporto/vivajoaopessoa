@@ -4,6 +4,7 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .current-weather {
@@ -62,6 +63,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin-bottom: 30px;
   }
 
   .card-weather {
@@ -76,8 +78,7 @@
     color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
-}
-@media (max-width: 768px) {
+
 .week, .weather-icons, .temperatures {
   display: flex;
   justify-content: space-around;
@@ -99,7 +100,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
   }
 
   .current-weather {
@@ -120,6 +121,7 @@
     justify-content: space-around;
     width: 100%;
     margin: 0px;
+    line-height: 1; /* Valor menor para reduzir o espaço */
   }
 
   .day, .weather-icon, .temperature {
