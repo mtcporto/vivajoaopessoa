@@ -169,25 +169,31 @@ function loadAirQualityData() {
     .then(response => response.json())
     .then(data => {
       const uvIndex = data.current.uv_index;
-      const usAqi = data.hourly.us_aqi[0];
+      const usAqi = data.hourly.us_aqi.length > 0 ? data.hourly.us_aqi[0] : null;
 
       const airQualityInfoContainer = document.querySelector('#air-quality-info');
       if (airQualityInfoContainer) {
-        airQualityInfoContainer.innerHTML = `
+        let airQualityHtml = `
           <div class="air-quality-column">
             <div>Índice UV</div>
             <span class="badge ${getUvColorClass(uvIndex)}">${getUvIndexCategory(uvIndex)}</span>
           </div>
-          <div class="air-quality-column">
-            <div>Qualidade do Ar</div>
-            <span class="badge ${getAqiColorClass(usAqi)}">${getAqiCategory(usAqi)}</span>
-          </div>
         `;
+
+        if (usAqi !== null) {
+          airQualityHtml += `
+            <div class="air-quality-column">
+              <div>Qualidade do Ar</div>
+              <span class="badge ${getAqiColorClass(usAqi)}">${getAqiCategory(usAqi)}</span>
+            </div>
+          `;
+        }
+
+        airQualityInfoContainer.innerHTML = airQualityHtml;
       }
     })
     .catch(error => console.error(error));
 }
-
 function getUvIndexCategory(uvIndex) {
   if (uvIndex < 3) {
     return 'Baixo';
