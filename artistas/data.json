@@ -1,0 +1,107 @@
+{
+    "artistas": [
+        {
+            "imagem": "imagens/bandaodile.png",
+            "nome": "Banda Odile",
+            "categoria": "Música",
+            "canais": {
+                "youtube": "https://www.youtube.com/@bandaodile/videos",
+                "instagram": "https://www.instagram.com/bandaodile/"
+            },
+            "contato": {
+                "whatsapp": "+55 83 99639-0564"
+            }
+        },
+        {
+            "imagem": "imagens/tapuia1.jpeg",
+            "nome": "Tapuia",
+            "categoria": "Música",
+            "canais": {
+                "youtube": "https://www.youtube.com/@tapuiapb/videos",
+                "instagram": "https://www.instagram.com/tapuiapb/",
+                "spotify": "https://open.spotify.com/intl-pt/artist/1qhYGpcYH5e1Iu8pn4k3Uw"
+            },
+            "contato": {
+                "email": "tapuiapb@gmail.com"
+            },
+            "singles": [
+                {
+                    "nome": "Miscreated",
+                    "ano": 2023,
+                    "spotify": "https://open.spotify.com/intl-pt/track/5bBhKT0R0oYhOhcMb4GRqn"
+                },
+                {
+                    "nome": "Outsider",
+                    "ano": 2023,
+                    "spotify": "https://open.spotify.com/intl-pt/track/1U3ntsIZq6jqv9sMpb7VPt"
+                }
+            ]
+        },
+        {
+            "imagem": "imagens/lilysanfoneira.jpeg",
+            "nome": "Lily Sanfoneira",
+            "categoria": "Música",
+            "canais": {
+                "youtube": "https://www.youtube.com/@LilySanfoneira/videos",
+                "instagram": "https://www.instagram.com/lilysanfoneira/",
+                "spotify": "https://open.spotify.com/intl-pt/artist/7gcqD3P0x9on0Lan3XoRHn?si=dd8Ozmt7Q3qnqMQ7I064qg&nd=1&dlsi=67682be4a551499e",
+                "website": "https://lnk.bio/lilysanfoneira"
+            },
+            "contato": {
+                "email": "lilysanfoneira@gmail.com",
+                "whatsapp": "+55 83 98726-0756"
+            },
+            "albuns": [
+                {
+                    "nome": "Menina-flor",
+                    "ano": 2024,
+                    "spotify": "https://open.spotify.com/intl-pt/album/4MzqAJEmqkbzlO6oGDgCVw"
+                }
+            ]
+        },
+        {
+            "imagem": "imagens/chicocorrea.jpeg",
+            "nome": "Chico Correa",
+            "categoria": "Música",
+            "canais": {
+                "youtube": "https://www.youtube.com/@ChicoCorrea/videos",
+                "instagram": "https://www.instagram.com/chicocorrea/",
+                "spotify": "https://open.spotify.com/intl-pt/artist/7wDpWdfVXnLkin6t6VUcSQ"
+            },
+            "albuns": [
+                {
+                    "nome": "Chico Correa & Eletronic Band",
+                    "ano": 2006,
+                    "spotify": "https://open.spotify.com/intl-pt/album/500liPbFDOmctUoCDfujHi"
+                }
+            ]
+        },
+        {
+            "imagem": "imagens/seupereira.jpeg",
+            "nome": "Seu Pereira e Coletivo 401",
+            "categoria": "Música",
+            "canais": {
+                "youtube": "https://www.youtube.com/@TVSEUPEREIRA/videos",
+                "instagram": "https://www.instagram.com/seupereiraecoletivo401/",
+                "spotify": "https://open.spotify.com/intl-pt/artist/5dk0R5am4zMYmG6uyZwfkW"
+            },
+            "albuns": [
+                {
+                    "nome": "Seu Pereira e Coletivo 401",
+                    "ano": 2012,
+                    "spotify": "https://open.spotify.com/intl-pt/album/68EvMId14n2rNu6dUeU6za"
+                },
+                {
+                    "nome": "Eu nao sou boa influencia pra voce",
+                    "ano": 2017,
+                    "spotify": "https://open.spotify.com/intl-pt/album/1cmFBmekEtPb2fK9I0H5cc"
+                },
+                {
+                    "nome": "Seu Pereira e Coletivo 401 no Estudio Showlivre (ao Vivo)",
+                    "ano": 2018,
+                    "spotify": "https://open.spotify.com/intl-pt/album/3iBaVTmqkbEFN83TcTqZRS"
+                }
+            ]
+        }
+    ]
+}
