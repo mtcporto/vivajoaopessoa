@@ -24,15 +24,25 @@
                         const link = item.querySelector("link").textContent;
                         const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString("pt-BR");
                         const description = item.querySelector("description").textContent;
-                        const image = item.querySelector("media\\:content").getAttribute("url");
+                        const mediaContent = item.querySelector("media\\:content");
+
+                        let image = "";
+                        if (mediaContent) {
+                            image = mediaContent.getAttribute("url");
+                        } else {
+                            // Imagem padrão caso não exista imagem no feed
+                            image = "https://via.placeholder.com/150";
+                        }
 
                         const card = document.createElement("div");
                         card.className = "card mb-3";
 
-                        const cardImage = document.createElement("img");
-                        cardImage.src = image;
-                        cardImage.className = "card-img-top";
-                        card.appendChild(cardImage);
+                        if (image) {
+                            const cardImage = document.createElement("img");
+                            cardImage.src = image;
+                            cardImage.className = "card-img-top";
+                            card.appendChild(cardImage);
+                        }
 
                         const cardBody = document.createElement("div");
                         cardBody.className = "card-body";
