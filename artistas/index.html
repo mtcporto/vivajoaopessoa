@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Nossos Artistas</title>
+    <title>Artistas</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             padding-bottom: 20px;
@@ -34,11 +35,63 @@
         .plyr__control--overlaid {
             display: none;
         }
+        .artist-card {
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            color: #343a40;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        }
+        .artist-card img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .artist-card h2 {
+            font-weight: bold;
+            text-align: center;
+        }
+        .artist-card ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .artist-card a {
+            color: #343a40;
+            text-decoration: none;
+        }
+        .artist-card a:hover {
+            color: #007bff;
+        }
+        .artist-card i {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+            color: #6c757d;
+        }
+        .artist-card .icon-list {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .card-columns {
+            column-count: 3;
+        }
+        @media (max-width: 991px) {
+            .card-columns {
+                column-count: 2;
+            }
+        }
+        @media (max-width: 767px) {
+            .card-columns {
+                column-count: 1;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Nossos Artistas</h1>
+        <h1>Artistas</h1>
     </div>
     <div id="videoCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
         <ol class="carousel-indicators">
@@ -91,6 +144,9 @@
             </div>
         </div>
     </div>
+    <div class="container mt-20 card-columns" id="artistCards">
+        <!-- Os cards dos artistas serão inseridos aqui -->
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
@@ -135,6 +191,48 @@
             ytPlayers[current].pauseVideo();
             ytPlayers[prev].playVideo();
         });
+        // Carregar os dados dos artistas do arquivo JSON
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                const artistCards = document.getElementById('artistCards');
+                data.artistas.forEach(artista => {
+                    const card = document.createElement('div');
+                    card.className = 'card artist-card';
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body';
+                    const cardImage = document.createElement('img');
+                    cardImage.src = artista.imagem || 'placeholder-image.png';
+                    cardImage.alt = artista.nome;
+                    cardBody.appendChild(cardImage);
+                    const cardTitle = document.createElement('h2');
+                    cardTitle.className = 'card-title';
+                    cardTitle.textContent = artista.nome;
+                    cardBody.appendChild(cardTitle);
+                    const iconList = document.createElement('div');
+                    iconList.className = 'icon-list';
+                    iconList.innerHTML = `
+                        ${artista.canais.youtube ? `<a href="${artista.canais.youtube}" target="_blank"><i class="fab fa-youtube"></i></a>` : ''}
+                        ${artista.canais.instagram ? `<a href="${artista.canais.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>` : ''}
+                        ${artista.canais.spotify ? `<a href="${artista.canais.spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ''}
+                        ${artista.canais.website ? `<a href="${artista.canais.website}" target="_blank"><i class="fas fa-globe"></i></a>` : ''}
+                        ${artista.contato && artista.contato.email ? `<a href="mailto:${artista.contato.email}" target="_blank"><i class="fas fa-envelope"></i></a>` : ''}
+                        ${artista.contato && artista.contato.whatsapp ? `<a href="https://wa.me/${artista.contato.whatsapp.replace(/\D/g, '')}" target="_blank"><i class="fab fa-whatsapp"></i></a>` : ''}
+                    `;
+                    cardBody.appendChild(iconList);
+                    const cardText = document.createElement('ul');
+                    cardText.innerHTML = `
+                        ${artista.albuns ? `<li><strong>Albuns:</strong>${artista.albuns.map(album => `<br><a href="${album.spotify}" target="_blank">${album.nome} (${album.ano})</a>`).join('')}</li>` : ''}
+                        ${artista.singles ? `<li><strong>Singles:</strong>${artista.singles.map(single => `<br><a href="${single.spotify}" target="_blank">${single.nome} (${single.ano})</a>`).join('')}</li>` : ''}
+                    `;
+                    cardBody.appendChild(cardText);
+                    card.appendChild(cardBody);
+                    artistCards.appendChild(card);
+                });
+            });
     </script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
 </body>
 </html>
