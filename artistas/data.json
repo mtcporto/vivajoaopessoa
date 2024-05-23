@@ -6,7 +6,8 @@
             "categoria": "Música",
             "canais": {
                 "youtube": "https://www.youtube.com/@bandaodile/videos",
-                "instagram": "https://www.instagram.com/bandaodile/"
+                "instagram": "https://www.instagram.com/bandaodile/",
+                "website": "https://bandaodile.github.io/portfolio/"
             },
             "contato": {
                 "whatsapp": "+55 83 99639-0564"
@@ -100,6 +101,88 @@
                     "nome": "Seu Pereira e Coletivo 401 no Estudio Showlivre (ao Vivo)",
                     "ano": 2018,
                     "spotify": "https://open.spotify.com/intl-pt/album/3iBaVTmqkbEFN83TcTqZRS"
+                }
+            ]
+        },
+        {
+            "imagem": "imagens/valdonato.jpeg",
+            "nome": "Val Donato",
+            "categoria": "Música",
+            "canais": {
+                "youtube": "https://www.youtube.com/@ValDonato/videos",
+                "instagram": "https://www.instagram.com/valdonato/",
+                "spotify": "https://open.spotify.com/intl-pt/artist/4zOnAX9cemPxJ6UGIYhAi3"
+            },
+            "contato": {
+            },
+            "albuns": [
+                {
+                    "nome": "Café Amargo",
+                    "ano": 2015,
+                    "spotify": "https://open.spotify.com/intl-pt/album/68XJWzxjLtG3drXxiS93dJ"
+                }
+            ]
+        },
+        {
+            "imagem": "imagens/pedrofaissal.png",
+            "nome": "Pedro Faissal e o Meio Free",
+            "categoria": "Música",
+            "canais": {
+                "youtube": "https://www.youtube.com/@pedrofaissal/videos",
+                "instagram": "https://www.instagram.com/pedromeiofree/",
+                "spotify": "https://open.spotify.com/intl-pt/artist/6YoJ1rK7rnFr39ZwYBSrwY",
+                "website": "https://new.express.adobe.com/webpage/NmFsrXIkOPCBj"
+            },
+            "contato": {
+            "whatsapp": "+5583999209990"
+            },
+            "albuns": [
+                {
+                    "nome": "Peso de Menino e Jeito de Homem",
+                    "ano": 2012,
+                    "spotify": "https://open.spotify.com/intl-pt/album/7IUbzZV9sT2r5JyWF7cNdb"
+                },
+                {
+                    "nome": "Pessoa Minha",
+                    "ano": 2013,
+                    "spotify": "https://open.spotify.com/intl-pt/album/2S3t3ibpElSzEH1O14Ee80"
+                },
+                {
+                    "nome": "Half Livre",
+                    "ano": 2015,
+                    "spotify": "https://open.spotify.com/intl-pt/album/3Uq29CYFKHlRc74qtMaUTY"
+                }
+            ]
+        },
+        {
+            "imagem": "imagens/furmigadub.jpg",
+            "nome": "Furmiga Dub",
+            "categoria": "Música",
+            "canais": {
+                "youtube": "https://www.youtube.com/@furmigadub/videos",
+                "instagram": "https://www.instagram.com/furmigadub/",
+                "spotify": "https://open.spotify.com/intl-pt/artist/5RfK4k07kFOxYDV0yMfn6x",
+                "website": "http://www.furmigadub.com.br/"
+            },
+            "contato": {
+                "email": "fabiano.formiga@gmail.com",
+                "whatsapp": "+55 83 9888718480"
+            },
+            "albuns": [
+                {
+                    "nome": "FurmigaDub e Seu Bando e os Mestres da Paraíba",
+                    "ano": 2019,
+                    "spotify": "https://open.spotify.com/intl-pt/album/7ouNVmW1I6fBtgR7GPMr4t"
+                },
+                {
+                    "nome": "FurmigaDub e Seu Bando no Estudio Showlivre",
+                    "ano": 2019,
+                    "spotify": "https://open.spotify.com/intl-pt/album/0QbVtQlQ1KOgwNHGUbImwx"
+                },
+                {
+                    "nome": "Grave na Mata, Vol 2",
+                    "ano": 2023,
+                    "spotify": "https://open.spotify.com/intl-pt/album/6Rto82ltFP2icSAkwcxtaE"
                 }
             ]
         }
