@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alertas API</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .header {
+            background-color: #000;
+            color: #fff;
+            padding: 10px 0;
+        }
+        .content {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header text-center">
+            <h1>Alertas API</h1>
+        </div>
+        <div class="content">
+            <div id="alertas" class="row"></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const url = "https://api.preparecenter.org/v1/org/br/alerts/rss";
+            const headers = {
+                "x-api-key": "ucoUdythzuslm8pee4YEBAnb3KThmdfW"
+            };
+
+            fetch(url, { headers })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error: ${response.status}`);
+                    }
+                    return response.json(); // Supondo que a resposta da API esteja em JSON
+                })
+                .then(data => {
+                    const alertasContainer = document.getElementById('alertas');
+                    data.data.forEach(alerta => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-4';
+
+                        const card = document.createElement('div');
+                        card.className = 'card mb-4';
+
+                        const cardBody = document.createElement('div');
+                        cardBody.className = 'card-body';
+
+                        const title = document.createElement('h5');
+                        title.className = 'card-title';
+                        title.textContent = alerta.translations[0].title;
+
+                        const description = document.createElement('p');
+                        description.className = 'card-text';
+                        description.textContent = alerta.translations[0].description;
+
+                        const link = document.createElement('a');
+                        link.href = alerta.webUrl;
+                        link.className = 'btn btn-primary';
+                        link.textContent = 'Mais informações';
+
+                        cardBody.appendChild(title);
+                        cardBody.appendChild(description);
+                        cardBody.appendChild(link);
+                        card.appendChild(cardBody);
+                        col.appendChild(card);
+                        alertasContainer.appendChild(col);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
