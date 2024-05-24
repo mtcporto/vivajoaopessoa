@@ -57,7 +57,7 @@
                     var today = new Date();
                     today.setHours(23, 59, 59, 999);
 
-                    if (expiresDate > today) return;
+                    if (expiresDate < today) return;
 
                     var colorRisk = "";
                     var estados = "";
