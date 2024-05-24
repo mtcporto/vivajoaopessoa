@@ -56,24 +56,16 @@
                         var link = $(this).find("link").text();
                         $.get(link, function(alertData) {
                             var alertEl = $(alertData);
-                            var inicio = new Date(alertEl.find('onset').text().replace('T', ' ').replace(/-/g, '/'));
-                            var fim = new Date(alertEl.find('expires').text().replace('T', ' ').replace(/-/g, '/'));
-                            var agora = new Date();
+                            var estadoAlerta = alertEl.find('parameter valueName:contains("Estados")').next().text();
+                            var evento = {
+                                titulo: alertEl.find('title').text(),
+                                link: alertEl.find('web').text()
+                            };
 
-                            if (inicio <= agora && fim >= agora) {
-                                var estadoAlerta = alertEl.find('parameter valueName:contains("Estados")').next().text();
-                                var evento = {
-                                    titulo: alertEl.find('title').text(),
-                                    link: alertEl.find('web').text(),
-                                    inicio: inicio,
-                                    fim: fim
-                                };
-
-                                if (!eventosPorEstado[estadoAlerta]) {
-                                    eventosPorEstado[estadoAlerta] = [];
-                                }
-                                eventosPorEstado[estadoAlerta].push(evento);
+                            if (!eventosPorEstado[estadoAlerta]) {
+                                eventosPorEstado[estadoAlerta] = [];
                             }
+                            eventosPorEstado[estadoAlerta].push(evento);
                         });
                     });
 
@@ -108,8 +100,6 @@
                     var avisoHtml = '<div class="card mb-3">';
                     avisoHtml += '<div class="card-header"><strong>' + evento.titulo + '</strong></div>';
                     avisoHtml += '<div class="card-body">';
-                    avisoHtml += '<p><strong>Início:</strong> ' + evento.inicio.toLocaleString('pt-BR') + '</p>';
-                    avisoHtml += '<p><strong>Fim:</strong> ' + evento.fim.toLocaleString('pt-BR') + '</p>';
                     avisoHtml += '<a href="' + evento.link + '" target="_blank" class="btn btn-primary">Detalhes</a>';
                     avisoHtml += '</div></div>';
 
