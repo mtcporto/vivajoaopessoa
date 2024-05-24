@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,9 @@
         .alert-card {
             background-color: #6c757d;
             color: white;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
         }
         .state-list {
             list-style-type: none;
@@ -23,8 +26,8 @@
 </head>
 <body>
     <header class="bg-dark text-white p-3 text-center"><h1>Alertas meteorológicos</h1></header>
-    <div id="alertDetails" class="container mt-3"></div>
     <div id="userAlert" class="container mt-3"></div>
+    <div id="alertDetails" class="container mt-3"></div>
     <div id="stateAlerts" class="container mt-3"></div>
 
     <script>
@@ -42,7 +45,6 @@
 
             function carregarDetalhesAlerta(url, callback) {
                 $.get(url, function(data) {
-                    var alertDetailsHtml = '<div class="alert-card p-3 mb-3">';
                     var event = $(data).find("event").text();
                     var responseType = $(data).find("responseType").text();
                     var urgency = $(data).find("urgency").text();
@@ -50,6 +52,12 @@
                     var certainty = $(data).find("certainty").text();
                     var onset = formatarData($(data).find("onset").text());
                     var expires = formatarData($(data).find("expires").text());
+
+                    var expiresDate = new Date($(data).find("expires").text());
+                    var today = new Date();
+                    today.setHours(23, 59, 59, 999);
+
+                    if (expiresDate > today) return;
 
                     var colorRisk = "";
                     var estados = "";
@@ -70,7 +78,8 @@
                     var municipiosArray = municipios.split(', ');
                     var municipiosExibidos = municipiosArray.slice(0, 3).join(', ') + (municipiosArray.length > 3 ? ", mais..." : "");
 
-                    alertDetailsHtml += '<h2 style="color:' + colorRisk + ';">' + event + '</h2>';
+                    var alertDetailsHtml = '<div class="alert-card" style="color:' + colorRisk + ';">';
+                    alertDetailsHtml += '<h2>' + event + '</h2>';
                     alertDetailsHtml += '<p><strong>Resposta:</strong> ' + traduzir(responseType) + '</p>';
                     alertDetailsHtml += '<p><strong>Urgência:</strong> ' + traduzir(urgency) + '</p>';
                     alertDetailsHtml += '<p><strong>Severidade:</strong> ' + traduzir(severity) + '</p>';
@@ -187,4 +196,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
