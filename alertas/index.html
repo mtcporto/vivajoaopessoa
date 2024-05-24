@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <style>
+        .alert-card {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <header class="bg-dark text-white p-3 text-center"><h1>Alertas meteorológicos</h1></header>
@@ -26,7 +32,7 @@
 
             function carregarDetalhesAlerta(url) {
                 $.get(url, function(data) {
-                    var alertDetailsHtml = '<div class="alert alert-primary">';
+                    var alertDetailsHtml = '<div class="alert-card p-3 mb-3">';
                     var event = $(data).find("event").text();
                     var responseType = $(data).find("responseType").text();
                     var urgency = $(data).find("urgency").text();
@@ -55,15 +61,14 @@
                     var municipiosExibidos = municipiosArray.slice(0, 3).join(', ') + (municipiosArray.length > 3 ? ", mais..." : "");
 
                     alertDetailsHtml += '<h2 style="color:' + colorRisk + ';">' + event + '</h2>';
-                    alertDetailsHtml += '<p><strong>Resposta:</strong> ' + responseType + '</p>';
-                    alertDetailsHtml += '<p><strong>Urgência:</strong> ' + urgency + '</p>';
-                    alertDetailsHtml += '<p><strong>Severidade:</strong> ' + severity + '</p>';
-                    alertDetailsHtml += '<p><strong>Certeza:</strong> ' + certainty + '</p>';
+                    alertDetailsHtml += '<p><strong>Resposta:</strong> ' + traduzir(responseType) + '</p>';
+                    alertDetailsHtml += '<p><strong>Urgência:</strong> ' + traduzir(urgency) + '</p>';
+                    alertDetailsHtml += '<p><strong>Severidade:</strong> ' + traduzir(severity) + '</p>';
+                    alertDetailsHtml += '<p><strong>Certeza:</strong> ' + traduzir(certainty) + '</p>';
                     alertDetailsHtml += '<p><strong>Início do Alerta:</strong> ' + onset + '</p>';
                     alertDetailsHtml += '<p><strong>Término do Alerta:</strong> ' + expires + '</p>';
                     alertDetailsHtml += '<p><strong>Estados Afetados:</strong> ' + estados + '</p>';
                     alertDetailsHtml += '<p><strong>Municípios Afetados:</strong> ' + municipiosExibidos + '</p>';
-                    alertDetailsHtml += '<p><strong>Color Risk:</strong> ' + colorRisk + '</p>';
                     alertDetailsHtml += '</div>';
 
                     $('#alertDetails').append(alertDetailsHtml);
@@ -89,6 +94,17 @@
                 }).fail(function() {
                     console.log('Erro ao carregar os links do RSS geral');
                 });
+            }
+
+            function traduzir(texto) {
+                var traducoes = {
+                    "Prepare": "Prepare-se",
+                    "Future": "Futura",
+                    "Severe": "Severa",
+                    "Moderate": "Moderada",
+                    "Likely": "Provável"
+                };
+                return traducoes[texto] || texto;
             }
 
             carregarLinksRSS();
