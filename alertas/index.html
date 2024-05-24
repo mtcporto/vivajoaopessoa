@@ -8,7 +8,7 @@
 </head>
 <body>
     <header class="bg-dark text-white p-3 text-center"><h1>Alertas meteorológicos</h1></header>
-    <div id="alertDetails" class="container mt-3"></div>
+    <div id="alertDeck" class="container mt-3"></div>
 
     <script>
         $(document).ready(function() {
@@ -48,7 +48,7 @@
                     alertDetailsHtml += '<p><strong>Municípios Afetados:</strong> ' + municipios.join(", ") + '</p>';
                     alertDetailsHtml += '<p><strong>Color Risk:</strong> ' + colorRisk + '</p>';
 
-                    $('#alertDetails').html(alertDetailsHtml);
+                    $('#alertDeck').append(alertDetailsHtml);
                 }).fail(function() {
                     console.log('Erro ao carregar os detalhes do alerta');
                 });
@@ -60,15 +60,24 @@
                 dataOntem.setDate(dataOntem.getDate() - 1); // Obtendo a data de ontem
 
                 $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
+                    var cardDeckHtml = '<h2>Alertas Meteorológicos</h2><div class="card-deck">';
+
                     $(data).find("item").each(function() {
                         var link = $(this).find("link").text();
                         var dataPublicacao = new Date($(this).find("pubDate").text());
 
                         // Verificar se a data de publicação é de ontem ou hoje
                         if (dataPublicacao.getDate() === dataOntem.getDate() || dataPublicacao.getDate() === dataAtual.getDate()) {
-                            carregarDetalhesAlerta(link);
+                            cardDeckHtml += '<div class="card"><div class="card-body">';
+                            cardDeckHtml += '<h5 class="card-title">' + formatarData(dataPublicacao) + '</h5>';
+                            cardDeckHtml += '<p class="card-text"><a href="' + link + '" target="_blank">' + link + '</a></p>';
+                            cardDeckHtml += '</div></div>';
+                            carregarDetalhesAlerta(link); // Carregar detalhes do alerta ao clicar no link
                         }
                     });
+
+                    cardDeckHtml += '</div>';
+                    $('#alertDeck').html(cardDeckHtml);
                 }).fail(function() {
                     console.log('Erro ao carregar os links do RSS geral');
                 });
