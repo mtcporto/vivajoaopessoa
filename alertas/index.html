@@ -18,9 +18,6 @@
         .card-body {
             color: white;
         }
-        .card-header {
-            color: white;
-        }
     </style>
 </head>
 <body>
@@ -111,7 +108,7 @@
                             estados[estado].push({ aviso, severidade, inicio, fim, cidade, colorRisk });
 
                             var avisoHtml = '<div class="card mb-3 d-none">';
-                            avisoHtml += '<div class="card-header" style="background-color:' + colorRisk + ';"><strong>' + aviso + '</strong></div>';
+                            avisoHtml += '<div class="card-header" style="background-color:' + colorRisk + '; color:white;"><strong>' + aviso + '</strong></div>';
                             avisoHtml += '<div class="card-body">';
                             avisoHtml += '<p><strong>Severidade:</strong> ' + severidade + '</p>';
                             avisoHtml += '<p><strong>Início:</strong> ' + inicio.toLocaleString('pt-BR') + '</p>';
@@ -213,11 +210,11 @@
                     'São Paulo': 'SP',
                     'Sergipe': 'SE',
                     'Tocantins': 'TO'
-                };
+                        };
 
                 return siglas[estado] || estado;
             }
         });
     </script>
 </body>
-</html>
+</html> 
