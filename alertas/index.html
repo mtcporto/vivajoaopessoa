@@ -34,19 +34,19 @@
                     var certainty = $(data).find("certainty").text();
                     var onset = formatarData($(data).find("onset").text());
                     var expires = formatarData($(data).find("expires").text());
-                    var estados = $(data).find("parameter[valueName='Estados'] value").text().split(", ");
-                    var municipios = $(data).find("parameter[valueName='Municipios'] value").text().split(", ");
+                    var estados = $(data).find("parameter[valueName='Estados'] value").text();
+                    var municipios = $(data).find("parameter[valueName='Municipios'] value").text();
                     var colorRisk = $(data).find("parameter[valueName='ColorRisk'] value").text();
 
-                    alertDetailsHtml += '<h2>' + event + '</h2>';
+                    alertDetailsHtml += '<h2 style="color:' + colorRisk + ';">' + event + '</h2>';
                     alertDetailsHtml += '<p><strong>Resposta:</strong> ' + responseType + '</p>';
                     alertDetailsHtml += '<p><strong>Urgência:</strong> ' + urgency + '</p>';
                     alertDetailsHtml += '<p><strong>Severidade:</strong> ' + severity + '</p>';
                     alertDetailsHtml += '<p><strong>Certeza:</strong> ' + certainty + '</p>';
                     alertDetailsHtml += '<p><strong>Início do Alerta:</strong> ' + onset + '</p>';
                     alertDetailsHtml += '<p><strong>Término do Alerta:</strong> ' + expires + '</p>';
-                    alertDetailsHtml += '<p><strong>Estados Afetados:</strong> ' + estados.slice(0, 3).join(", ") + (estados.length > 3 ? ', mais...' : '') + '</p>';
-                    alertDetailsHtml += '<p><strong>Municípios Afetados:</strong> ' + municipios.slice(0, 3).join(", ") + (municipios.length > 3 ? ', mais...' : '') + '</p>';
+                    alertDetailsHtml += '<p><strong>Estados Afetados:</strong> ' + estados + '</p>';
+                    alertDetailsHtml += '<p><strong>Municípios Afetados:</strong> ' + municipios + '</p>';
                     alertDetailsHtml += '<p><strong>Color Risk:</strong> ' + colorRisk + '</p>';
                     alertDetailsHtml += '</div>';
 
