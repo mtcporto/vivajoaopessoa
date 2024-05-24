@@ -130,80 +130,101 @@
                     estadosHtml += '</ul>';
                 }
                 $('#estados').html(estadosHtml);
-            });
 
-// Função para filtrar os cards com base na cidade e estado inseridos no formulário de pesquisa
-$('#pesquisaForm').submit(function(event) {
-    event.preventDefault();
-
-    var cidadePesquisada = $('#cidade').val().trim().toLowerCase();
-    var estadoPesquisado = $('#estado').val().trim().toLowerCase();
-
-    // Ocultar todos os cards
-    $('.card').addClass('d-none');
-
-    // Mostrar cards relacionados à pesquisa de cidade ou estado
-    for (var estado in estados) {
-        var estadoSigla = getEstadoSigla(estado);
-
-        for (var i = 0; i < estados[estado].length; i++) {
-            var alerta = estados[estado][i];
-            var cidadesAlerta = alerta.cidade.toLowerCase().split(',').map(function(cidade) {
-                return cidade.trim().split('-')[0].trim();
-            });
-
-            if ((cidadePesquisada && cidadesAlerta.includes(cidadePesquisada)) ||
-                (estadoPesquisado && (estado.toLowerCase().includes(estadoPesquisado) || estadoSigla.toLowerCase() === estadoPesquisado))) {
-
-                var $card = $('.card').eq(i);
-                $card.removeClass('d-none');
-
-                // Adicionar borda vermelha se for a localização do usuário
-                if ((cidadeUsuario && cidadesAlerta.includes(cidadeUsuario.toLowerCase())) ||
-                    (estadoUsuario && estadoUsuario.toLowerCase() === estado.toLowerCase())) {
-                    $card.addClass('border-danger');
+                // Verificar se há alertas para a cidade do usuário e mostrar mensagem se não houver
+                var alertaParaCidadeUsuario = false;
+                for (var estado in estados) {
+                    for (var i = 0; i < estados[estado].length; i++) {
+                        var alerta = estados[estado][i];
+                        var cidadesAlerta = alerta.cidade.toLowerCase().split(',').map(function(cidade) {
+                            return cidade.trim().split('-')[0].trim();
+                        });
+                        if (cidadeUsuario && cidadesAlerta.includes(cidadeUsuario.toLowerCase())) {
+                            alertaParaCidadeUsuario = true;
+                        break;
+                    }
+                }
+                if (alertaParaCidadeUsuario) {
+                    break;
                 }
             }
+
+            if (!alertaParaCidadeUsuario) {
+                $('#avisos').html('<div class="alert alert-info">Não há alertas para ' + cidadeUsuario + ' no momento.</div>');
+            }
+        });
+
+        // Função para filtrar os cards com base na cidade e estado inseridos no formulário de pesquisa
+        $('#pesquisaForm').submit(function(event) {
+            event.preventDefault();
+
+            var cidadePesquisada = $('#cidade').val().trim().toLowerCase();
+            var estadoPesquisado = $('#estado').val().trim().toLowerCase();
+
+            // Ocultar todos os cards
+            $('.card').addClass('d-none');
+
+            // Mostrar cards relacionados à pesquisa de cidade ou estado
+            for (var estado in estados) {
+                var estadoSigla = getEstadoSigla(estado);
+
+                for (var i = 0; i < estados[estado].length; i++) {
+                    var alerta = estados[estado][i];
+                    var cidadesAlerta = alerta.cidade.toLowerCase().split(',').map(function(cidade) {
+                        return cidade.trim().split('-')[0].trim();
+                    });
+
+                    if ((cidadePesquisada && cidadesAlerta.includes(cidadePesquisada)) ||
+                        (estadoPesquisado && (estado.toLowerCase().includes(estadoPesquisado) || estadoSigla.toLowerCase() === estadoPesquisado))) {
+
+                        var $card = $('.card').eq(i);
+                        $card.removeClass('d-none');
+
+                        // Adicionar borda vermelha se for a localização do usuário
+                        if ((cidadeUsuario && cidadesAlerta.includes(cidadeUsuario.toLowerCase())) ||
+                            (estadoUsuario && estadoUsuario.toLowerCase() === estado.toLowerCase())) {
+                            $card.addClass('border-danger');
+                        }
+                    }
+                }
+            }
+        });
+
+        // Função para obter a sigla do estado a partir do nome completo
+        function getEstadoSigla(estado) {
+            var siglas = {
+                'Acre': 'AC',
+                'Alagoas': 'AL',
+                'Amapá': 'AP',
+                'Amazonas': 'AM',
+                'Bahia': 'BA',
+                'Ceará': 'CE',
+                'Distrito Federal': 'DF',
+                'Espírito Santo': 'ES',
+                'Goiás': 'GO',
+                'Maranhão': 'MA',
+                'Mato Grosso': 'MT',
+                'Mato Grosso do Sul': 'MS',
+                'Minas Gerais': 'MG',
+                'Pará': 'PA',
+                'Paraíba': 'PB',
+                'Paraná': 'PR',
+                'Pernambuco': 'PE',
+                'Piauí': 'PI',
+                'Rio de Janeiro': 'RJ',
+                'Rio Grande do Norte': 'RN',
+                'Rio Grande do Sul': 'RS',
+                'Rondônia': 'RO',
+                'Roraima': 'RR',
+                'Santa Catarina': 'SC',
+                'São Paulo': 'SP',
+                'Sergipe': 'SE',
+                'Tocantins': 'TO'
+            };
+
+            return siglas[estado] || '';
         }
-    }
-});
-
-
-// Função para obter a sigla do estado a partir do nome completo
-function getEstadoSigla(estado) {
-    var siglas = {
-        'Acre': 'AC',
-        'Alagoas': 'AL',
-        'Amapá': 'AP',
-        'Amazonas': 'AM',
-        'Bahia': 'BA',
-        'Ceará': 'CE',
-        'Distrito Federal': 'DF',
-        'Espírito Santo': 'ES',
-        'Goiás': 'GO',
-        'Maranhão': 'MA',
-        'Mato Grosso': 'MT',
-        'Mato Grosso do Sul': 'MS',
-        'Minas Gerais': 'MG',
-        'Pará': 'PA',
-        'Paraíba': 'PB',
-        'Paraná': 'PR',
-        'Pernambuco': 'PE',
-        'Piauí': 'PI',
-        'Rio de Janeiro': 'RJ',
-        'Rio Grande do Norte': 'RN',
-        'Rio Grande do Sul': 'RS',
-        'Rondônia': 'RO',
-        'Roraima': 'RR',
-        'Santa Catarina': 'SC',
-        'São Paulo': 'SP',
-        'Sergipe': 'SE',
-        'Tocantins': 'TO'
-    };
-
-    return siglas[estado] || '';
-}
-});
-</script>
+    });
+    </script>
 </body>
 </html>
