@@ -24,16 +24,24 @@
             }
 
             function carregarLinksRSS() {
+                var dataAtual = new Date();
+                var dataOntem = new Date(dataAtual);
+                dataOntem.setDate(dataOntem.getDate() - 1); // Obtendo a data de ontem
+
                 $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
-                    var linksRssHtml = '<h2>Links do RSS Geral</h2><ul class="list-group">';
+                    var linksRssHtml = '<h2>Links do RSS Geral (Ontem e Hoje)</h2><ul class="list-group">';
 
                     $(data).find("item").each(function() {
                         var link = $(this).find("link").text();
                         var titulo = $(this).find("title").text();
-                        var dataPublicacao = $(this).find("pubDate").text();
-                        var dataFormatada = formatarData(dataPublicacao);
+                        var dataPublicacao = new Date($(this).find("pubDate").text());
 
-                        linksRssHtml += '<li class="list-group-item"><a href="' + link + '" target="_blank">' + titulo + '</a> - ' + dataFormatada + '</li>';
+                        // Verificar se a data de publicação é de ontem ou hoje
+                        if (dataPublicacao.getDate() === dataOntem.getDate() || dataPublicacao.getDate() === dataAtual.getDate()) {
+                            var dataFormatada = formatarData(dataPublicacao);
+
+                            linksRssHtml += '<li class="list-group-item"><a href="' + link + '" target="_blank">' + titulo + '</a> - ' + dataFormatada + '</li>';
+                        }
                     });
 
                     linksRssHtml += '</ul>';
