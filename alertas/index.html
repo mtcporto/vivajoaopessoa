@@ -34,9 +34,20 @@
                     var certainty = $(data).find("certainty").text();
                     var onset = formatarData($(data).find("onset").text());
                     var expires = formatarData($(data).find("expires").text());
-                    var estados = $(data).find("parameter[valueName='Estados'] value").text();
-                    var municipios = $(data).find("parameter[valueName='Municipios'] value").text();
                     var colorRisk = $(data).find("parameter[valueName='ColorRisk'] value").text();
+
+                    // Buscar valores dos parâmetros "Estados" e "Municipios"
+                    var estados = "";
+                    var municipios = "";
+                    $(data).find("parameter").each(function() {
+                        var valueName = $(this).find("valueName").text();
+                        var value = $(this).find("value").text();
+                        if (valueName === "Estados") {
+                            estados = value;
+                        } else if (valueName === "Municipios") {
+                            municipios = value;
+                        }
+                    });
 
                     alertDetailsHtml += '<h2 style="color:' + colorRisk + ';">' + event + '</h2>';
                     alertDetailsHtml += '<p><strong>Resposta:</strong> ' + responseType + '</p>';
