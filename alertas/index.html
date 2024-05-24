@@ -69,13 +69,14 @@
             }
 
   $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
+$.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
     $(data).find("item").each(function() {
         var el = $(this);
         var link = el.find("link").text();
         $.get(link, function(alertData) {
             var alertEl = $(alertData);
-            var inicio = new Date(alertEl.find('onset').text());
-            var fim = new Date(alertEl.find('expires').text());
+            var inicio = new Date(alertEl.find('onset').text().replace('T', ' ').replace(/-/g, '/'));
+            var fim = new Date(alertEl.find('expires').text().replace('T', ' ').replace(/-/g, '/'));
             var agora = new Date();
 
             if (inicio <= agora && fim >= agora) {
