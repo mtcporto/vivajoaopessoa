@@ -68,57 +68,43 @@
                 console.log('Geolocalização não é suportada por este navegador.');
             }
 
-            $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
-                $(data).find("item").each(function() {
-                    var el = $(this);
-                    var link = el.find("link").text();
-                    $.get(link, function(alertData) {
-                        var alertEl = $(alertData);
-                        var inicio = new Date(alertEl.find('onset').text());
-                        var fim = new Date(alertEl.find('expires').text());
-                        var agora = new Date();
-                        agora.setHours(0, 0, 0, 0);
-                        var fimDia = new Date(agora);
-                        fimDia.setHours(23, 59, 59, 999);
-                        if (inicio >= agora || fim >= agora) {
-                            var aviso = alertEl.find('event').text();
-                            var severidade = alertEl.find('severity').text();
-                            switch (severidade) {
-                                case 'Severe':
-                                    severidade = 'Perigo';
-                                    break;
-                                case 'Extreme':
-                                    severidade = 'Grande Perigo';
-                                    break;
-                                case 'Moderate':
-                                    severidade = 'Perigo Potencial';
-                                    break;
-                                default:
-                                    severidade = 'Desconhecido';
-                            }
-                            var colorRisk = alertEl.find('parameter valueName:contains("ColorRisk")').next().text();
-                            var estado = alertEl.find('parameter valueName:contains("Estados")').next().text();
-                            var cidade = alertEl.find('parameter valueName:contains("Cidades")').next().text();
+  $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
+    $(data).find("item").each(function() {
+        var el = $(this);
+        var link = el.find("link").text();
+        $.get(link, function(alertData) {
+            var alertEl = $(alertData);
+            var inicio = new Date(alertEl.find('onset').text());
+            var fim = new Date(alertEl.find('expires').text());
+            var agora = new Date();
 
-                            if (!estados[estado]) {
-                                estados[estado] = [];
-                            }
-                            estados[estado].push({ aviso, severidade, inicio, fim, cidade, colorRisk });
+            if (inicio <= agora && fim >= agora) {
+                var aviso = alertEl.find('event').text();
+                var severidade = alertEl.find('severity').text();
+                var colorRisk = alertEl.find('parameter valueName:contains("ColorRisk")').next().text();
+                var estado = alertEl.find('parameter valueName:contains("Estados")').next().text();
+                var cidade = alertEl.find('parameter valueName:contains("Municipios")').next().text();
 
-                            var avisoHtml = '<div class="card mb-3 d-none">';
-                            avisoHtml += '<div class="card-header" style="background-color:' + colorRisk + ';"><strong>' + aviso + '</strong></div>';
-                            avisoHtml += '<div class="card-body">';
-                            avisoHtml += '<p><strong>Severidade:</strong> ' + severidade + '</p>';
-                            avisoHtml += '<p><strong>Início:</strong> ' + inicio.toLocaleString('pt-BR') + '</p>';
-                            avisoHtml += '<p><strong>Fim:</strong> ' + fim.toLocaleString('pt-BR') + '</p>';
-                            avisoHtml += '<p><strong>Cidade:</strong> ' + cidade + '</p>';
-                            avisoHtml += '<p><strong>Estado:</strong> ' + estado + '</p>';
-                            avisoHtml += '</div></div>';
+                if (!estados[estado]) {
+                    estados[estado] = [];
+                }
+                estados[estado].push({ aviso, severidade, inicio, fim, cidade, colorRisk });
 
-                            $('#avisos').append(avisoHtml);
-                        }
-                    });
-                });
+                var avisoHtml = '<div class="card mb-3 d-none">';
+                avisoHtml += '<div class="card-header" style="background-color:' + colorRisk + ';"><strong>' + aviso + '</strong></div>';
+                avisoHtml += '<div class="card-body">';
+                avisoHtml += '<p><strong>Severidade:</strong> ' + severidade + '</p>';
+                avisoHtml += '<p><strong>Início:</strong> ' + inicio.toLocaleString('pt-BR') + '</p>';
+                avisoHtml += '<p><strong>Fim:</strong> ' + fim.toLocaleString('pt-BR') + '</p>';
+                avisoHtml += '<p><strong>Cidade:</strong> ' + cidade + '</p>';
+                avisoHtml += '<p><strong>Estado:</strong> ' + estado + '</p>';
+                avisoHtml += '</div></div>';
+
+                $('#avisos').append(avisoHtml);
+            }
+        });
+    });
+});
             }).always(function() {
                 var estadosHtml = '<h2>Estados Afetados</h2>';
                 for (var estado in estados) {
