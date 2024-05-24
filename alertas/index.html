@@ -5,119 +5,31 @@
     <title>Alertas meteorológicos</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <style>
-        .card {
-            flex: 0 0 auto;
-            margin: 10px;
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-            transition: 0.3s;
-        }
-        .card:hover {
-            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-        }
-    </style>
 </head>
 <body>
     <header class="bg-dark text-white p-3 text-center"><h1>Alertas meteorológicos</h1></header>
-    <div id="localizacao" class="container mt-3"></div>
-    <div class="container mt-3">
-        <h2>Eventos Meteorológicos por Estado</h2>
-        <div id="eventosPorEstado" class="list-group"></div>
-    </div>
-    <div id="avisos" class="container mt-3 d-flex flex-wrap justify-content-center"></div>
+    <div id="linksRss" class="container mt-3"></div>
 
     <script>
         $(document).ready(function() {
-            var cidadeUsuario, estadoUsuario;
-
-            function obterLocalizacao(latitude, longitude) {
-                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + latitude + '&lon=' + longitude;
-
-                $.getJSON(url, function(data) {
-                    if (data.address) {
-                        cidadeUsuario = data.address.city || data.address.town || data.address.village;
-                        estadoUsuario = data.address.state;
-
-                        $('#localizacao').html('<h2>Sua Localização</h2><p>' + cidadeUsuario + ', ' + estadoUsuario + '</p>');
-
-                        // Após obter a localização, consultar os eventos por estado
-                        consultarEventosPorEstado();
-                    } else {
-                        console.log('Erro ao obter localização');
-                    }
-                });
-            }
-
-            function consultarEventosPorEstado() {
+            function carregarLinksRSS() {
                 $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
-                    var eventosPorEstado = {};
+                    var linksRssHtml = '<h2>Links do RSS Geral</h2><ul class="list-group">';
 
                     $(data).find("item").each(function() {
                         var link = $(this).find("link").text();
-                        $.get(link, function(alertData) {
-                            var alertEl = $(alertData);
-                            var estadoAlerta = alertEl.find('parameter valueName:contains("Estados")').next().text();
-                            var evento = {
-                                titulo: alertEl.find('title').text(),
-                                link: alertEl.find('web').text()
-                            };
-
-                            if (!eventosPorEstado[estadoAlerta]) {
-                                eventosPorEstado[estadoAlerta] = [];
-                            }
-                            eventosPorEstado[estadoAlerta].push(evento);
-                        });
+                        var titulo = $(this).find("title").text();
+                        linksRssHtml += '<li class="list-group-item"><a href="' + link + '" target="_blank">' + titulo + '</a></li>';
                     });
 
-                    // Após consultar os eventos, exibir os eventos por estado na lista
-                    exibirEventosPorEstado(eventosPorEstado);
+                    linksRssHtml += '</ul>';
+                    $('#linksRss').html(linksRssHtml);
                 }).fail(function() {
-                    console.log('Erro ao consultar eventos');
+                    console.log('Erro ao carregar os links do RSS geral');
                 });
             }
 
-            function exibirEventosPorEstado(eventosPorEstado) {
-                var listaEventosHtml = '';
-
-                for (var estado in eventosPorEstado) {
-                    listaEventosHtml += '<a href="#" class="list-group-item list-group-item-action" data-estado="' + estado + '">' + estado + '</a>';
-                }
-
-                $('#eventosPorEstado').html(listaEventosHtml);
-
-                // Adicionar evento de clique para exibir os detalhes dos eventos do estado selecionado
-                $('#eventosPorEstado a').click(function(event) {
-                    event.preventDefault();
-                    var estadoSelecionado = $(this).data('estado');
-                    exibirDetalhesEventosPorEstado(eventosPorEstado[estadoSelecionado]);
-                });
-            }
-
-            function exibirDetalhesEventosPorEstado(eventosEstado) {
-                $('#avisos').empty();
-
-                eventosEstado.forEach(function(evento) {
-                    var avisoHtml = '<div class="card mb-3">';
-                    avisoHtml += '<div class="card-header"><strong>' + evento.titulo + '</strong></div>';
-                    avisoHtml += '<div class="card-body">';
-                    avisoHtml += '<a href="' + evento.link + '" target="_blank" class="btn btn-primary">Detalhes</a>';
-                    avisoHtml += '</div></div>';
-
-                    $('#avisos').append(avisoHtml);
-                });
-            }
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var lat = position.coords.latitude;
-                    var lon = position.coords.longitude;
-                    obterLocalizacao(lat, lon);
-                }, function() {
-                    console.log('Erro ao obter localização');
-                });
-            } else {
-                console.log('Geolocalização não é suportada por este navegador.');
-            }
+            carregarLinksRSS();
         });
     </script>
 </body>
