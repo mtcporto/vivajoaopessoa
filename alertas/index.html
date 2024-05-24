@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -11,11 +11,21 @@
             background-color: #6c757d;
             color: white;
         }
+        .state-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .state-list li {
+            cursor: pointer;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <header class="bg-dark text-white p-3 text-center"><h1>Alertas meteorológicos</h1></header>
     <div id="alertDetails" class="container mt-3"></div>
+    <div id="userAlert" class="container mt-3"></div>
+    <div id="stateAlerts" class="container mt-3"></div>
 
     <script>
         $(document).ready(function() {
@@ -30,7 +40,7 @@
                 return dia + '/' + mes + '/' + ano + ' ' + hora + ':' + (minutos < 10 ? '0' + minutos : minutos);
             }
 
-            function carregarDetalhesAlerta(url) {
+            function carregarDetalhesAlerta(url, callback) {
                 $.get(url, function(data) {
                     var alertDetailsHtml = '<div class="alert-card p-3 mb-3">';
                     var event = $(data).find("event").text();
@@ -71,7 +81,7 @@
                     alertDetailsHtml += '<p><strong>Municípios Afetados:</strong> ' + municipiosExibidos + '</p>';
                     alertDetailsHtml += '</div>';
 
-                    $('#alertDetails').append(alertDetailsHtml);
+                    callback(alertDetailsHtml, municipiosArray, estados);
                 }).fail(function() {
                     console.log('Erro ao carregar os detalhes do alerta');
                 });
@@ -83,16 +93,82 @@
                 dataOntem.setDate(dataOntem.getDate() - 1);
 
                 $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
+                    var estadosComAlertas = new Set();
+                    var alertasMunicipios = [];
+                    var alertasHtml = '';
+
                     $(data).find("item").each(function() {
                         var link = $(this).find("link").text();
                         var dataPublicacao = new Date($(this).find("pubDate").text());
 
                         if (dataPublicacao.getDate() === dataOntem.getDate() || dataPublicacao.getDate() === dataAtual.getDate()) {
-                            carregarDetalhesAlerta(link);
+                            carregarDetalhesAlerta(link, function(alertHtml, municipios, estados) {
+                                alertasHtml += alertHtml;
+                                $('#alertDetails').html(alertasHtml);
+                                estados.split(', ').forEach(estado => estadosComAlertas.add(estado));
+                                alertasMunicipios.push(...municipios);
+                            });
                         }
                     });
+
+                    setTimeout(() => {
+                        mostrarAlertasUsuario(alertasMunicipios);
+                        listarEstadosComAlertas(estadosComAlertas);
+                    }, 2000);
                 }).fail(function() {
                     console.log('Erro ao carregar os links do RSS geral');
+                });
+            }
+
+            function mostrarAlertasUsuario(alertasMunicipios) {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        var lat = position.coords.latitude;
+                        var lon = position.coords.longitude;
+
+                        $.get('https://nominatim.openstreetmap.org/reverse', {
+                            lat: lat,
+                            lon: lon,
+                            format: 'json'
+                        }, function(data) {
+                            var municipioUsuario = data.address.city || data.address.town || data.address.village;
+                            var estadoUsuario = data.address.state;
+                            var codigoIBGE = data.address.city_code;
+                            var municipioCompleto = municipioUsuario + ' - ' + estadoUsuario + ' (' + codigoIBGE + ')';
+                            
+                            var alertaEncontrado = alertasMunicipios.find(municipio => municipio.includes(municipioCompleto));
+                            var userAlertHtml = alertaEncontrado ? '<h4>Alerta para sua cidade:</h4>' + alertaEncontrado : '<h4>Não há alertas na sua cidade</h4>';
+                            
+                            $('#userAlert').html(userAlertHtml);
+                        });
+                    });
+                } else {
+                    $('#userAlert').html('<h4>Geolocalização não é suportada pelo seu navegador.</h4>');
+                }
+            }
+
+            function listarEstadosComAlertas(estadosComAlertas) {
+                var stateListHtml = '<h4>Estados com alertas:</h4><ul class="state-list">';
+                estadosComAlertas.forEach(function(estado) {
+                    stateListHtml += '<li data-estado="' + estado + '">' + estado + '</li>';
+                });
+                stateListHtml += '</ul>';
+                $('#stateAlerts').html(stateListHtml);
+
+                $('.state-list li').click(function() {
+                    var estadoSelecionado = $(this).data('estado');
+                    mostrarAlertasPorEstado(estadoSelecionado);
+                });
+            }
+
+            function mostrarAlertasPorEstado(estado) {
+                $('#alertDetails .alert-card').each(function() {
+                    var estadosAfetados = $(this).find('p:contains("Estados Afetados")').text();
+                    if (estadosAfetados.includes(estado)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
                 });
             }
 
@@ -111,4 +187,4 @@
         });
     </script>
 </body>
-</html>
+</html> 
