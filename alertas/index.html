@@ -12,6 +12,17 @@
 
     <script>
         $(document).ready(function() {
+            function formatarData(data) {
+                var dataObj = new Date(data);
+                var dia = dataObj.getDate();
+                var mes = dataObj.getMonth() + 1;
+                var ano = dataObj.getFullYear();
+                var hora = dataObj.getHours();
+                var minutos = dataObj.getMinutes();
+
+                return dia + '/' + mes + '/' + ano + ' ' + hora + ':' + (minutos < 10 ? '0' + minutos : minutos);
+            }
+
             function carregarLinksRSS() {
                 $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
                     var linksRssHtml = '<h2>Links do RSS Geral</h2><ul class="list-group">';
@@ -19,7 +30,10 @@
                     $(data).find("item").each(function() {
                         var link = $(this).find("link").text();
                         var titulo = $(this).find("title").text();
-                        linksRssHtml += '<li class="list-group-item"><a href="' + link + '" target="_blank">' + titulo + '</a></li>';
+                        var dataPublicacao = $(this).find("pubDate").text();
+                        var dataFormatada = formatarData(dataPublicacao);
+
+                        linksRssHtml += '<li class="list-group-item"><a href="' + link + '" target="_blank">' + titulo + '</a> - ' + dataFormatada + '</li>';
                     });
 
                     linksRssHtml += '</ul>';
