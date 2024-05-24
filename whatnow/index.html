@@ -111,16 +111,18 @@
 
                         const sections = ['mitigation', 'seasonalForecast', 'warning', 'watch', 'immediate', 'recover'];
                         sections.forEach(section => {
-                            const sectionTitle = document.createElement('h6');
-                            sectionTitle.className = 'card-subtitle mb-2 text-muted';
-                            sectionTitle.textContent = section.charAt(0).toUpperCase() + section.slice(1);
+                            if (item.translations.en[section] && item.translations.en[section].length > 0) {
+                                const sectionTitle = document.createElement('h6');
+                                sectionTitle.className = 'card-subtitle mb-2 text-muted';
+                                sectionTitle.textContent = section.charAt(0).toUpperCase() + section.slice(1);
 
-                            const sectionContent = document.createElement('p');
-                            sectionContent.className = 'card-text';
-                            sectionContent.textContent = item.translations.en[section].join(' ');
+                                const sectionContent = document.createElement('p');
+                                sectionContent.className = 'card-text';
+                                sectionContent.textContent = item.translations.en[section].join(' ');
 
-                            cardBody.appendChild(sectionTitle);
-                            cardBody.appendChild(sectionContent);
+                                cardBody.appendChild(sectionTitle);
+                                cardBody.appendChild(sectionContent);
+                            }
                         });
 
                         const link = document.createElement('a');
