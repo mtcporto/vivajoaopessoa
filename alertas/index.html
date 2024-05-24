@@ -8,7 +8,7 @@
 </head>
 <body>
     <header class="bg-dark text-white p-3 text-center"><h1>Alertas meteorológicos</h1></header>
-    <div id="linksRss" class="container mt-3"></div>
+    <div id="alertDetails" class="container mt-3"></div>
 
     <script>
         $(document).ready(function() {
@@ -23,29 +23,52 @@
                 return dia + '/' + mes + '/' + ano + ' ' + hora + ':' + (minutos < 10 ? '0' + minutos : minutos);
             }
 
+            function carregarDetalhesAlerta(url) {
+                $.get(url, function(data) {
+                    var alertDetailsHtml = '<h2>Detalhes do Alerta</h2>';
+                    var event = $(data).find("event").text();
+                    var responseType = $(data).find("responseType").text();
+                    var urgency = $(data).find("urgency").text();
+                    var severity = $(data).find("severity").text();
+                    var certainty = $(data).find("certainty").text();
+                    var onset = formatarData($(data).find("onset").text());
+                    var expires = formatarData($(data).find("expires").text());
+                    var estados = $(data).find("parameter[valueName='Estados'] value").text().split(", ");
+                    var municipios = $(data).find("parameter[valueName='Municipios'] value").text().split(", ");
+                    var colorRisk = $(data).find("parameter[valueName='ColorRisk'] value").text();
+
+                    alertDetailsHtml += '<p><strong>Tipo de Evento:</strong> ' + event + '</p>';
+                    alertDetailsHtml += '<p><strong>Resposta:</strong> ' + responseType + '</p>';
+                    alertDetailsHtml += '<p><strong>Urgência:</strong> ' + urgency + '</p>';
+                    alertDetailsHtml += '<p><strong>Severidade:</strong> ' + severity + '</p>';
+                    alertDetailsHtml += '<p><strong>Certeza:</strong> ' + certainty + '</p>';
+                    alertDetailsHtml += '<p><strong>Início do Alerta:</strong> ' + onset + '</p>';
+                    alertDetailsHtml += '<p><strong>Término do Alerta:</strong> ' + expires + '</p>';
+                    alertDetailsHtml += '<p><strong>Estados Afetados:</strong> ' + estados.join(", ") + '</p>';
+                    alertDetailsHtml += '<p><strong>Municípios Afetados:</strong> ' + municipios.join(", ") + '</p>';
+                    alertDetailsHtml += '<p><strong>Color Risk:</strong> ' + colorRisk + '</p>';
+
+                    $('#alertDetails').html(alertDetailsHtml);
+                }).fail(function() {
+                    console.log('Erro ao carregar os detalhes do alerta');
+                });
+            }
+
             function carregarLinksRSS() {
                 var dataAtual = new Date();
                 var dataOntem = new Date(dataAtual);
                 dataOntem.setDate(dataOntem.getDate() - 1); // Obtendo a data de ontem
 
                 $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
-                    var linksRssHtml = '<h2>Links do RSS Geral (Ontem e Hoje)</h2><ul class="list-group">';
-
                     $(data).find("item").each(function() {
                         var link = $(this).find("link").text();
-                        var titulo = $(this).find("title").text();
                         var dataPublicacao = new Date($(this).find("pubDate").text());
 
                         // Verificar se a data de publicação é de ontem ou hoje
                         if (dataPublicacao.getDate() === dataOntem.getDate() || dataPublicacao.getDate() === dataAtual.getDate()) {
-                            var dataFormatada = formatarData(dataPublicacao);
-
-                            linksRssHtml += '<li class="list-group-item"><a href="' + link + '" target="_blank">' + titulo + '</a> - ' + dataFormatada + '</li>';
+                            carregarDetalhesAlerta(link);
                         }
                     });
-
-                    linksRssHtml += '</ul>';
-                    $('#linksRss').html(linksRssHtml);
                 }).fail(function() {
                     console.log('Erro ao carregar os links do RSS geral');
                 });
