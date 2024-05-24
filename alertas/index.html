@@ -21,24 +21,13 @@
     <header class="bg-dark text-white p-3 text-center"><h1>Alertas meteorológicos</h1></header>
     <div id="localizacao" class="container mt-3"></div>
     <div class="container mt-3">
-        <h2>Pesquisar por cidade/estado</h2>
-        <form id="pesquisaForm">
-            <div class="form-group">
-                <label for="cidade">Cidade:</label>
-                <input type="text" class="form-control" id="cidade" placeholder="Digite a cidade">
-            </div>
-            <div class="form-group">
-                <label for="estado">Estado:</label>
-                <input type="text" class="form-control" id="estado" placeholder="Digite o estado">
-            </div>
-            <button type="submit" class="btn btn-primary">Pesquisar</button>
-        </form>
+        <h2>Eventos Meteorológicos por Estado</h2>
+        <div id="eventosPorEstado" class="list-group"></div>
     </div>
     <div id="avisos" class="container mt-3 d-flex flex-wrap justify-content-center"></div>
 
     <script>
         $(document).ready(function() {
-            var estados = {};
             var cidadeUsuario, estadoUsuario;
 
             function obterLocalizacao(latitude, longitude) {
@@ -51,19 +40,20 @@
 
                         $('#localizacao').html('<h2>Sua Localização</h2><p>' + cidadeUsuario + ', ' + estadoUsuario + '</p>');
 
-                        // Após obter a localização, consultar os alertas
-                        consultarAlertas(cidadeUsuario, estadoUsuario);
+                        // Após obter a localização, consultar os eventos por estado
+                        consultarEventosPorEstado();
                     } else {
                         console.log('Erro ao obter localização');
                     }
                 });
             }
 
-            function consultarAlertas(cidade, estado) {
+            function consultarEventosPorEstado() {
                 $.get('https://apiprevmet3.inmet.gov.br/avisos/rss', function(data) {
+                    var eventosPorEstado = {};
+
                     $(data).find("item").each(function() {
-                        var el = $(this);
-                        var link = el.find("link").text();
+                        var link = $(this).find("link").text();
                         $.get(link, function(alertData) {
                             var alertEl = $(alertData);
                             var inicio = new Date(alertEl.find('onset').text().replace('T', ' ').replace(/-/g, '/'));
@@ -71,33 +61,59 @@
                             var agora = new Date();
 
                             if (inicio <= agora && fim >= agora) {
-                                var aviso = alertEl.find('event').text();
-                                var severidade = alertEl.find('severity').text();
-                                var colorRisk = alertEl.find('parameter valueName:contains("ColorRisk")').next().text();
                                 var estadoAlerta = alertEl.find('parameter valueName:contains("Estados")').next().text();
-                                var cidadeAlerta = alertEl.find('parameter valueName:contains("Municipios")').next().text();
+                                var evento = {
+                                    titulo: alertEl.find('title').text(),
+                                    link: alertEl.find('web').text(),
+                                    inicio: inicio,
+                                    fim: fim
+                                };
 
-                                if (!estados[estadoAlerta]) {
-                                    estados[estadoAlerta] = [];
+                                if (!eventosPorEstado[estadoAlerta]) {
+                                    eventosPorEstado[estadoAlerta] = [];
                                 }
-                                estados[estadoAlerta].push({ aviso, severidade, inicio, fim, cidadeAlerta, colorRisk });
-
-                                var avisoHtml = '<div class="card mb-3 d-none">';
-                                avisoHtml += '<div class="card-header" style="background-color:' + colorRisk + ';"><strong>' + aviso + '</strong></div>';
-                                avisoHtml += '<div class="card-body">';
-                                avisoHtml += '<p><strong>Severidade:</strong> ' + severidade + '</p>';
-                                avisoHtml += '<p><strong>Início:</strong> ' + inicio.toLocaleString('pt-BR') + '</p>';
-                                avisoHtml += '<p><strong>Fim:</strong> ' + fim.toLocaleString('pt-BR') + '</p>';
-                                avisoHtml += '<p><strong>Cidade:</strong> ' + cidadeAlerta + '</p>';
-                                avisoHtml += '<p><strong>Estado:</strong> ' + estadoAlerta + '</p>';
-                                avisoHtml += '</div></div>';
-
-                                $('#avisos').append(avisoHtml);
+                                eventosPorEstado[estadoAlerta].push(evento);
                             }
                         });
                     });
+
+                    // Após consultar os eventos, exibir os eventos por estado na lista
+                    exibirEventosPorEstado(eventosPorEstado);
                 }).fail(function() {
-                    console.log('Erro ao consultar alertas');
+                    console.log('Erro ao consultar eventos');
+                });
+            }
+
+            function exibirEventosPorEstado(eventosPorEstado) {
+                var listaEventosHtml = '';
+
+                for (var estado in eventosPorEstado) {
+                    listaEventosHtml += '<a href="#" class="list-group-item list-group-item-action" data-estado="' + estado + '">' + estado + '</a>';
+                }
+
+                $('#eventosPorEstado').html(listaEventosHtml);
+
+                // Adicionar evento de clique para exibir os detalhes dos eventos do estado selecionado
+                $('#eventosPorEstado a').click(function(event) {
+                    event.preventDefault();
+                    var estadoSelecionado = $(this).data('estado');
+                    exibirDetalhesEventosPorEstado(eventosPorEstado[estadoSelecionado]);
+                });
+            }
+
+            function exibirDetalhesEventosPorEstado(eventosEstado) {
+                $('#avisos').empty();
+
+                eventosEstado.forEach(function(evento) {
+                    var avisoHtml = '<div class="card mb-3">';
+                    avisoHtml += '<div class="card-header"><strong>' + evento.titulo + '</strong></div>';
+                    avisoHtml += '<div class="card-body">';
+                    avisoHtml += '<p><strong>Início:</strong> ' + evento.inicio.toLocaleString('pt-BR') + '</p>';
+                    avisoHtml += '<p><strong>Fim:</strong> ' + evento.fim.toLocaleString('pt-BR') + '</p>';
+                    avisoHtml += '<a href="' + evento.link + '" target="_blank" class="btn btn-primary">Detalhes</a>';
+                    avisoHtml += '</div></div>';
+
+                    $('#avisos').append(avisoHtml);
                 });
             }
 
@@ -112,20 +128,6 @@
             } else {
                 console.log('Geolocalização não é suportada por este navegador.');
             }
-
-            // Função para filtrar os cards com base na cidade e estado inseridos no formulário de pesquisa
-            $('#pesquisaForm').submit(function(event) {
-                event.preventDefault();
-
-                var cidadePesquisada = $('#cidade').val().trim().toLowerCase();
-                var estadoPesquisado = $('#estado').val().trim().toLowerCase();
-
-                // Limpar avisos anteriores
-                $('#avisos').empty();
-
-                // Consultar os alertas com base na cidade e estado pesquisados
-                consultarAlertas(cidadePesquisada, estadoPesquisado);
-            });
         });
     </script>
 </body>
