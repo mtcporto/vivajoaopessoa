@@ -46,15 +46,8 @@
                     <th>4ª Maré</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Sáb 1</td>
-                    <td>[ 23:34 ] 0.9 m</td>
-                    <td>[ 06:01 ] -0.7 m</td>
-                    <td>[ 12:15 ] 0.8 m</td>
-                    <td>[ 18:24 ] -0.7 m</td>
-                </tr>
-                <!-- Adicione mais linhas conforme necessário -->
+            <tbody id="tide-table-body">
+                <!-- Linhas de dados serão inseridas aqui -->
             </tbody>
         </table>
     </div>
@@ -62,5 +55,46 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@neaps/tide-predictor/dist/web/tide-predictor.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Dados de exemplo para João Pessoa, deve ser substituído por dados reais
+            const constituents = [
+                { phase_GMT: 0.0, amplitude: 1.0, name: 'M2', speed: 28.984104 }
+                // Adicione mais dados de harmônicos aqui
+            ];
+
+            const startDate = new Date('2024-05-26');
+            const endDate = new Date('2024-05-30');
+
+            const tides = TidePredictor(constituents).getExtremesPrediction({
+                start: startDate,
+                end: endDate
+            });
+
+            const tableBody = document.getElementById('tide-table-body');
+
+            tides.forEach((tide, index) => {
+                const row = document.createElement('tr');
+
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + index);
+
+                const dayCell = document.createElement('td');
+                dayCell.textContent = date.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' });
+
+                row.appendChild(dayCell);
+
+                tide.extremes.forEach(extreme => {
+                    const cell = document.createElement('td');
+                    const time = new Date(extreme.date);
+                    cell.textContent = `[ ${time.getHours()}:${time.getMinutes()} ] ${extreme.height.toFixed(1)} m`;
+                    row.appendChild(cell);
+                });
+
+                tableBody.appendChild(row);
+            });
+        });
+    </script>
 </body>
 </html>
