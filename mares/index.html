@@ -36,8 +36,8 @@
     </div>
 
     <div class="container">
-        Marinha do Brasil<br>
-        SEG 27  [ 00:17 ] 0.6         [ 06:36 ] 2.2          [ 12:56 ] 0.5          [ 19:17 ]  2.0 
+        <!-- Marinha do Brasil<br>
+        SEG 27  [ 00:17 ] 0.6         [ 06:36 ] 2.2          [ 12:56 ] 0.5          [ 19:17 ]  2.0  -->
 
         <table class="table table-striped">
             <thead class="thead-dark">
@@ -55,63 +55,68 @@
         </table>
     </div>
 
-    <!-- Carregar a biblioteca tide-predictor e tide-database -->
-    <script src="https://unpkg.com/@neaps/tide-predictor@0.1.1/dist/web/tide-predictor.min.js"></script>
-    <script src="https://unpkg.com/@neaps/tide-database@0.1.2/dist/web/tide-database.umd.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initTidePrediction();
-        });
+    <!-- Carregar a biblioteca tide-predictor -->
+        <script src="https://unpkg.com/@neaps/tide-predictor@0.1.1/dist/web/tide-predictor.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                initTidePrediction();
+            });
+            // m2 s2 n2 k2 k1 o1 p1 mf mm ssa
+            function initTidePrediction() {
+        const constituents = [
+            { name: 'O1', amplitude: 0.05, phase_GMT: 163.0, speed: 15.04107 },
+            { name: 'K1', amplitude: 0.05, phase_GMT: 235.0, speed: 15.041069 },
+            { name: 'P1', amplitude: 0.02, phase_GMT: 228.0, speed: 14.958932 },
+            { name: 'M2', amplitude: 0.81, phase_GMT: 124.0, speed: 28.984105 },
+            { name: 'MU2', amplitude: 0.02, phase_GMT: 119.0, speed: 27.968208 }, // Adicionado MU2
+            { name: 'S2', amplitude: 0.28, phase_GMT: 142.0, speed: 30.0 },
+            { name: 'N2', amplitude: 0.17, phase_GMT: 114.0, speed: 28.439730 },
+            { name: '2N2', amplitude: 0.02, phase_GMT: 108.0, speed: 27.895355 }, // Adicionado 2N2
+            { name: 'NU2', amplitude: 0.03, phase_GMT: 116.0, speed: 28.512583 }, // Adicionado NU2
+            { name: 'K2', amplitude: 0.08, phase_GMT: 137.0, speed: 30.082138 }
+        ];
+            const now = new Date();
+            const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const endDate = new Date(startDate.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 dias a partir de hoje
 
-        async function initTidePrediction() {
-            const database = new TideDatabase();
-            const station = await database.findNearestStation(-7.1192, -34.8556); // Coordenadas aproximadas de João Pessoa
+            const predictor = tidePredictor(constituents, { phaseKey: 'phase_GMT' });
+            const tides = predictor.getExtremesPrediction({ start: startDate, end: endDate });
 
-            if (station) {
-                const predictor = tidePredictor(station.constituents);
-                const now = new Date();
-                const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                const endDate = new Date(startDate.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 dias a partir de hoje
-                const tides = predictor.getExtremesPrediction({ start: startDate, end: endDate });
+            const tableBody = document.getElementById('tide-table-body');
 
-                const tableBody = document.getElementById('tide-table-body');
+            tides.forEach(tide => {
+                const date = new Date(tide.time);
+                const dayCell = date.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' });
+                const time = new Date(date.getTime()); // Mantendo o fuso horário GMT-3 (João Pessoa)
+                const formattedTime = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
+                const height = `${tide.level.toFixed(1)} m`;
+                const typeIcon = tide.high ? '<span class="mdi mdi-triangle" style="color: red;"></span>' : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
 
-                tides.forEach(tide => {
-                    const date = new Date(tide.time);
-                    const dayCell = date.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' });
-                    const time = new Date(date.getTime()); // Mantendo o fuso horário original
-                    const formattedTime = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
-                    const height = `${tide.level.toFixed(1)} m`;
-                    const typeIcon = tide.high ? '<span class="mdi mdi-triangle" style="color: red;"></span>' : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
+                let row = tableBody.querySelector(`tr[data-date="${dayCell}"]`);
+                if (!row) {
+                    row = document.createElement('tr');
+                    row.setAttribute('data-date', dayCell);
 
-                    let row = tableBody.querySelector(`tr[data-date="${dayCell}"]`);
-                    if (!row) {
-                        row = document.createElement('tr');
-                        row.setAttribute('data-date', dayCell);
+                    const dayColumn = document.createElement('td');
+                    dayColumn.textContent = dayCell;
+                    row.appendChild(dayColumn);
 
-                        const dayColumn = document.createElement('td');
-                        dayColumn.textContent = dayCell;
-                        row.appendChild(dayColumn);
-
-                        for (let i = 0; i < 4; i++) {
-                            const tideColumn = document.createElement('td');
-                            row.appendChild(tideColumn);
-                        }
-
-                        tableBody.appendChild(row);
+                    for (let i = 0; i < 4; i++) {
+                        const tideColumn = document.createElement('td');
+                        row.appendChild(tideColumn);
                     }
 
-                    const cells = row.querySelectorAll('td');
-                    for (let i = 1; i < cells.length; i++) {
-                        if (cells[i].textContent === "") {
-                            cells[i].innerHTML = `[ ${formattedTime} ] ${height} ${typeIcon}`;
-                            break;
-                        }
+                    tableBody.appendChild(row);
+                }
+
+                const cells = row.querySelectorAll('td');
+                for (let i = 1; i < cells.length; i++) {
+                    if (cells[i].textContent === "") {
+                        cells[i].innerHTML = `[ ${formattedTime} ] ${height} ${typeIcon}`;
+                        break;
                     }
-                });
-            } else {
-                console.error('Não foi possível encontrar uma estação de maré próxima de João Pessoa.');
-            }
+                }
+            });
         }
     </script>
 
