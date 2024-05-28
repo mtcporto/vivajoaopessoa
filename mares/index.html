@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tábua de Marés - João Pessoa</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,16 +27,18 @@
     </style>
 </head>
 <body>
-
     <div class="header">
         <h1>Tábua de Marés - João Pessoa</h1>
     </div>
-    
+
     <div class="title">
-        <h2>Maio de 2024 - Semana de 26 de Maio</h2>
+        <h2>Previsão para os próximos 5 dias</h2>
     </div>
-    
+
     <div class="container">
+        Marinha do Brasil<br>
+        SEG 27  [ 00:17 ] 0.6         [ 06:36 ] 2.2          [ 12:56 ] 0.5          [ 19:17 ]  2.0 
+
         <table class="table table-striped">
             <thead class="thead-dark">
                 <tr>
@@ -52,49 +55,68 @@
         </table>
     </div>
 
+    <!-- Carregar a biblioteca tide-predictor e tide-database -->
+    <script src="https://unpkg.com/@neaps/tide-predictor@0.1.1/dist/web/tide-predictor.min.js"></script>
+    <script src="https://unpkg.com/@neaps/tide-database@0.1.2/dist/web/tide-database.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initTidePrediction();
+        });
+
+        async function initTidePrediction() {
+            const database = new TideDatabase();
+            const station = await database.findNearestStation(-7.1192, -34.8556); // Coordenadas aproximadas de João Pessoa
+
+            if (station) {
+                const predictor = tidePredictor(station.constituents);
+                const now = new Date();
+                const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const endDate = new Date(startDate.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 dias a partir de hoje
+                const tides = predictor.getExtremesPrediction({ start: startDate, end: endDate });
+
+                const tableBody = document.getElementById('tide-table-body');
+
+                tides.forEach(tide => {
+                    const date = new Date(tide.time);
+                    const dayCell = date.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' });
+                    const time = new Date(date.getTime()); // Mantendo o fuso horário original
+                    const formattedTime = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
+                    const height = `${tide.level.toFixed(1)} m`;
+                    const typeIcon = tide.high ? '<span class="mdi mdi-triangle" style="color: red;"></span>' : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
+
+                    let row = tableBody.querySelector(`tr[data-date="${dayCell}"]`);
+                    if (!row) {
+                        row = document.createElement('tr');
+                        row.setAttribute('data-date', dayCell);
+
+                        const dayColumn = document.createElement('td');
+                        dayColumn.textContent = dayCell;
+                        row.appendChild(dayColumn);
+
+                        for (let i = 0; i < 4; i++) {
+                            const tideColumn = document.createElement('td');
+                            row.appendChild(tideColumn);
+                        }
+
+                        tableBody.appendChild(row);
+                    }
+
+                    const cells = row.querySelectorAll('td');
+                    for (let i = 1; i < cells.length; i++) {
+                        if (cells[i].textContent === "") {
+                            cells[i].innerHTML = `[ ${formattedTime} ] ${height} ${typeIcon}`;
+                            break;
+                        }
+                    }
+                });
+            } else {
+                console.error('Não foi possível encontrar uma estação de maré próxima de João Pessoa.');
+            }
+        }
+    </script>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@neaps/tide-predictor/dist/web/tide-predictor.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Dados de exemplo para João Pessoa, deve ser substituído por dados reais
-            const constituents = [
-                { phase_GMT: 0.0, amplitude: 1.0, name: 'M2', speed: 28.984104 }
-                // Adicione mais dados de harmônicos aqui
-            ];
-
-            const startDate = new Date('2024-05-26');
-            const endDate = new Date('2024-05-30');
-
-            const tides = TidePredictor(constituents).getExtremesPrediction({
-                start: startDate,
-                end: endDate
-            });
-
-            const tableBody = document.getElementById('tide-table-body');
-
-            tides.forEach((tide, index) => {
-                const row = document.createElement('tr');
-
-                const date = new Date(startDate);
-                date.setDate(startDate.getDate() + index);
-
-                const dayCell = document.createElement('td');
-                dayCell.textContent = date.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' });
-
-                row.appendChild(dayCell);
-
-                tide.extremes.forEach(extreme => {
-                    const cell = document.createElement('td');
-                    const time = new Date(extreme.date);
-                    cell.textContent = `[ ${time.getHours()}:${time.getMinutes()} ] ${extreme.height.toFixed(1)} m`;
-                    row.appendChild(cell);
-                });
-
-                tableBody.appendChild(row);
-            });
-        });
-    </script>
 </body>
 </html>
