@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>GPT Clone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts Link For Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+  <style>
+    /* Import Google font - Poppins */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    :root {
+      --text-color: #FFFFFF;
+      --icon-color: #ACACBE;
+      --icon-hover-bg: #5b5e71;
+      --placeholder-color: #dcdcdc;
+      --outgoing-chat-bg: #343541;
+      --incoming-chat-bg: #444654;
+      --outgoing-chat-border: #343541;
+      --incoming-chat-border: #444654;
+    }
+    .light-mode {
+      --text-color: #343541;
+      --icon-color: #a9a9bc;
+      --icon-hover-bg: #f1f1f3;
+      --placeholder-color: #6c6c6c;
+      --outgoing-chat-bg: #FFFFFF;
+      --incoming-chat-bg: #F7F7F8;
+      --outgoing-chat-border: #FFFFFF;
+      --incoming-chat-border: #D9D9E3;
+    }
+    body {
+      background: var(--outgoing-chat-bg);
+    }
+
+    /* Chats container styling */
+    .chat-container {
+      overflow-y: auto;
+      max-height: 100vh;
+      padding-bottom: 150px;
+    }
+
+    .chat-container .chat.outgoing .chat-details p {
+      background-color: var(--outgoing-chat-bg);
+      color: var(--text-color);
+      padding: 10px 20px;
+      border-radius: 20px;
+      margin-left: 50px;
+      max-width: 100%;
+    }
+
+    pre {
+      background-color: #282c34;
+      color: #abb2bf;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    :where(.chat-container, textarea)::-webkit-scrollbar {
+      width: 6px;
+    }
+    :where(.chat-container, textarea)::-webkit-scrollbar-track {
+      background: var(--incoming-chat-bg);
+      border-radius: 25px;
+    }
+    :where(.chat-container, textarea)::-webkit-scrollbar-thumb {
+      background: var(--icon-color);
+      border-radius: 25px;
+    }
+    .default-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 70vh;
+      padding: 0 10px;
+      text-align: center;
+      color: var(--text-color);
+    }
+    .default-text h1 {
+      font-size: 3.3rem;
+    }
+    .default-text p {
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
+    .chat-container .chat {
+      padding: 25px 10px;
+      display: flex;
+      justify-content: flex-start;
+      color: var(--text-color);
+    }
+    .chat-container .chat.outgoing {
+      background: var(--outgoing-chat-bg);
+      border: 1px solid var(--outgoing-chat-border);
+      align-self: flex-start;
+    }
+    .chat-container .chat.incoming {
+      background: var(--incoming-chat-bg);
+      border: 1px solid var(--incoming-chat-border);
+      align-self: flex-end;
+    }
+    .chat .chat-content {
+      display: flex;
+      max-width: 1200px;
+      width: 100%;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    span.material-symbols-rounded {
+      user-select: none;
+      cursor: pointer;
+    }
+    .chat .chat-content span {
+      cursor: pointer;
+      font-size: 1.3rem;
+      color: var(--icon-color);
+      visibility: hidden;
+    }
+    .chat:hover .chat-content:not(:has(.typing-animation), :has(.error)) span {
+      visibility: visible;
+    }
+    /* .chat .chat-details {
+      display: flex;
+      align-items: center;
+    } */
+    .chat .chat-details img {
+      width: 35px;
+      height: 35px;
+      align-self: flex-start;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    .chat-container .chat .chat-details p  pre code li ul ol{
+      padding: 10px 20px;
+      border-radius: 20px;
+      background-color: var(--outgoing-chat-bg);
+      color: var(--text-color);
+    }
+
+    .chat-container .chat.incoming .chat-details p  pre code li ul ol{
+      background-color: var(--incoming-chat-bg);
+      color: var(--text-color);
+      padding: 10px 20px;
+      border-radius: 20px;
+      margin-left: 50px;
+      max-width: 100%;
+    }
+
+    .chat .chat-details p   pre code li ul ol{
+      white-space: pre-wrap;
+      font-size: 1.05rem;
+      padding: 0 50px 0 25px;
+      color: var(--text-color) !important;
+      word-break: break-word;
+    }
+    .chat .chat-details p.error {
+      color: #e55865;
+    }
+    .chat .typing-animation {
+      padding-left: 25px;
+      display: inline-flex;
+    }
+    .typing-animation .typing-dot {
+      height: 7px;
+      width: 7px;
+      border-radius: 50%;
+      margin: 0 3px;
+      opacity: 0.7;
+      background: var(--text-color);
+      animation: animateDots 1.5s var(--delay) ease-in-out infinite;
+    }
+    .typing-animation .typing-dot:first-child {
+      margin-left: 0;
+    }
+    @keyframes animateDots {
+      0%,44% {
+        transform: translateY(0px);
+      }
+      28% {
+        opacity: 0.4;
+        transform: translateY(-6px);
+      }
+      44% {
+        opacity: 0.2;
+      }
+    }
+
+    /* Typing container styling */
+    .typing-container {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      padding: 20px 10px;
+      justify-content: center;
+      background: var(--outgoing-chat-bg);
+      border-top: 1px solid var(--incoming-chat-border);
+    }
+    .typing-container .typing-content {
+      display: flex;
+      max-width: 950px;
+      width: 100%;
+      align-items: flex-end;
+    }
+    .typing-container .typing-textarea {
+      width: 100%;
+      display: flex;
+      position: relative;
+    }
+    .typing-textarea textarea {
+      resize: none;
+      height: 55px;
+      width: 100%;
+      border: none;
+      padding: 15px 45px 15px 20px;
+      color: var(--text-color);
+      font-size: 1rem;
+      border-radius: 4px;
+      max-height: 250px;
+      overflow-y: auto;
+      background: var(--incoming-chat-bg);
+      outline: 1px solid var(--incoming-chat-border);
+    }
+    .typing-textarea textarea::placeholder {
+      color: var(--placeholder-color);
+    }
+    .typing-content span {
+      width: 55px;
+      height: 55px;
+      display: flex;
+      border-radius: 4px;
+      font-size: 1.35rem;
+      align-items: center;
+      justify-content: center;
+      color: var(--icon-color);
+    }
+    .typing-textarea span {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      visibility: hidden;
+    }
+    .typing-textarea textarea:valid ~ span {
+      visibility: visible;
+    }
+    .typing-controls {
+      display: flex;
+    }
+    .typing-controls span {
+      margin-left: 7px;
+      border: 1px solid transparent;
+    }
+    .typing-controls span:hover {
+      background: var(--icon-hover-bg);
+    }
+
+    @media screen and (max-width: 700px) {
+      .chat-container {
+        padding-bottom: 130px;
+      }
+      .chat-container .chat.outgoing .chat-details p {
+        padding: 10px 10px;
+        border-radius: 10px;
+        margin-left: 10px;
+        max-width: 100%;
+      }
+      .chat-container .chat.incoming .chat-details p  pre code li ul ol {
+        padding: 10px 10px;
+        border-radius: 10px;
+        margin-left: 10px;
+        max-width: 100%;
+      }
+      .chat-container .chat .chat-details p  pre code li ul ol{
+        white-space: pre-wrap;
+        font-size: 0.75rem;
+        padding: 0 10px 0 10px;
+        color: var(--text-color) !important;
+        word-break: break-word;
+      }
+      .typing-container {
+        padding: 10px 10px;
+      }
+      .typing-container .typing-content span {
+        width: 45px;
+        height: 45px;
+        font-size: 1.15rem;
+      }
+      .typing-container .typing-controls span {
+        margin-left: 5px;
+      }
+      .typing-content {
+        max-width: 700px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Default Text -->
+  <div class="default-text">
+    <h1>GPT Chat Bot</h1>
+    <p>Envie uma mensagem para iniciar uma conversa</p>
+  </div>
+
+  <!-- Chats Container -->
+  <div class="chat-container"></div>
+
+  <!-- Typing Box -->
+  <div class="typing-container">
+    <div class="typing-content">
+      <div class="typing-textarea">
+        <textarea placeholder="Envie uma mensagem..."></textarea>
+        <span class="material-symbols-rounded send">send</span>
+      </div>
+      <div class="typing-controls">
+        <span class="material-symbols-rounded dark_mode">dark_mode</span>
+        <span class="material-symbols-rounded delete">delete</span>
+      </div>
+    </div>
+  </div>
+  <script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  openai.apiBase = 'https://api.etx.tec.br';
+
+  const chatContainer = document.querySelector(".chat-container");
+  const textarea = document.querySelector("textarea");
+  const sendChatBtn = document.querySelector("span.send");
+  const defaultText = document.querySelector(".default-text");
+
+  
+      const API_KEY = 'sk-service-account-GkEoZRcXx2qIp1Cy9GxnT3BlbkFJgi6ZC4rjaa4Xu9dX7E19'; // Substitute with your OpenAI API key
+  
+      // Function to handle errors
+      const handleError = (chatElement, errorMessage) => {
+        chatElement.querySelector("p").textContent = errorMessage;
+        chatElement.querySelector("p").classList.add("error");
+      };
+  
+      // Function to create a chat element
+      const createChatElement = (message, className) => {
+        const chatElement = document.createElement("div");
+        chatElement.classList.add("chat", className);
+        chatElement.innerHTML = `
+          <div class="chat-content">
+            <div class="chat-details">
+              <img src="https://via.placeholder.com/35" alt="${className}">
+              <p></p>
+            </div>
+            <span class="material-symbols-rounded">content_copy</span>
+          </div>
+        `;
+        chatElement.querySelector("p").textContent = message;
+        return chatElement;
+      };
+  
+      const getChatResponse = async (incomingChatElement, attempt = 0) => {
+  const messageElement = incomingChatElement.querySelector("p");
+  const message = textarea.value.trim();
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const API_URL = "https://api.etx.tec.br/v1/chat/completions";
+  const requestOptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: message }],
+    }),
+  };
+
+  try {
+    const response = await fetch(API_URL, requestOptions);
+    if (!response.ok) {
+      if (response.status === 429 && attempt < 5) {
+        await delay(2 ** attempt * 1000); // Exponential backoff
+        return getChatResponse(incomingChatElement, attempt + 1);
+      } else {
+        throw new Error("Request failed");
+      }
+    }
+    const data = await response.json();
+    messageElement.textContent = data.choices[0].message.content.trim();
+    hljs.highlightAll();
+  } catch (error) {
+    handleError(incomingChatElement, "Oops! Algo deu errado. Por favor, tente novamente.");
+  }
+
+  chatContainer.scrollTo(0, chatContainer.scrollHeight);
+};
+  
+      // Function to handle outgoing chat
+      const handleOutgoingChat = () => {
+        const message = textarea.value.trim();
+        if (!message) return;
+  
+        textarea.value = "";
+        textarea.style.height = `${initialHeight}px`;
+  
+        const outgoingChatElement = createChatElement(message, "outgoing");
+        chatContainer.appendChild(outgoingChatElement);
+        chatContainer.scrollTo(0, chatContainer.scrollHeight);
+  
+        setTimeout(() => {
+          const incomingChatElement = createChatElement("Digitando...", "incoming");
+          chatContainer.appendChild(incomingChatElement);
+          chatContainer.scrollTo(0, chatContainer.scrollHeight);
+          getChatResponse(incomingChatElement);
+        }, 500);
+      };
+  
+      // Function to adjust textarea height
+      const adjustTextareaHeight = () => {
+        textarea.style.height = `${initialHeight}px`;
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      };
+  
+      if (sendChatBtn) {
+        sendChatBtn.addEventListener("click", handleOutgoingChat);
+      }
+      if (textarea) {
+        textarea.addEventListener("input", adjustTextareaHeight);
+      }
+  
+      // Function to toggle dark mode
+      const toggleDarkMode = () => document.body.classList.toggle("light-mode");
+  
+      // Function to delete all chats
+      const deleteAllChats = () => {
+        document.querySelectorAll(".chat").forEach(chat => chat.remove());
+        defaultText.style.display = "flex";
+      };
+  
+      const initialHeight = textarea.scrollHeight;
+      adjustTextareaHeight();
+  
+      const darkModeBtn = document.querySelector(".material-symbols-rounded.dark_mode");
+      if (darkModeBtn) {
+        darkModeBtn.addEventListener("click", toggleDarkMode);
+      }
+  
+      const deleteBtn = document.querySelector(".material-symbols-rounded.delete");
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", deleteAllChats);
+      }
+    });
+  </script>
+  
+</body>
+</html>
