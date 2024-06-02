@@ -128,6 +128,10 @@
     .chat:hover .chat-content:not(:has(.typing-animation), :has(.error)) span {
       visibility: visible;
     }
+    /* .chat .chat-details {
+      display: flex;
+      align-items: center;
+    } */
     .chat .chat-details img {
       width: 35px;
       height: 35px;
@@ -136,23 +140,23 @@
       border-radius: 2px;
     }
 
-    .chat-container .chat .chat-details p pre code li ul ol {
+    .chat-container .chat .chat-details p  pre code li ul ol{
       padding: 10px 20px;
       border-radius: 20px;
       background-color: var(--outgoing-chat-bg);
       color: var(--text-color);
     }
 
-    .chat-container .chat.incoming .chat-details p pre code li ul ol {
+    .chat-container .chat.incoming .chat-details p  pre code li ul ol{
       background-color: var(--incoming-chat-bg);
-      color: var(--text-color);
+      color: var (--text-color);
       padding: 10px 20px;
       border-radius: 20px;
       margin-left: 50px;
       max-width: 100%;
     }
 
-    .chat .chat-details p pre code li ul ol {
+    .chat .chat-details p   pre code li ul ol{
       white-space: pre-wrap;
       font-size: 1.05rem;
       padding: 0 50px 0 25px;
@@ -179,7 +183,7 @@
       margin-left: 0;
     }
     @keyframes animateDots {
-      0%, 44% {
+      0%,44% {
         transform: translateY(0px);
       }
       28% {
@@ -274,120 +278,159 @@
         border-radius: 10px;
         margin-left: 10px;
       }
-      .typing-container {
-        padding: 10px 5px;
-      }
       .typing-container .typing-content {
-        max-width: 100%;
+        flex-direction: column;
       }
-      .typing-textarea textarea {
-        padding: 10px 20px;
-        font-size: 0.9rem;
+      .typing-content span {
+        width: 45px;
+        height: 45px;
+      }
+      .typing-controls {
+        margin-top: 10px;
+        justify-content: flex-end;
+      }
+      .typing-controls span {
+        margin-left: 0;
       }
     }
   </style>
 </head>
 <body>
-  <div class="chat-container" id="chat-container">
+  <div class="chat-container">
     <div class="default-text">
       <h1>GPT Clone</h1>
-      <p>Digite uma mensagem para começar a conversar.</p>
+      <p>Envie uma mensagem para iniciar a conversa</p>
     </div>
   </div>
-
   <div class="typing-container">
     <div class="typing-content">
       <div class="typing-textarea">
-        <textarea id="chat-input" placeholder="Digite sua mensagem..."></textarea>
-        <span class="material-symbols-rounded" id="send-btn">send</span>
+        <textarea spellcheck="false" placeholder="Digite uma mensagem"></textarea>
+        <span id="send-btn" class="material-symbols-rounded">send</span>
+      </div>
+      <div class="typing-controls">
+        <span id="theme-btn" class="material-symbols-rounded">light_mode</span>
+        <span id="delete-btn" class="material-symbols-rounded">delete</span>
       </div>
     </div>
   </div>
 
   <script>
-    const chatContainer = document.getElementById("chat-container");
-    const chatInput = document.getElementById("chat-input");
-    const sendBtn = document.getElementById("send-btn");
+    const chatContainer = document.querySelector(".chat-container");
+    const textarea = document.querySelector("textarea");
+    const sendChatBtn = document.querySelector("#send-btn");
+    const themeBtn = document.querySelector("#theme-btn");
+    const deleteBtn = document.querySelector("#delete-btn");
+    const initialHeight = textarea.scrollHeight;
 
-    function createChatElement(message, className) {
-      const chat = document.createElement("div");
-      chat.classList.add("chat", className);
-      const chatContent = document.createElement("div");
-      chatContent.classList.add("chat-content");
-      const chatDetails = document.createElement("div");
-      chatDetails.classList.add("chat-details");
-      const p = document.createElement("p");
-      p.textContent = message;
-      chatDetails.appendChild(p);
-      chatContent.appendChild(chatDetails);
-      chat.appendChild(chatContent);
-      return chat;
-    }
-
-    async function getChatResponse(message) {
-      const apiKey = 'YOUR_API_KEY'; // Insira sua chave de API aqui
-      const response = await fetch('https://api.etx.tec.br/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'Einstein-v6.1-Llama3-8B-Q4_K_M.gguf',
-          messages: [{ role: 'user', content: message }],
-          temperature: 0.7
-        })
-      });
-      const data = await response.json();
-      if (response.ok) {
-        return data.choices[0].message.content;
-      } else {
-        throw new Error(data.error.message);
-      }
-    }
-
-    sendBtn.addEventListener("click", async () => {
-      const userMessage = chatInput.value;
-      if (!userMessage.trim()) return;
-
-      const outgoingChat = createChatElement(userMessage, "outgoing");
-      chatContainer.appendChild(outgoingChat);
-      chatInput.value = "";
-
-      const typingAnimation = document.createElement("div");
-      typingAnimation.classList.add("chat", "incoming");
-      typingAnimation.innerHTML = `
-        <div class="chat-content">
-          <div class="chat-details">
-            <p class="typing-animation">
-              <span class="typing-dot"></span>
-              <span class="typing-dot"></span>
-              <span class="typing-dot"></span>
-            </p>
-          </div>
-        </div>`;
-      chatContainer.appendChild(typingAnimation);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      try {
-        const botMessage = await getChatResponse(userMessage);
-        chatContainer.removeChild(typingAnimation);
-        const incomingChat = createChatElement(botMessage, "incoming");
-        chatContainer.appendChild(incomingChat);
-      } catch (error) {
-        chatContainer.removeChild(typingAnimation);
-        const errorMessage = createChatElement("Erro: " + error.message, "incoming");
-        errorMessage.querySelector("p").classList.add("error");
-        chatContainer.appendChild(errorMessage);
-      }
-
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+    // Change textarea height based on input
+    textarea.addEventListener("input", () => {
+      textarea.style.height = `${initialHeight}px`;
+      textarea.style.height = `${textarea.scrollHeight}px`;
     });
 
-    chatInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
+    const createElement = (html, className) => {
+      const element = document.createElement("div");
+      element.className = `chat ${className}`;
+      element.innerHTML = html;
+      return element;
+    };
+
+    const getChatResponse = async (incomingChatDiv) => {
+      const API_URL = "https://api.etx.tec.br/v1/chat/completions";
+      const messageElement = document.createElement("p");
+      messageElement.classList.add("typing-animation");
+      messageElement.innerHTML = `<span class="typing-dot"></span>
+                                  <span class="typing-dot"></span>
+                                  <span class="typing-dot"></span>`;
+      incomingChatDiv.querySelector(".chat-details").appendChild(messageElement);
+      chatContainer.scrollTo(0, chatContainer.scrollHeight);
+
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "Einstein-v6.1-Llama3-8B-Q4_K_M.gguf",
+          messages: [{ role: "user", content: userMessage }],
+          temperature: 0.7
+        })
+      };
+
+      try {
+        const response = await fetch(API_URL, requestOptions);
+        if (!response.ok) {
+          throw new Error("Erro ao obter resposta do servidor");
+        }
+        const data = await response.json();
+        messageElement.remove();
+        const content = data.choices[0].message.content.trim();
+        const pElement = document.createElement("p");
+        pElement.textContent = content;
+        incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
+        chatContainer.scrollTo(0, chatContainer.scrollHeight);
+      } catch (error) {
+        messageElement.remove();
+        const errorElement = document.createElement("p");
+        errorElement.classList.add("error");
+        errorElement.textContent = "Erro ao obter resposta. Tente novamente.";
+        incomingChatDiv.querySelector(".chat-details").appendChild(errorElement);
+        chatContainer.scrollTo(0, chatContainer.scrollHeight);
+      }
+    };
+
+    const handleOutgoingChat = () => {
+      userMessage = textarea.value.trim();
+      if (!userMessage) return;
+
+      textarea.value = "";
+      textarea.style.height = `${initialHeight}px`;
+
+      const html = `<div class="chat-content">
+                      <div class="chat-details">
+                        <p></p>
+                      </div>
+                    </div>`;
+      const outgoingChatDiv = createElement(html, "outgoing");
+      outgoingChatDiv.querySelector("p").textContent = userMessage;
+      document.querySelector(".default-text")?.remove();
+      chatContainer.appendChild(outgoingChatDiv);
+      chatContainer.scrollTo(0, chatContainer.scrollHeight);
+
+      setTimeout(() => {
+        const incomingHtml = `<div class="chat-content">
+                                <div class="chat-details">
+                                  <img src="bot.jpg" alt="GPT Clone">
+                                </div>
+                              </div>`;
+        const incomingChatDiv = createElement(incomingHtml, "incoming");
+        chatContainer.appendChild(incomingChatDiv);
+        chatContainer.scrollTo(0, chatContainer.scrollHeight);
+
+        getChatResponse(incomingChatDiv);
+      }, 600);
+    };
+
+    sendChatBtn.addEventListener("click", handleOutgoingChat);
+
+    textarea.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        sendBtn.click();
+        handleOutgoingChat();
+      }
+    });
+
+    themeBtn.addEventListener("click", () => {
+      document.body.classList.toggle("light-mode");
+      themeBtn.textContent = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
+    });
+
+    deleteBtn.addEventListener("click", () => {
+      if (confirm("Tem certeza que deseja deletar todos os chats?")) {
+        document.querySelectorAll(".chat").forEach(chat => chat.remove());
+        chatContainer.appendChild(document.querySelector(".default-text") || createElement(`<div class="default-text">
+                                                                                           <h1>GPT Clone</h1>
+                                                                                           <p>Envie uma mensagem para iniciar a conversa</p>
+                                                                                         </div>`, ""));
       }
     });
   </script>
