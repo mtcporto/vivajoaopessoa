@@ -1,0 +1,53 @@
+<body>
+
+<div class="container">
+    <h1>Converse com o Chatbot</h1>
+    <div id="chat-container"></div>
+    <input type="text" id="message-input" placeholder="Digite sua mensagem...">
+    <button id="send-btn">Enviar</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+const apiKey = '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';
+const model = 'Einstein-v6.1-Llama3-8B-Q4_K_M.gguf'; // Modelo Einstein
+const prompt = "Você só responde em portugues e está se comunicando no whatsapp. Você deve sempre iniciar uma conversa: quando iniciar a ocnversa informe ao usuário que ele concordou com os termos no link: https://etx.tec.br/lgpd/ informe também que caso você venha apresentar um problema e o usuário deseje entrar em contato com a ETX faça no formumário: https://etx.tec.br/#contato, a ETX não usa email"; // Prompt
+
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+
+async function sendMessage() {
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value.trim();
+    if (message === '') return;
+
+    appendMessage('Você', message);
+    
+    try {
+        const response = await axios.post('https://api.etx.tec.br/v1/completions', {
+            model: model,
+            prompt: prompt + '\n' + message,
+            max_tokens: 4096
+        }, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`
+            }
+        });
+
+        const botResponse = response.data.choices[0].text.trim();
+        appendMessage('Bot', botResponse);
+
+        messageInput.value = '';
+    } catch (error) {
+        console.error('Erro ao enviar a mensagem:', error);
+    }
+}
+
+function appendMessage(sender, message) {
+    const chatContainer = document.getElementById('chat-container');
+    const messageElement = document.createElement('div');
+    messageElement.textContent = `${sender}: ${message}`;
+    chatContainer.appendChild(messageElement);
+}
+</script>
+
+</body>
