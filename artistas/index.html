@@ -5,138 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Artistas</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .card-text-container {
-    padding: 10px;
-}
-
-.albums-list,
-.singles-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-        body {
-            padding-bottom: 10px;
-        }
-        .header {
-            background-color: black;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-        .carousel-inner {
-            text-align: center;
-        }
-        .carousel-caption {
-    display: none;
-}
-#artistCards {
-    margin-top: 20px;
-}
-        .plyr__video-embed {
-            width: 900px;
-            height: 500px;
-            margin: auto;
-        }
-        .plyr__control--overlaid {
-            display: none;
-        }
-
-        .card-body {
-    -ms-flex: 1 1 auto;
-    flex: 1 1 auto;
-    padding: 0px;
-}
-        .artist-card {
-    padding: 0px; /* Alterado de 20px para 10px */
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    color: #343a40;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-
-    .artist-card .card-content {
-    padding: 10px; /* Ou qualquer outro valor desejado */
-}
-}
-        .artist-card img {
-            width: 100%;
-            height: auto;
-            margin-bottom: 10px;
-        }
-        .artist-card h2 {
-            font-weight: bold;
-            text-align: center;
-        }
-        .artist-card ul {
-            list-style-type: none;
-            padding: 0px;
-        }
-        .artist-card a {
-            color: #343a40;
-            text-decoration: none;
-        }
-        .artist-card a:hover {
-            color: #007bff;
-        }
-        .artist-card i {
-            width: 24px;
-            height: 24px;
-            vertical-align: middle;
-            color: #6c757d;
-        }
-        .artist-card .icon-list {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .card-columns {
-            column-count: 3;
-        }
-.carousel-video {
-    max-width: 100%;
-    margin: 0 auto;
-}
-
-@media (max-width: 767px) {
-    .carousel-video {
-        max-width: 100%;
-    }
-    .plyr__video-embed {
-        width: 100%;
-        height: 0;
-        padding-bottom: 56.25%; /* Proporção de 16:9 */
-        position: relative;
-    }
-    .plyr__video-embed > iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
-}
-
-        @media (max-width: 991px) {
-            .card-columns {
-                column-count: 2;
-            }
-        }
-        @media (max-width: 767px) {
-            .card-columns {
-                column-count: 1;
-            }
-        }    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="header">
         <h1>Artistas</h1>
     </div>
+    
     <div id="videoCarousel" class="carousel slide carousel-video" data-ride="carousel" data-interval="3000">
+        <a class="carousel-control-prev" href="#videoCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Anterior</span>
+        </a>
+        <a class="carousel-control-next" href="#videoCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Próximo</span>
+        </a>
         <ol class="carousel-indicators">
             <li data-target="#videoCarousel" data-slide-to="0" class="active"></li>
             <li data-target="#videoCarousel" data-slide-to="1"></li>
@@ -146,40 +31,40 @@
         </ol>
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <div class="plyr__video-embed" id="player1">
-                    <iframe id="ytplayer1" src="https://www.youtube.com/embed/PpTlkAa1F0E?autoplay=1&mute=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
+                <div class="video-container">
+                    <iframe id="ytplayer3" src="https://www.youtube.com/embed/9mS5zZfWMSU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=9mS5zZfWMSU&start=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
+                </div>
+                <div class="carousel-caption">
+                    <h5>Lily - Menina-flor (Álbum completo)</h5>
+                </div>
+            </div>
+            <div class="carousel-item ">
+                <div class="video-container">
+                    <iframe id="ytplayer1" src="https://www.youtube.com/embed/PpTlkAa1F0E?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=PpTlkAa1F0E&start=22" allowfullscreen allowtransparency allow="autoplay"></iframe>
                 </div>
                 <div class="carousel-caption">
                     <h5>ChicoCorrea&ElectronicBand - LELE</h5>
                 </div>
             </div>
             <div class="carousel-item">
-                <div class="plyr__video-embed" id="player2">
-                    <iframe id="ytplayer2" src="https://www.youtube.com/embed/YBKWvPt2omU?autoplay=1&mute=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
+                <div class="video-container">
+                    <iframe id="ytplayer2" src="https://www.youtube.com/embed/YBKWvPt2omU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=YBKWvPt2omU&start=20" allowfullscreen allowtransparency allow="autoplay"></iframe>
                 </div>
                 <div class="carousel-caption">
                     <h5>EU NÃO SOU BOA INFLUÊNCIA PRA VOCE - DVD Seu Pereira e Coletivo 401</h5>
                 </div>
             </div>
             <div class="carousel-item">
-                <div class="plyr__video-embed" id="player3">
-                    <iframe id="ytplayer3" src="https://www.youtube.com/embed/9mS5zZfWMSU?autoplay=1&mute=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
-                </div>
-                <div class="carousel-caption">
-                    <h5>Lily - Menina-flor (Álbum completo)</h5>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <div class="plyr__video-embed" id="player4">
-                    <iframe id="ytplayer4" src="https://www.youtube.com/embed/CjoXcW2BQH4?autoplay=1&mute=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
+                <div class="video-container">
+                    <iframe id="ytplayer4" src="https://www.youtube.com/embed/CjoXcW2BQH4?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=CjoXcW2BQH4&start=32" allowfullscreen allowtransparency allow="autoplay"></iframe>
                 </div>
                 <div class="carousel-caption">
                     <h5>Tapuia - Outsider (Official Lyric Video)</h5>
                 </div>
             </div>
             <div class="carousel-item">
-                <div class="plyr__video-embed" id="player5">
-                    <iframe id="ytplayer5" src="https://www.youtube.com/embed/esFSlvLKsFw?autoplay=1&mute=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
+                <div class="video-container">
+                    <iframe id="ytplayer5" src="https://www.youtube.com/embed/esFSlvLKsFw?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=esFSlvLKsFw" allowfullscreen allowtransparency allow="autoplay"></iframe>
                 </div>
                 <div class="carousel-caption">
                     <h5>Banda Odile - Medley (I Will Survive, Maniac, Somebody to Love, I Feel Good, Uptown Funk)</h5>
@@ -193,17 +78,7 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
     <script>
-        // Initialize Plyr instances with volume set to 0
-        const players = [
-            new Plyr('#player1', { controls: [], volume: 0 }),
-            new Plyr('#player2', { controls: [], volume: 0 }),
-            new Plyr('#player3', { controls: [], volume: 0 }),
-            new Plyr('#player4', { controls: [], volume: 0 }),
-            new Plyr('#player5', { controls: [], volume: 0 })
-        ];
-
         // Add YouTube Player API script
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -213,8 +88,8 @@
         // YouTube API ready callback
         var ytPlayers = [];
         function onYouTubeIframeAPIReady() {
-            ytPlayers = players.map((_, index) => {
-                return new YT.Player('ytplayer' + (index + 1), {
+            ytPlayers = ['ytplayer1', 'ytplayer2', 'ytplayer3', 'ytplayer4', 'ytplayer5'].map((id) => {
+                return new YT.Player(id, {
                     events: {
                         'onReady': onPlayerReady
                     }
@@ -251,18 +126,22 @@
             playNextPlayer(e);
         });
 
-        // Mute all players when the page is loaded
-        window.addEventListener('load', function () {
-            ytPlayers.forEach(player => {
-                player.mute();
-            });
-        });
-
         // Load artist data from JSON file
         fetch('data.json')
             .then(response => response.json())
             .then(data => {
                 const artistCards = document.getElementById('artistCards');
+                // Função para randomizar a ordem dos cards
+                function shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                    return array;
+                }
+
+                // Randomizar a ordem dos artistas
+                data.artistas = shuffleArray(data.artistas);
                 data.artistas.forEach(artista => {
                     const card = document.createElement('div');
                     card.className = 'card artist-card';
@@ -283,7 +162,6 @@
                         ${artista.canais.instagram ? `<a href="${artista.canais.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>` : ''}
                         ${artista.canais.spotify ? `<a href="${artista.canais.spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ''}
                         ${artista.canais.website ? `<a href="${artista.canais.website}" target="_blank"><i class="fas fa-globe"></i></a>` : ''}
-                        ${artista.contato && artista.contato.email ? `<a href="mailto:${artista.contato.email}" target="_blank"><i class="fas fa-envelope"></i></a>` : ''}
                         ${artista.contato && artista.contato.whatsapp ? `<a href="https://wa.me/${artista.contato.whatsapp.replace(/\D/g, '')}" target="_blank"><i class="fab fa-whatsapp"></i></a>` : ''}
                     `;
                     cardBody.appendChild(iconList);
