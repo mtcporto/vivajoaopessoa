@@ -1,0 +1,188 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    padding-bottom: 10px;
+    background-color: #f8f8f8; /* Cor de fundo offwhite */
+}
+
+.header {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Carousel Styles */
+.carousel-video {
+    width: 50%;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.carousel-inner {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    overflow: visible; /* Permite a visualização dos vídeos anterior e posterior */
+}
+
+.carousel-item {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease; /* Adiciona transição suave para movimento */
+}
+
+.carousel-item:hover {
+    transform: translateY(-5px); /* Move o card levemente para cima */
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* Proporção 16:9 */
+    height: 0;
+    overflow: hidden;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-caption {
+    display: none;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    top: 50%;
+    display: block; /* Exibe os controles de navegação */
+}
+
+/* Card Styles */
+.card {
+    margin: 20px 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px); /* Adicionar esta linha */
+}
+
+.card img {
+    width: 100%;
+    height: auto;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card-title {
+    font-size: 1.5em;
+    margin: 10px 0;
+}
+
+.icon-list a {
+    margin-right: 10px;
+}
+
+.card-text-container {
+    padding: 10px;
+}
+
+.albums-list,
+.singles-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.artist-card {
+    padding: 0px;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    color: #343a40;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.artist-card img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.artist-card h2 {
+    font-weight: bold;
+    text-align: center;
+}
+
+.artist-card ul {
+    list-style-type: none;
+    padding: 0px;
+}
+
+.artist-card a {
+    color: #343a40;
+    text-decoration: none;
+}
+
+.artist-card a:hover {
+    color: #cf201a;
+}
+
+.artist-card i {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    color: #6c757d;
+}
+
+.artist-card .icon-list {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.card-columns {
+    column-count: 3;
+}
+
+#artistCards {
+    margin-top: 20px;
+}
+
+.card-body {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 0px;
+}
+
+@media (max-width: 991px) {
+    
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 767px) {
+    .video-container {
+        position: relative;
+        height: 0;
+        overflow: hidden;
+    }
+    .card-columns {
+        column-count: 1;
+    }
+
+    .carousel-video {
+        width: 100%;
+    }
+}
