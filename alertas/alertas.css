@@ -1,0 +1,115 @@
+.weather-icon {
+    margin-left: 10px;
+}
+
+.event-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 5px;
+    text-align: center;
+    line-height: 50px;
+    color: black;
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+    z-index: 2; /* Colocar os botões acima do canvas */
+}
+
+.alert-container {
+    display: inline-block;
+    margin: 5px;
+}
+
+.alert-link {
+    text-decoration: none;
+    color: inherit;
+}
+    
+.event-buttons-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    height: 70px; /* Ajuste a altura do div conforme necessário */
+    border-radius: 10px;
+    padding: 10px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    background: rgb(26, 27, 44);
+}
+
+.event-buttons-container p {
+    margin: 0;
+    font-size: 24px;
+    line-height: 50px;
+    font-weight: bold;
+    color: yellow;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2; /* Colocar o texto acima do canvas */
+}
+
+.event-buttons-wrapper {
+    display: flex;
+    gap: 5px;
+}
+
+@media (max-width: 768px) {
+    .event-button {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        line-height: 40px;
+    }
+
+    .event-buttons-container p {
+        font-size: 20px;
+        line-height: 40px;
+    }
+    .event-buttons-container {
+    height: 50px; /* Ajuste a altura do div conforme necessário */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+}
+
+@media (max-width: 576px) {
+    .event-button {
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+        line-height: 30px;
+    }
+
+    .event-buttons-container p {
+        font-size: 16px;
+        line-height: 30px;
+    }
+}
+
+body {
+    margin: 0;
+    background: white;
+}
+
+#joaopessoaEvents {
+    position: relative;
+}
+
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Manter o canvas atrás dos botões e texto */
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
