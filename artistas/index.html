@@ -130,8 +130,7 @@
             .card-columns {
                 column-count: 1;
             }
-        }
-    </style>
+        }    </style>
 </head>
 <body>
     <div class="header">
@@ -196,13 +195,13 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
     <script>
-        // Initialize Plyr instances
+        // Initialize Plyr instances with volume set to 0
         const players = [
-            new Plyr('#player1', { controls: [] }),
-            new Plyr('#player2', { controls: [] }),
-            new Plyr('#player3', { controls: [] }),
-            new Plyr('#player4', { controls: [] }),
-            new Plyr('#player5', { controls: [] })
+            new Plyr('#player1', { controls: [], volume: 0 }),
+            new Plyr('#player2', { controls: [], volume: 0 }),
+            new Plyr('#player3', { controls: [], volume: 0 }),
+            new Plyr('#player4', { controls: [], volume: 0 }),
+            new Plyr('#player5', { controls: [], volume: 0 })
         ];
 
         // Add YouTube Player API script
@@ -224,31 +223,42 @@
         }
 
         function onPlayerReady(event) {
+            event.target.mute(); // Mute the video
             if (event.target.getIframe().closest('.carousel-item').classList.contains('active')) {
                 event.target.playVideo();
             }
         }
-// Função para pausar o player atual
-function pauseCurrentPlayer(e) {
-    const currentPlayer = e.target.getElementsByTagName('iframe')[$('.carousel-item.active').index()];
-    if (currentPlayer && currentPlayer.contentWindow && currentPlayer.contentWindow.postMessage) {
-        currentPlayer.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-    }
-}
 
-// Função para reproduzir o próximo player
-function playNextPlayer(e) {
-    const nextPlayer = e.target.getElementsByTagName('iframe')[$(e.relatedTarget).index()];
-    if (nextPlayer && nextPlayer.contentWindow && nextPlayer.contentWindow.postMessage) {
-        nextPlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-    }
-}
+        // Function to pause the current player
+        function pauseCurrentPlayer(e) {
+            const currentPlayer = e.target.getElementsByTagName('iframe')[$('.carousel-item.active').index()];
+            if (currentPlayer && currentPlayer.contentWindow && currentPlayer.contentWindow.postMessage) {
+                currentPlayer.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+            }
+        }
 
-$('#videoCarousel').on('slide.bs.carousel', function (e) {
-    pauseCurrentPlayer(e);
-    playNextPlayer(e);
-});
-        // Carregar os dados dos artistas do arquivo JSON
+        // Function to play the next player
+        function playNextPlayer(e) {
+            const nextPlayer = e.target.getElementsByTagName('iframe')[$(e.relatedTarget).index()];
+            if (nextPlayer && nextPlayer.contentWindow && nextPlayer.contentWindow.postMessage) {
+                nextPlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                nextPlayer.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+            }
+        }
+
+        $('#videoCarousel').on('slide.bs.carousel', function (e) {
+            pauseCurrentPlayer(e);
+            playNextPlayer(e);
+        });
+
+        // Mute all players when the page is loaded
+        window.addEventListener('load', function () {
+            ytPlayers.forEach(player => {
+                player.mute();
+            });
+        });
+
+        // Load artist data from JSON file
         fetch('data.json')
             .then(response => response.json())
             .then(data => {
@@ -278,26 +288,20 @@ $('#videoCarousel').on('slide.bs.carousel', function (e) {
                     `;
                     cardBody.appendChild(iconList);
                     const cardTextContainer = document.createElement('div');
-cardTextContainer.className = 'card-text-container';
-
-const albumsList = document.createElement('ul');
-albumsList.className = 'albums-list';
-albumsList.innerHTML = artista.albuns ? `<li><strong>Albuns:</strong>${artista.albuns.map(album =>` <br><a href="${album.spotify}" target="_blank">${album.nome} (${album.ano})</a>`).join('')}</li>` : '';
-
-const singlesList = document.createElement('ul');
-singlesList.className = 'singles-list';
-singlesList.innerHTML = artista.singles ? `<li><strong>Singles:</strong>${artista.singles.map(single =>` <br><a href="${single.spotify}" target="_blank">${single.nome} (${single.ano})</a>`).join('')}</li>` : '';
-
-cardTextContainer.appendChild(albumsList);
-cardTextContainer.appendChild(singlesList);
-cardBody.appendChild(cardTextContainer);
+                    cardTextContainer.className = 'card-text-container';
+                    const albumsList = document.createElement('ul');
+                    albumsList.className = 'albums-list';
+                    albumsList.innerHTML = artista.albuns ? `<li><strong>Albuns:</strong>${artista.albuns.map(album =>` <br><a href="${album.spotify}" target="_blank">${album.nome} (${album.ano})</a>`).join('')}</li>` : '';
+                    const singlesList = document.createElement('ul');
+                    singlesList.className = 'singles-list';
+                    singlesList.innerHTML = artista.singles ? `<li><strong>Singles:</strong>${artista.singles.map(single =>` <br><a href="${single.spotify}" target="_blank">${single.nome} (${single.ano})</a>`).join('')}</li>` : '';
+                    cardTextContainer.appendChild(albumsList);
+                    cardTextContainer.appendChild(singlesList);
+                    cardBody.appendChild(cardTextContainer);
                     card.appendChild(cardBody);
                     artistCards.appendChild(card);
                 });
             });
     </script>
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-        <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
 </body>
 </html>
