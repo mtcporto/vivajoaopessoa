@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tábua de Marés - João Pessoa</title>
+    <title>Tábua de Marés</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
     <style>
@@ -20,25 +20,38 @@
             text-align: center;
             margin: 20px 0;
         }
+        .content {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
         table {
             width: 100%;
             margin: 20px 0;
         }
+        .day-row {
+            background-color: #f8f9fa;
+        }
+        #container {
+            width: 100%;
+            height: 400px;
+            margin: 20px 0;
+        }
+
+
+
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Tábua de Marés - João Pessoa</h1>
+        <h1>Tábua de Marés</h1>
     </div>
-
+    
     <div class="title">
-        <h2>Previsão para os próximos 5 dias</h2>
+        <h2>Próximos 5 dias</h2>
     </div>
 
-    <div class="container">
-        <!-- Marinha do Brasil<br>
-        SEG 27  [ 00:17 ] 0.6         [ 06:36 ] 2.2          [ 12:56 ] 0.5          [ 19:17 ]  2.0  -->
-
+    <div class="content">
         <table class="table table-striped">
             <thead class="thead-dark">
                 <tr>
@@ -53,69 +66,220 @@
                 <!-- Linhas de dados serão inseridas aqui -->
             </tbody>
         </table>
+
+        <div id="container"></div>
     </div>
 
     <!-- Carregar a biblioteca tide-predictor -->
-        <script src="https://unpkg.com/@neaps/tide-predictor@0.1.1/dist/web/tide-predictor.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                initTidePrediction();
-            });
-            // m2 s2 n2 k2 k1 o1 p1 mf mm ssa
-            function initTidePrediction() {
+    <script src="https://unpkg.com/@neaps/tide-predictor@0.1.1/dist/web/tide-predictor.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initTidePrediction();
+        });
+
         const constituents = [
-            { name: 'O1', amplitude: 0.05, phase_GMT: 163.0, speed: 15.04107 },
-            { name: 'K1', amplitude: 0.05, phase_GMT: 235.0, speed: 15.041069 },
-            { name: 'P1', amplitude: 0.02, phase_GMT: 228.0, speed: 14.958932 },
-            { name: 'M2', amplitude: 0.81, phase_GMT: 124.0, speed: 28.984105 },
-            { name: 'MU2', amplitude: 0.02, phase_GMT: 119.0, speed: 27.968208 }, // Adicionado MU2
-            { name: 'S2', amplitude: 0.28, phase_GMT: 142.0, speed: 30.0 },
-            { name: 'N2', amplitude: 0.17, phase_GMT: 114.0, speed: 28.439730 },
-            { name: '2N2', amplitude: 0.02, phase_GMT: 108.0, speed: 27.895355 }, // Adicionado 2N2
-            { name: 'NU2', amplitude: 0.03, phase_GMT: 116.0, speed: 28.512583 }, // Adicionado NU2
-            { name: 'K2', amplitude: 0.08, phase_GMT: 137.0, speed: 30.082138 }
-        ];
+    { name: 'M2', amplitude: 0.79, phase_GMT: 124.0, speed: 28.984105 },
+    { name: 'S2', amplitude: 0.28, phase_GMT: 142.0, speed: 30.0 },
+    { name: 'N2', amplitude: 0.17, phase_GMT: 114.0, speed: 28.439730 },
+    { name: 'K1', amplitude: 0.05, phase_GMT: 235.0, speed: 15.041069 },
+    { name: 'O1', amplitude: 0.05, phase_GMT: 163.0, speed: 15.04107 },
+    { name: 'P1', amplitude: 0.02, phase_GMT: 228.0, speed: 14.958932 },
+    { name: 'Q1', amplitude: 0.01, phase_GMT: 276.0, speed: 13.398661 },
+    { name: 'K2', amplitude: 0.08, phase_GMT: 137.0, speed: 30.082138 },
+    { name: 'NO1', amplitude: 0.02, phase_GMT: 163.0, speed: 13.398660 },
+    { name: 'J1', amplitude: 0.02, phase_GMT: 288.0, speed: 15.0 },
+    { name: 'OO1', amplitude: 0.01, phase_GMT: 213.0, speed: 16.139101 }
+];
+
+const timeOffset = {
+    high: -10, // Offset de tempo para maré alta em minutos
+    low: 18   // Offset de tempo para maré baixa em minutos
+};
+
+const heightOffset = {
+    high: 1.5, // Offset de altura para maré alta
+    low: 1.35   // Offset de altura para maré baixa
+};
+
+
+        const adjustedConstituents = constituents.map(constituent => {
+            return {
+                ...constituent,
+                phase_GMT: constituent.phase_GMT % 360,
+                amplitude: constituent.amplitude
+            };
+        });
+
+        console.log(adjustedConstituents);
+
+        function initTidePrediction() {
             const now = new Date();
             const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const endDate = new Date(startDate.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 dias a partir de hoje
 
-            const predictor = tidePredictor(constituents, { phaseKey: 'phase_GMT' });
+            const predictor = tidePredictor(adjustedConstituents, {
+                phaseKey: 'phase_GMT'
+            });
+
             const tides = predictor.getExtremesPrediction({ start: startDate, end: endDate });
 
             const tableBody = document.getElementById('tide-table-body');
+            const chartData = [];
+            const categories = [];
+            let currentPoint = null;
+
+            let previousDate = '';
 
             tides.forEach(tide => {
                 const date = new Date(tide.time);
-                const dayCell = date.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' });
+                const day = date.getDate().toString().padStart(2, '0');
+                const weekday = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+                const formattedDayCell = `${weekday.charAt(0).toUpperCase() + weekday.slice(1)} ${day}`;
+                const formattedDayOnly = `${day}`;
+                const formattedWeekdayOnly = `${weekday.charAt(0).toUpperCase() + weekday.slice(1)}`;
                 const time = new Date(date.getTime()); // Mantendo o fuso horário GMT-3 (João Pessoa)
                 const formattedTime = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
-                const height = `${tide.level.toFixed(1)} m`;
+
+                // Ajustar os horários das marés altas e baixas
+                if (tide.high) {
+                    date.setMinutes(date.getMinutes() + timeOffset.high);
+                    tide.level += heightOffset.high;
+                } else {
+                    date.setMinutes(date.getMinutes() + timeOffset.low);
+                    tide.level += heightOffset.low;
+                }
+
+                const height = tide.level < 1 ? `${tide.level.toFixed(2)} m` : `${tide.level.toFixed(1)} m`;
                 const typeIcon = tide.high ? '<span class="mdi mdi-triangle" style="color: red;"></span>' : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
 
-                let row = tableBody.querySelector(`tr[data-date="${dayCell}"]`);
-                if (!row) {
-                    row = document.createElement('tr');
-                    row.setAttribute('data-date', dayCell);
+                // Adiciona os dados ao gráfico apenas se for o dia atual
+                if (date.toDateString() === now.toDateString()) {
+                    categories.push(formattedTime);
+                    const point = {
+                        y: tide.level,
+                        marker: {
+                            symbol: tide.high ? 'triangle' : 'triangle-down',
+                            fillColor: tide.high ? 'red' : 'green'
+                        }
+                    };
+                    chartData.push(point);
+
+                    // Verifica se é o ponto atual
+                    if (now.getHours() === date.getHours() && now.getMinutes() === date.getMinutes()) {
+                        currentPoint = {
+                            y: tide.level,
+                            x: categories.length - 1,
+                            marker: {
+                                symbol: 'circle',
+                                fillColor: 'red',
+                                radius: 8
+                            }
+                        };
+                    }
+                }
+
+                if (previousDate !== formattedDayCell) {
+                    const dayRow = document.createElement('tr');
+                    dayRow.setAttribute('data-date', formattedDayCell);
 
                     const dayColumn = document.createElement('td');
-                    dayColumn.textContent = dayCell;
-                    row.appendChild(dayColumn);
+                    dayColumn.textContent = formattedWeekdayOnly;
+                    dayRow.appendChild(dayColumn);
+
+                    for (let i = 0; i < 4; i++) {
+                        const timeColumn = document.createElement('td');
+                        timeColumn.classList.add('time-column');
+                        dayRow.appendChild(timeColumn);
+                    }
+
+                    tableBody.appendChild(dayRow);
+
+                    const tideRow = document.createElement('tr');
+                    tideRow.setAttribute('data-date', formattedDayCell);
+
+                    const dateColumn = document.createElement('td');
+                    dateColumn.textContent = formattedDayOnly;
+                    tideRow.appendChild(dateColumn);
 
                     for (let i = 0; i < 4; i++) {
                         const tideColumn = document.createElement('td');
-                        row.appendChild(tideColumn);
+                        tideColumn.classList.add('tide-column');
+                        tideRow.appendChild(tideColumn);
                     }
 
-                    tableBody.appendChild(row);
+                    tableBody.appendChild(tideRow);
+
+                    previousDate = formattedDayCell;
                 }
 
-                const cells = row.querySelectorAll('td');
-                for (let i = 1; i < cells.length; i++) {
-                    if (cells[i].textContent === "") {
-                        cells[i].innerHTML = `[ ${formattedTime} ] ${height} ${typeIcon}`;
+                const dayRow = tableBody.querySelector(`tr[data-date="${formattedDayCell}"]`);
+                const cellsTime = dayRow.querySelectorAll('.time-column');
+                const tideRow = dayRow.nextElementSibling;
+                const cellsTide = tideRow.querySelectorAll('.tide-column');
+
+                for (let i = 0; i < cellsTime.length; i++) {
+                    if (cellsTime[i].textContent === "") {
+                        cellsTime[i].textContent = `${formattedTime}`;
+                        cellsTide[i].innerHTML = `${height} ${typeIcon}`;
                         break;
                     }
                 }
+            });
+
+            // Adiciona o ponto atual ao gráfico
+            if (currentPoint) {
+                chartData.push(currentPoint);
+                categories.push(now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0'));
+            }
+
+            Highcharts.setOptions({
+                time: {
+                    useUTC: false,
+                    timezoneOffset: -3 * 60 // Fuso horário GMT-3 (João Pessoa)
+                }
+            });
+
+            setInterval(updateChart, 60000); // 60000 milissegundos = 1 minuto
+
+            function updateChart() {
+                const now = new Date();
+                const currentPoint = {
+                    y: 0, // Defina a altura atual correta
+                    x: categories.length,
+                    marker: {
+                        symbol: 'circle',
+                        fillColor: 'red',
+                        radius: 8
+                    }
+                };
+                chartData.push(currentPoint);
+                categories.push(`${now.getHours()}:${now.getMinutes()}`);
+                chart.series[0].setData(chartData);
+                chart.xAxis[0].setCategories(categories);
+            }
+
+            // Configura o gráfico Highcharts
+            Highcharts.chart('container', {
+                title: {
+                    text: 'Tábua de marés de hoje'
+                },
+                xAxis: {
+                    categories: categories
+                },
+                yAxis: {
+                    title: {
+                        text: 'Altura da Maré (m)'
+                    }
+                },
+                tooltip: {
+                    valueDecimals: 1
+                },
+                series: [{
+                    type: 'spline',
+                    name: 'Altura da Maré',
+                    data: chartData
+                }]
             });
         }
     </script>
