@@ -1,6 +1,11 @@
-.fonte .badge {
-  font-size: 14px; /* Adjust as needed */
+body {
+  font-family: Arial, sans-serif;
+  padding-bottom: 10px;
+  background-color: #F5F5DC; /* Cor de fundo offwhite */
 }
+.badge {
+  font-size: 16px; /* Adjust as needed */
+    }
 .card-img-top {
     width: 100%;
     height: 150px;
@@ -25,10 +30,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .fonte {
-    font-size: 0.8em;
-    color: #888;
-  }
+
   @media (max-width: 767px) {
     .card-img-top {
       height: 200px;

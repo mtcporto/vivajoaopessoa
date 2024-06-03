@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
         body {
-            padding-bottom: 20px;
+            font-family: Arial, sans-serif;
+            padding-bottom: 10px;
+            background-color: #F5F5DC; /* Cor de fundo offwhite */
         }
         .header {
             background-color: black;
@@ -57,50 +59,35 @@
         .then(response => response.json())
         .then(data => {
             const container = document.querySelector('.container');
-            // Agrupar estabelecimentos por categoria
-            const categorias = data.estabelecimentos.reduce((acc, estabelecimento) => {
-                acc[estabelecimento.categoria] = acc[estabelecimento.categoria] || [];
-                acc[estabelecimento.categoria].push(estabelecimento);
-                return acc;
-            }, {});
-
-            Object.keys(categorias).forEach(categoria => {
-                const categoryTitle = document.createElement('h2');
-                categoryTitle.className = 'category-title';
-                categoryTitle.innerText = categoria.charAt(0).toUpperCase() + categoria.slice(1);
-                container.appendChild(categoryTitle);
-
-                const row = document.createElement('div');
-                row.className = 'row';
-
-                categorias[categoria].forEach(estabelecimento => {
-                    const col = document.createElement('div');
-                    col.className = 'col-md-4';
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    const instagramLink = estabelecimento.instagram ? `https://www.instagram.com/${estabelecimento.instagram}` : '#';
-                    const mapLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(estabelecimento.endereco)}`;
-                    card.innerHTML = `
-                        <img src="${estabelecimento.foto}" class="card-img-top" alt="${estabelecimento.nome}">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                               ${estabelecimento.nome}
-                            </h5>
-                            <p class="card-text">
-                                <a href="${mapLink}" target="_blank" class="map-icon">
-                                    <i class="fas fa-map-marked-alt"></i>
-                                </a>
-                                <a href="${instagramLink}" target="_blank" class="instagram-icon">
-                                    <i class="fab fa-instagram"></i>
-                                </a>
-                            </p>
-                        </div>
-                    `;
-                    row.appendChild(col);
-                    col.appendChild(card);
-                });
-                container.appendChild(row);
+            const row = document.createElement('div');
+            row.className = 'row';
+            data.estabelecimentos.forEach(estabelecimento => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4';
+                const card = document.createElement('div');
+                card.className = 'card';
+                const instagramLink = estabelecimento.instagram ? `https://www.instagram.com/${estabelecimento.instagram}` : '#';
+                const mapLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(estabelecimento.endereco)}`;
+                card.innerHTML = `
+                    <img src="${estabelecimento.foto}" class="card-img-top" alt="${estabelecimento.nome}">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                           ${estabelecimento.nome}
+                        </h5>
+                        <p class="card-text">
+                            <a href="${mapLink}" target="_blank" class="map-icon">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </a>
+                            <a href="${instagramLink}" target="_blank" class="instagram-icon">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </p>
+                    </div>
+                `;
+                row.appendChild(col);
+                col.appendChild(card);
             });
+            container.appendChild(row);
         });
 </script>
 
