@@ -13,11 +13,16 @@
   margin-top:20px;
 }
 
+body {
+  font-family: Arial, sans-serif;
+  padding-bottom: 10px;
+  background-color: #F5F5DC; /* Cor de fundo offwhite */
+}
 .air-quality-info {
   margin-right: auto;
   display: flex;
   flex-direction: column;
-  margin-left: 30px;
+  margin-left: 20px;
 }
 
 .air-quality-column {
@@ -35,8 +40,7 @@
 .badge-green {
   background-color: #16c71c;
 }
-
-.badge-yellow {
+.badge.bg-orange, .badge-yellow {
   background-color: #d6c318;
   color: black;
 }
@@ -74,7 +78,7 @@
     max-width: 100%;
     font-family: Arial, Helvetica, sans-serif;
     border-radius: 10px;
-    background: linear-gradient(to bottom left, #023a58, #48cae4);
+    /* background: linear-gradient(to bottom left, #023a58, #48cae4); */
     color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
@@ -141,7 +145,7 @@
     margin: 0 auto;
     border-radius: 10px;
     font-family: Arial, Helvetica, sans-serif;
-    background: linear-gradient(to bottom left, #023a58, #48cae4);
+    /* background: linear-gradient(to bottom left, #011620, #024163); */
     color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }

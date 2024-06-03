@@ -194,66 +194,63 @@ function loadAirQualityData() {
     })
     .catch(error => console.error(error));
 }
-function getUvIndexCategory(uvIndex) {
-  if (uvIndex < 3) {
-    return 'Baixo';
-  } else if (uvIndex < 6) {
-    return 'Moderado';
-  } else if (uvIndex < 8) {
-    return 'Alto';
-  } else if (uvIndex < 11) {
-    return 'Muito Alto';
-  } else {
-    return 'Extremo';
-  }
-}
 
 function getUvColorClass(uvIndex) {
-  if (uvIndex < 3) {
-    return 'badge-green';
-  } else if (uvIndex < 6) {
-    return 'badge-yellow';
-  } else if (uvIndex < 8) {
-    return 'badge-orange';
-  } else if (uvIndex < 11) {
-    return 'badge-red';
-  } else {
-    return 'badge-purple';
-  }
+  if (uvIndex < 3) return 'bg-success';
+  if (uvIndex < 6) return 'bg-warning';
+  if (uvIndex < 8) return 'bg-orange';
+  return 'bg-danger';
 }
 
-function getAqiCategory(aqi) {
-  if (aqi <= 50) {
-    return 'Bom';
-  } else if (aqi <= 100) {
-    return 'Moderado';
-  } else if (aqi <= 150) {
-    return 'Não Saudável para Grupos Sensíveis';
-  } else if (aqi <= 200) {
-    return 'Não Saudável';
-  } else if (aqi <= 300) {
-    return 'Muito Não Saudável';
-  } else {
-    return 'Perigoso';
-  }
+function getUvIndexCategory(uvIndex) {
+  if (uvIndex < 3) return 'Baixo';
+  if (uvIndex < 6) return 'Moderado';
+  if (uvIndex < 8) return 'Alto';
+  return 'Muito Alto';
 }
 
 function getAqiColorClass(aqi) {
-  if (aqi <= 50) {
-    return 'badge-green';
-  } else if (aqi <= 100) {
-    return 'badge-yellow';
-  } else if (aqi <= 150) {
-    return 'badge-orange';
-  } else if (aqi <= 200) {
-    return 'badge-red';
-  } else if (aqi <= 300) {
-    return 'badge-purple';
-  } else {
-    return 'badge-maroon';
+  if (aqi <= 50) return 'bg-success';
+  if (aqi <= 100) return 'bg-warning';
+  if (aqi <= 150) return 'bg-orange';
+  return 'bg-danger';
+}
+
+function getAqiCategory(aqi) {
+  if (aqi <= 50) return 'Boa';
+  if (aqi <= 100) return 'Moderada';
+  if (aqi <= 150) return 'Ruim para grupos sensíveis';
+  return 'Ruim';
+}
+
+// function reloadStylesheets() {
+//   const links = document.querySelectorAll('link[rel="stylesheet"]');
+//   links.forEach(link => {
+//     const href = link.getAttribute('href').split('?')[0];
+//     link.setAttribute('href', href + '?v=' + new Date().getTime());
+//   });
+// }
+
+function setWeatherCardBackground() {
+  const currentHour = new Date().getHours();
+  const weatherCard = document.querySelector('.card-weather');
+
+  if (weatherCard) {
+    if (currentHour >= 5 && currentHour < 16) {
+      weatherCard.style.setProperty('background', 'linear-gradient(to bottom left, #023a58, #48cae4)', 'important');
+    } else if (currentHour >= 16 && currentHour < 18) {
+      weatherCard.style.setProperty('background', 'linear-gradient(to bottom left, #a40027, #f88510)', 'important');
+    } else {
+      weatherCard.style.setProperty('background', 'linear-gradient(to bottom left, #000000, #024163)', 'important');
+    }
   }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   loadWeatherData();
+  setWeatherCardBackground();
+  // reloadStylesheets(); 
 });
+
+
+
