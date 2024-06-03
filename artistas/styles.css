@@ -2,7 +2,7 @@
 body {
     font-family: Arial, sans-serif;
     padding-bottom: 10px;
-    background-color: #f8f8f8; /* Cor de fundo offwhite */
+    background-color: #F5F5DC; /* Cor de fundo offwhite */
 }
 
 .header {
@@ -15,8 +15,8 @@ body {
 
 /* Carousel Styles */
 .carousel-video {
-    width: 50%;
-    max-width: 100%;
+    width: 100%;
+    max-width: 1140px;
     margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;
