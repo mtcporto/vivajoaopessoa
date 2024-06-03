@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Viva João Pessoa</title>
     <link rel="stylesheet" type="text/css" href="/clima/weather.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
-    <link rel="stylesheet" type="text/css" href="/alertas/alertas.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
     .header {
       background-color: black;
@@ -21,75 +18,52 @@
       font-size: 2em;
       margin-bottom: 20px;
     }    
+          .current-weather {
+    display: flex;
+    flex-direction: column;
+    align-items: normal;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    margin-left: 8%;
+  }
     .card-weather {
       margin-bottom: 20px;
       width: 100%;
-      max-width: 100%;
+      max-width: 100%;  
+
     }
-    .badge.bg-orange, .badge-yellow, .bg-warning  {
-  background-color: #d6c318;
-  color: black;
-}
+    .badge-yellow {
+      background-color: #d6c318;
+      color: black;
+    }
     .current-weather {
       margin-top: 20px;
     }
-    .week, .weather-icons, .temperatures {
-      margin: 0px;
-    }
-    .event-buttons-container {
-    position: relative;
-    width: 100%;
-    height: 70px;
-    /* ... */
+.week, .weather-icons, .temperatures {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin: 0px;
 }
-
-@media (max-width: 768px) {
-    .event-buttons-container {
-        width: 100%;
-        max-width: 100%;
-    }
-    .event-buttons-container p {
-          margin-left: 10px;
-          }
-      .event-buttons-wrapper {
-        margin-right: 10px;
-      }
-}
-
-@media (min-width: 768px) {
-    .event-buttons-container {
-        width: 100%;
-        max-width: 100%;
-    }
-    .event-buttons-container p {
-          margin-left: 90px;
-          }
-      .event-buttons-wrapper {
-        margin-right: 70px;
-      }
-}
-
-
+        @media (max-width: 768px) {
+  .forecast {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 30px;
+  }
     </style>
 </head>
 <body>
-
     <header class="bg-gray-900 text-white py-4 header">
         <div class="container mx-auto text-center">
           <h1 class="text-3xl font-bold" style="text-align: center;">
-            <span id="typed-text">Viva</span>João Pessoa
+            <span id="typed-text">Viva</span> João Pessoa
           </h1>        </div>
     </header>
 
-
     <div class="container">
 
-      <div id="joaopessoaEvents" class="event-buttons-container text-center">
-        <canvas id='canvas'></canvas>
-        <p><i class="fas fa-exclamation-triangle"></i> Alertas meteorológicos</p>
-        <div class="event-buttons-wrapper"></div>
-    </div>
-        
       <div id="weather-info">
         <div class="card-weather">
           <div class="forecast">
@@ -111,6 +85,7 @@
 
 
 
+
     <footer class="bg-gray-900 text-gray-300 py-5">
       <div class="container">
           <div class="row">
@@ -128,8 +103,8 @@
               <div class="col-md-4 mb-3">
                   <h5 class="text-xl font-semibold mb-4">Contato</h5>
                   <ul class="nav flex-column">
-                    <li class="nav-item mb-2 text-muted ">Liga pra gente! <a href="tel:+5583988281973" class="text-gray-300 text-muted hover:underline"> <i class="bi bi-telephone"></i></a></li>
-                    <li class="nav-item mb-2 text-muted ">ou manda um e-mail. <a href="mailto:contato@vivajoaopessoa.com" class="text-gray-300 text-muted hover:underline"> <i class="bi bi-envelope"></i></a></li>
+                    <li class="nav-item mb-2 text-muted ">Ligue pra gente! <a href="tel:+5583988281973" class="text-gray-300 text-muted hover:underline"> <i class="bi bi-telephone"></i></a></li>
+                    <li class="nav-item mb-2 text-muted ">ou mande um e-mail. <a href="mailto:contato@vivajoaopessoa.com" class="text-gray-300 text-muted hover:underline"> <i class="bi bi-envelope"></i></a></li>
                   </ul>
               </div>
               <div class="col-md-4 mb-3">
@@ -150,36 +125,30 @@
       </div>
   </footer>
   
+
+
+
+
+
+
     <script>
-    // strings: [
-    //   'Descubra',
-    //   'Explore',
-    //   'Conheça',
-    //   'Experimente',
-    //   'Navegue por',
-    //   'Percorra',
-    //   'Sinta',
-    //   'Desvende',
-    //   'Celebre',
-    //   'Saboreie',
-    //   'Contemple',
-    //   'Curta',
-    //   'Mergulhe em',
-    //   'Aventure-se em',
-    //   'Viva'
-    // ],
+
 var typed = new Typed('#typed-text', {
     strings: [
-      '',
       'Descubra',
       'Explore',
       'Conheça',
+      'Experimente',
+      'Navegue por',
+      'Percorra',
       'Sinta',
       'Desvende',
       'Celebre',
       'Saboreie',
       'Contemple',
       'Curta',
+      'Mergulhe em',
+      'Aventure-se em',
       'Viva'
     ],
     typeSpeed: 80,
@@ -237,7 +206,7 @@ var typed = new Typed('#typed-text', {
     "link": "/noticias/",
     "imagem": "/imagens/noticias.jpeg"
   },
-      // {
+  // {
   //   "titulo": "Notícias - João Pessoa",
   //   "texto": "Confira as últimas notícias sobre o que está acontecendo em Joao Pessoa.",
   //   "link": "https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSkwyMHZNREZvZVRsa0VnVndkQzFDVWlnQVAB?ceid=BR:pt-419&oc=3",
@@ -249,14 +218,9 @@ var typed = new Typed('#typed-text', {
     // "link": "https://www.tripadvisor.com.br/Attractions-g303428-Activities-Joao_Pessoa_State_of_Paraiba.html",
     "link": "/guia/",
     "imagem": "/imagens/atracoes.jpeg"
-  },
-    {
-    "titulo": "Artistas",
-    "texto": "Artistas da nossa cidade.",
-    "link": "/artistas/",
-    "imagem": "/imagens/artistas.png"
   }
-];
+]
+;
 
         // Função para criar os cards dinamicamente
         function createCards() {
@@ -284,6 +248,5 @@ var typed = new Typed('#typed-text', {
         window.onload = createCards;
     </script>
    <script src="/clima/weather.js"></script>
-   <script src="/alertas/alertas.js"></script>
 </body>
 </html>
