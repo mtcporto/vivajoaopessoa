@@ -167,6 +167,7 @@ $(document).ready(function() {
             if (joaopessoaAlerts.length > 0) {
                 exibirEventosJoaoPessoa(joaopessoaAlerts);
             } else {
+                console.log("Não existem alertas no momento.");
                 ocultarEventosJoaoPessoa();
             }
         } catch (error) {
@@ -183,5 +184,9 @@ $(document).ready(function() {
         $('#joaopessoaEvents').show();
     }
     
+    function ocultarEventosJoaoPessoa() {
+        $('#joaopessoaEvents').hide();
+    }
+
     carregarLinksRSS();
 });
