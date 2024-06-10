@@ -101,7 +101,7 @@ $(document).ready(function() {
                     }
                 });
 
-                if (municipios.includes("João Pessoa")) {
+                if (municipios.includes("Acajutiba - BA")) {
                     let iconClass = "";
                     switch(event) {
                         case "Chuvas Intensas":
