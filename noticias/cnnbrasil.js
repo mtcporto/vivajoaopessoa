@@ -4,31 +4,35 @@ function loadCNNBrasilNews() {
     fetch(url)
         .then(response => response.text())
         .then(data => {
-            // Parse o XML
             const parser = new DOMParser();
-            const xml = parser.parseFromString(data, 'application/xml');
-            
-            // Pegue todos os itens
-            const items = xml.querySelectorAll('item');
-            
+            const xml = parser.parseFromString(data, "application/xml");
+
+            // Seleciona todos os itens do feed
+            const items = xml.querySelectorAll("item");
+
             items.forEach(item => {
-                const title = item.querySelector('title').textContent;
-                const link = item.querySelector('link').textContent;
-                const description = item.querySelector('description').textContent;
-                
-                // Capturando a imagem dentro do conteúdo (media:content)
-                const mediaContent = item.querySelector('media\\:content');
-                const imgUrl = mediaContent ? mediaContent.getAttribute('url') : null;
-                
-                // Verifica se a imagem existe
-                if (imgUrl) {
-                    console.log(`Title: ${title}`);
-                    console.log(`Image: ${imgUrl}`);
-                    console.log(`Link: ${link}`);
-                }
+                const title = item.querySelector("title").textContent;
+                const link = item.querySelector("link").textContent;
+                const description = item.querySelector("description").textContent;
+
+                // Busca por imagens no conteúdo da descrição ou em media:content
+                const imgElement = item.querySelector("media\\:content, img");
+                const imageUrl = imgElement ? imgElement.getAttribute('url') || imgElement.getAttribute('src') : null;
+
+                // Exibe as notícias
+                const newsContainer = document.getElementById("news-container");
+                const newsItem = document.createElement("div");
+                newsItem.classList.add("news-item");
+
+                newsItem.innerHTML = `
+                    <h2>${title}</h2>
+                    <a href="${link}" target="_blank">Leia mais</a>
+                    ${imageUrl ? `<img src="${imageUrl}" alt="${title}">` : ''}
+                    <p>${description}</p>
+                `;
+
+                newsContainer.appendChild(newsItem);
             });
         })
-        .catch(error => {
-            console.error('Erro ao carregar as notícias:', error);
-        });
+        .catch(error => console.error('Erro ao carregar o feed RSS:', error));
 }
