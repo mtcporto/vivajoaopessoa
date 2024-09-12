@@ -1,5 +1,7 @@
 # Viva João Pessoa
 
+Site com diversas informações de João Pessoa, desde informações meteorológicas, shows, eventos, programação de cinema, bares, restaurantes, tábua de mares, noticias, atrações e artistas locais. Tudo em  um só lugar.
+
 ## Alertas Meteorológicos 
   - apresentados para João Pessoa, se tiverem sido lancados na plataforma do INMET.
 ## Clima/Tempo
