@@ -2,8 +2,8 @@
 
 ## Alertas Meteorológicos 
   - apresentados para João Pessoa, se tiverem sido lancados na plataforma do INMET.
-## Temperatura, Condição climática, Índice UV e Qualidade do Ar 
-  - atualizada em tempo real via API. 
+## Clima/Tempo
+  - Temperatura, Condição climática, Índice UV e Qualidade do Ar atualizados em tempo real via API. 
 ## Shows e Eventos 
   - com fontes como Sympla, Eventim, Ingresso Digital, Bilheteria Digital e Outgo, usando webscrapping.
 ## Programação de Cinema 
