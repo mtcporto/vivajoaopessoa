@@ -1,38 +1,69 @@
+// cnnbrasil.js
 function loadCNNBrasilNews() {
     const url = 'https://cors.mosaicoworkers.workers.dev/www.cnnbrasil.com.br/feed/';
-    
-    fetch(url)
+    let newsCount = 0;
+
+    function loadNews() {
+      fetch(url)
         .then(response => response.text())
         .then(data => {
-            const parser = new DOMParser();
-            const xml = parser.parseFromString(data, "application/xml");
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(data, 'text/xml');
+          const items = xmlDoc.querySelectorAll('item');
 
-            // Seleciona todos os itens do feed
-            const items = xml.querySelectorAll("item");
+          items.forEach((item, index) => {
+            if (index >= newsCount && index < newsCount + 30) {
+              const title = item.querySelector('title').textContent;
+              const link = item.querySelector('link').textContent;
+              const pubDate = new Date(item.querySelector('pubDate').textContent).toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              });
 
-            items.forEach(item => {
-                const title = item.querySelector("title").textContent;
-                const link = item.querySelector("link").textContent;
-                const description = item.querySelector("description").textContent;
+              let imgURL = "https://via.placeholder.com/300x200.png?text=Sem+Imagem";
+              let contentEncoded = item.querySelector('content\\:encoded, encoded').textContent;
+              const parser = new DOMParser();
+              const contentDoc = parser.parseFromString(contentEncoded, 'text/html');
+              const imgElement = contentDoc.querySelector('img[data-src]');
+              if (imgElement) {
+                imgURL = imgElement.getAttribute('data-src');
+              }
 
-                // Busca por imagens no conteúdo da descrição ou em media:content
-                const imgElement = item.querySelector("media\\:content, img");
-                const imageUrl = imgElement ? imgElement.getAttribute('url') || imgElement.getAttribute('src') : null;
-
-                // Exibe as notícias
-                const newsContainer = document.getElementById("news-container");
-                const newsItem = document.createElement("div");
-                newsItem.classList.add("news-item");
-
-                newsItem.innerHTML = `
-                    <h2>${title}</h2>
-                    <a href="${link}" target="_blank">Leia mais</a>
-                    ${imageUrl ? `<img src="${imageUrl}" alt="${title}">` : ''}
-                    <p>${description}</p>
-                `;
-
-                newsContainer.appendChild(newsItem);
-            });
+              const html = `
+                <div class="col-md-4">
+                  <div class="card mb-4 shadow-sm">
+                    <img src="${imgURL}" class="bd-placeholder-img card-img-top" width="100%" height="225">
+                    <div class="card-body">
+                    <p class="fonte">
+                    <span class="badge badge-dark">Fonte: CNN Brasil</span>
+                    </p>                      
+                    <h5 class="card-title">${title}</h5>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                          <a href="${link}" target="_blank" class="btn btn-sm btn-outline-secondary">Ver Notícia</a>
+                        </div>
+                        <small class="text-muted">${pubDate}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+              document.querySelector("#newsCards").innerHTML += html;
+            }
+          });
+          newsCount += 30;
+          if (newsCount < items.length) {
+            document.querySelector("#loadMore").style.display = 'block';
+          } else {
+            document.querySelector("#loadMore").style.display = 'none';
+          }
         })
-        .catch(error => console.error('Erro ao carregar o feed RSS:', error));
-}
+        .catch(error => console.error('Erro:', error));
+    }
+
+    document.querySelector("#loadMore").addEventListener('click', loadNews);
+    loadNews();  }
