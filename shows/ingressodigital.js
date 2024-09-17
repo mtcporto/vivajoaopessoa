@@ -60,7 +60,7 @@ function loadIngressoDigitalEvents() {
                if (localElement && localElement.textContent.includes('João Pessoa, PB')) {
                  // Create the event card element
                  const eventoDiv = document.createElement('div');
-                 eventoDiv.className = 'col-md-3 col-sm-6 mb-4';
+                 eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
                  eventoDiv.innerHTML = `
                    <div class="card">
                      <a href="${link}" target="_blank" class="card-link">
