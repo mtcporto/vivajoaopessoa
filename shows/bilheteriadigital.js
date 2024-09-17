@@ -35,6 +35,7 @@ function loadBilheteriaDigitalEvents() {
                   <div class="card">
                     <a href="${linkCompleto}" class="card-link" target="_blank">
                     <img src="${imagemURL}" class="card-img-top" alt="${titulo} ">
+                    </a>
                     <div class="card-body">
                     <p class="fonte">
                     <span class="badge badge-warning">Fonte: Bilheteria Digital</span>
@@ -43,7 +44,6 @@ function loadBilheteriaDigitalEvents() {
                       <p class="card-text">${data}</p>
                       <p class="card-text">${cidade}</p>
                     </div>
-                </a>
                   </div><br>
                 `;
                 eventosDiv.appendChild(eventoDiv);
