@@ -15,26 +15,29 @@
     <style>
         body {
             background-color: #f8f9fa;
+            margin: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             height: 100vh;
+            font-family: Arial, sans-serif;
         }
         .chat-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
+            margin: auto;
             background: white;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
         }
         .chat-output {
-            max-height: 300px;
+            flex-grow: 1;
             overflow-y: auto;
-            margin-bottom: 20px;
             padding: 10px;
             border: 1px solid #dee2e6;
-            border-radius: 4px;
+            border-radius: 4px 4px 0 0;
             background-color: #f1f3f5;
         }
         .message {
@@ -46,60 +49,66 @@
         .message.bot {
             text-align: left;
         }
+        .input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #dee2e6;
+            background-color: white;
+        }
+        .input-container input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .input-container button {
+            flex-shrink: 0;
+        }
         .code-container {
-    position: relative;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    border: 1px solid #e1e4e8;
-    border-radius: 6px;
-    background-color: #282c34;
-}
-
-.code-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5em;
-    background-color: #1c2025;
-    border-bottom: 1px solid #e1e4e8;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-    color: #ffffff;
-    font-size: 0.9em;
-    font-family: Arial, sans-serif;
-}
-
-.code-lang {
-    font-weight: bold;
-}
-
-.copy-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 0.25em 0.5em;
-    border-radius: 4px;
-    font-size: 0.8em;
-    cursor: pointer;
-}
-
-.copy-button:hover {
-    background-color: #0056b3;
-}
-
-.copy-button:active {
-    background-color: #004085;
-}
-
+            position: relative;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            background-color: #282c34;
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5em;
+            background-color: #1c2025;
+            border-bottom: 1px solid #e1e4e8;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            color: #ffffff;
+            font-size: 0.9em;
+            font-family: Arial, sans-serif;
+        }
+        .code-lang {
+            font-weight: bold;
+        }
+        .copy-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.25em 0.5em;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+        .copy-button:active {
+            background-color: #004085;
+        }
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <h3 class="text-center">Nova Chat</h3>
         <div id="chat-output" class="chat-output"></div>
-        <div class="input-group">
-            <input type="text" id="user-input" class="form-control" placeholder="Type your message...">
-            <button id="send-button" class="btn btn-primary">Send</button>
+        <div class="input-container">
+            <input type="text" id="user-input" class="form-control" placeholder="Digite sua mensagem...">
+            <button id="send-button" class="btn btn-primary">Enviar</button>
         </div>
     </div>
 
@@ -138,68 +147,65 @@
                 addMessage(botResponse, 'bot');
             } catch (error) {
                 console.error('Error:', error);
-                addMessage('Error fetching response. Please try again.', 'bot');
+                addMessage('Erro ao obter resposta. Tente novamente.', 'bot');
             }
         });
 
         function addMessage(message, sender) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-    chatOutput.appendChild(messageDiv);
-    chatOutput.scrollTop = chatOutput.scrollHeight;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            chatOutput.appendChild(messageDiv);
+            chatOutput.scrollTop = chatOutput.scrollHeight;
 
-    if (sender === 'bot') {
-        const converter = new showdown.Converter();
-        let currentText = '';
-        let index = 0;
+            if (sender === 'bot') {
+                const converter = new showdown.Converter();
+                let currentText = '';
+                let index = 0;
 
-        const interval = setInterval(() => {
-            if (index < message.length) {
-                currentText += message[index];
-                index++;
+                const interval = setInterval(() => {
+                    if (index < message.length) {
+                        currentText += message[index];
+                        index++;
 
-                const html = converter.makeHtml(currentText).replace(
-                    /```(\w*)\n([\s\S]*?)```/g,
-                    (match, lang, code) => {
-                        const escapedCode = Prism.highlight(code, Prism.languages[lang] || Prism.languages.markup, lang);
-                        
-                        return `
-                            <div class="code-container">
-                                <div class="code-header">
-                                    <span class="code-lang">${lang}</span>
-                                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
-                                </div>
-                                <pre class="language-${lang}"><code>${escapedCode}</code></pre>
-                            </div>`;
+                        const html = converter.makeHtml(currentText).replace(
+                            /```(\w*)\n([\s\S]*?)```/g,
+                            (match, lang, code) => {
+                                const escapedCode = Prism.highlight(code, Prism.languages[lang] || Prism.languages.markup, lang);
 
+                                return `
+                                    <div class="code-container">
+                                        <div class="code-header">
+                                            <span class="code-lang">${lang}</span>
+                                            <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                                        </div>
+                                        <pre class="language-${lang}"><code>${escapedCode}</code></pre>
+                                    </div>`;
+                            }
+                        );
+
+                        messageDiv.innerHTML = html;
+                        Prism.highlightAllUnder(chatOutput);
+                        chatOutput.scrollTop = chatOutput.scrollHeight;
+                    } else {
+                        clearInterval(interval);
                     }
-                );
-
-                messageDiv.innerHTML = html;
-                Prism.highlightAllUnder(chatOutput);
-                chatOutput.scrollTop = chatOutput.scrollHeight;
+                }, 30); // Velocidade do streaming
             } else {
-                clearInterval(interval);
+                messageDiv.textContent = message;
             }
-        }, 30); // Velocidade do streaming
-    } else {
-        messageDiv.textContent = message;
-    }
-}
+        }
 
-// Função para copiar código ao clicar no botão
-function copyCode(button) {
-    const codeElement = button.parentElement.nextElementSibling.querySelector('code');
-    const code = codeElement.textContent;
+        function copyCode(button) {
+            const codeElement = button.parentElement.nextElementSibling.querySelector('code');
+            const code = codeElement.textContent;
 
-    navigator.clipboard.writeText(code).then(() => {
-        button.textContent = 'Copiado!';
-        setTimeout(() => {
-            button.textContent = 'Copiar';
-        }, 2000); // Reseta o texto do botão após 2 segundos
-    }).catch(err => console.error('Erro ao copiar código:', err));
-}
-
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copiado!';
+                setTimeout(() => {
+                    button.textContent = 'Copiar';
+                }, 2000);
+            }).catch(err => console.error('Erro ao copiar código:', err));
+        }
     </script>
 </body>
 </html>
