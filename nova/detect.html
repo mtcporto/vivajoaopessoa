@@ -32,8 +32,19 @@
         <video id="video" autoplay playsinline></video> <button id="switchCamera" class="btn btn-primary mt-2">Trocar Câmera</button>
     </div>
     <script>
-        const translations = { /* ... suas traduções ... */ };
-        const video = document.getElementById('video');
+    // Mapeamento de traduções (inglês -> português)
+    const translations = {
+      "person": "pessoa",
+      "chair": "cadeira",
+      "table": "mesa",
+      "bottle": "garrafa",
+      "cup": "copo",
+      "tv": "televisão",
+      "laptop": "notebook",
+      "cell phone": "celular",
+      // Adicione mais traduções conforme necessário
+    };
+
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
         const switchCameraButton = document.getElementById('switchCamera');
