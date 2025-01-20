@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Chat Multimodal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-html.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    
+    <style>
+        /* Estilos existentes */
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            width: 100%;
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chat-output {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px 4px 0 0;
+            background-color: #f1f3f5;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .message.user {
+            text-align: right;
+            margin-left: auto;
+            background-color: #007bff;
+            color: white;
+        }
+        .message.bot {
+            text-align: left;
+            margin-right: auto;
+            background-color: white;
+            border: 1px solid #dee2e6;
+        }
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            border-top: 1px solid #dee2e6;
+            background-color: white;
+            gap: 10px;
+        }
+        .message-input-container {
+            display: flex;
+            gap: 10px;
+        }
+        .input-container input[type="text"] {
+            flex-grow: 1;
+        }
+        .input-container button {
+            flex-shrink: 0;
+        }
+        /* Estilos para o código */
+        .code-container {
+            position: relative;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            background-color: #282c34;
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5em;
+            background-color: #1c2025;
+            border-bottom: 1px solid #e1e4e8;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            color: #ffffff;
+            font-size: 0.9em;
+        }
+        .code-lang {
+            font-weight: bold;
+        }
+        .copy-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.25em 0.5em;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+        .copy-button:active {
+            background-color: #004085;
+        }
+        /* Novos estilos para upload */
+        .file-upload-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .file-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+        }
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .remove-file {
+            color: red;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-output" class="chat-output"></div>
+        <div class="input-container">
+            <div class="file-upload-container">
+                <input type="file" id="file-input" class="form-control" accept="image/*,application/pdf">
+                <div id="file-preview"></div>
+            </div>
+            <div class="message-input-container">
+                <input type="text" id="user-input" class="form-control" placeholder="Digite sua mensagem...">
+                <button id="send-button" class="btn btn-primary">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "AIzaSyAQR7qRaUJ6wpEq_RrGSUzodbkmVbz7Gdk";
+        const modelUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=" + apiKey;
+
+        const chatOutput = document.getElementById('chat-output');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const fileInput = document.getElementById('file-input');
+        const filePreview = document.getElementById('file-preview');
+
+        let currentFile = null;
+
+        fileInput.addEventListener('change', handleFileSelect);
+        sendButton.addEventListener('click', handleSendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSendMessage();
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            currentFile = file;
+            filePreview.innerHTML = '';
+
+            const fileDisplay = document.createElement('div');
+            fileDisplay.className = 'uploaded-file';
+
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'file-preview';
+                fileDisplay.appendChild(img);
+            } else {
+                const fileName = document.createElement('span');
+                fileName.textContent = file.name;
+                fileDisplay.appendChild(fileName);
+            }
+
+            const removeButton = document.createElement('span');
+            removeButton.textContent = '×';
+            removeButton.className = 'remove-file';
+            removeButton.onclick = () => {
+                filePreview.innerHTML = '';
+                fileInput.value = '';
+                currentFile = null;
+            };
+            fileDisplay.appendChild(removeButton);
+
+            filePreview.appendChild(fileDisplay);
+        }
+
+        async function handleSendMessage() {
+            const userMessage = userInput.value.trim();
+            if (!userMessage && !currentFile) return;
+
+            addMessage(userMessage, 'user');
+            userInput.value = '';
+
+            try {
+                let requestBody = {
+                    contents: [{
+                        parts: []
+                    }]
+                };
+
+                // Adicionar texto da mensagem se houver
+                if (userMessage) {
+                    requestBody.contents[0].parts.push({ text: userMessage });
+                }
+
+                // Adicionar arquivo se houver
+                if (currentFile) {
+                    const base64Data = await fileToBase64(currentFile);
+                    requestBody.contents[0].parts.push({
+                        inlineData: {
+                            mimeType: currentFile.type,
+                            data: base64Data
+                        }
+                    });
+                }
+
+                const response = await fetch(modelUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch the response from the API');
+
+                const data = await response.json();
+                const botResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
+                addMessage(botResponse, 'bot');
+
+                // Limpar arquivo após envio
+                filePreview.innerHTML = '';
+                fileInput.value = '';
+                currentFile = null;
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Erro ao obter resposta. Tente novamente.', 'bot');
+            }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function addMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            chatOutput.appendChild(messageDiv);
+            chatOutput.scrollTop = chatOutput.scrollHeight;
+
+            if (sender === 'bot') {
+                const converter = new showdown.Converter();
+                let currentText = '';
+                let index = 0;
+
+                const interval = setInterval(() => {
+                    if (index < message.length) {
+                        currentText += message[index];
+                        index++;
+
+                        const html = converter.makeHtml(currentText).replace(
+                            /```(\w*)\n([\s\S]*?)```/g,
+                            (match, lang, code) => {
+                                const escapedCode = Prism.highlight(code, Prism.languages[lang] || Prism.languages.markup, lang);
+                                return `
+                                    <div class="code-container">
+                                        <div class="code-header">
+                                            <span class="code-lang">${lang}</span>
+                                            <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                                        </div>
+                                        <pre class="language-${lang}"><code>${escapedCode}</code></pre>
+                                    </div>`;
+                            }
+                        );
+
+                        messageDiv.innerHTML = html;
+                        Prism.highlightAllUnder(chatOutput);
+                        chatOutput.scrollTop = chatOutput.scrollHeight;
+                    } else {
+                        clearInterval(interval);
+                    }
+                }, 30);
+            } else {
+                messageDiv.textContent = message;
+            }
+        }
+
+        function copyCode(button) {
+            const codeElement = button.parentElement.nextElementSibling.querySelector('code');
+            const code = codeElement.textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copiado!';
+                setTimeout(() => {
+                    button.textContent = 'Copiar';
+                }, 2000);
+            }).catch(err => console.error('Erro ao copiar código:', err));
+        }
+    </script>
+</body>
+</html>
