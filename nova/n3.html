@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova Chat Multimodal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
@@ -50,15 +51,31 @@
         .message.user {
             text-align: right;
             margin-left: auto;
-            background-color: #007bff;
+            background-color: #3a4046;
             color: white;
         }
         .message.bot {
-            text-align: left;
-            margin-right: auto;
-            background-color: white;
-            border: 1px solid #dee2e6;
+    position: relative;
+    padding-right: 30px; /* Espaço para o ícone de cópia */
+}
+
+.message.bot .copy-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    cursor: pointer;
+    color: #6c757d;
+    transition: color 0.2s;
+}
+
+.message.bot .copy-icon:hover {
+    color: #007bff;
+}
+        .message .copy-icon:hover {
+            color: #15ff00;
         }
+
+
         .input-container {
             display: flex;
             flex-direction: column;
@@ -77,42 +94,68 @@
         .input-container button {
             flex-shrink: 0;
         }
-        /* Estilos para o código */
-        .code-container {
-            position: relative;
-            margin-top: 1em;
-            margin-bottom: 1em;
-            border: 1px solid #e1e4e8;
-            border-radius: 6px;
-            background-color: #282c34;
-        }
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5em;
-            background-color: #1c2025;
-            border-bottom: 1px solid #e1e4e8;
-            border-top-left-radius: 6px;
-            border-top-right-radius: 6px;
-            color: #ffffff;
-            font-size: 0.9em;
-        }
-        .code-lang {
-            font-weight: bold;
-        }
-        .copy-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 0.25em 0.5em;
-            border-radius: 4px;
-            font-size: 0.8em;
-            cursor: pointer;
-        }
-        .copy-button:hover {
-            background-color: #0056b3;
-        }
+/* Estilos para os blocos de código */
+.code-block {
+    margin: 1em 0;
+    overflow: hidden;
+}
+
+.code-block .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.code-block .code-language {
+    color: #6c757d;
+    font-size: 0.875rem;
+    font-family: ui-monospace, monospace;
+}
+
+.code-block .copy-button {
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.code-block .copy-button:hover {
+    color: #007bff;
+}
+
+.code-block pre {
+    margin: 0;
+    overflow-x: auto;
+}
+
+.code-block code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.copy-button {
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 0.9em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    transition: color 0.2s;
+}
+
+.copy-button:hover {
+    color: #007bff;
+}
         .copy-button:active {
             background-color: #004085;
         }
@@ -210,58 +253,64 @@
         }
 
         async function handleSendMessage() {
-            const userMessage = userInput.value.trim();
-            if (!userMessage && !currentFile) return;
+        const userMessage = userInput.value.trim();
+        if (!userMessage && !currentFile) return;
 
+        // Adiciona mensagem do usuário com imagem se houver
+        if (currentFile && currentFile.type.startsWith('image/')) {
+            const imageUrl = URL.createObjectURL(currentFile);
+            addMessage(userMessage, 'user', imageUrl);
+        } else {
             addMessage(userMessage, 'user');
-            userInput.value = '';
-
-            try {
-                let requestBody = {
-                    contents: [{
-                        parts: []
-                    }]
-                };
-
-                // Adicionar texto da mensagem se houver
-                if (userMessage) {
-                    requestBody.contents[0].parts.push({ text: userMessage });
-                }
-
-                // Adicionar arquivo se houver
-                if (currentFile) {
-                    const base64Data = await fileToBase64(currentFile);
-                    requestBody.contents[0].parts.push({
-                        inlineData: {
-                            mimeType: currentFile.type,
-                            data: base64Data
-                        }
-                    });
-                }
-
-                const response = await fetch(modelUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-
-                if (!response.ok) throw new Error('Failed to fetch the response from the API');
-
-                const data = await response.json();
-                const botResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
-                addMessage(botResponse, 'bot');
-
-                // Limpar arquivo após envio
-                filePreview.innerHTML = '';
-                fileInput.value = '';
-                currentFile = null;
-            } catch (error) {
-                console.error('Error:', error);
-                addMessage('Erro ao obter resposta. Tente novamente.', 'bot');
-            }
         }
+        
+        userInput.value = '';
+
+        try {
+            let requestBody = {
+                contents: [{
+                    parts: []
+                }]
+            };
+
+            if (userMessage) {
+                requestBody.contents[0].parts.push({ text: userMessage });
+            }
+
+            if (currentFile) {
+                const base64Data = await fileToBase64(currentFile);
+                requestBody.contents[0].parts.push({
+                    inlineData: {
+                        mimeType: currentFile.type,
+                        data: base64Data
+                    }
+                });
+            }
+
+            const response = await fetch(modelUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch the response from the API');
+
+            const data = await response.json();
+            const botResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
+            addMessage(botResponse, 'bot');
+
+            // Limpar arquivo após envio
+            filePreview.innerHTML = '';
+            fileInput.value = '';
+            currentFile = null;
+        } catch (error) {
+            console.error('Error:', error);
+            addMessage('Erro ao obter resposta. Tente novamente.', 'bot');
+        }
+    }
+
 
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
@@ -275,60 +324,177 @@
             });
         }
 
-        function addMessage(message, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            chatOutput.appendChild(messageDiv);
-            chatOutput.scrollTop = chatOutput.scrollHeight;
+        function addMessage(message, sender, imageUrl = null) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    chatOutput.appendChild(messageDiv);
 
-            if (sender === 'bot') {
-                const converter = new showdown.Converter();
-                let currentText = '';
-                let index = 0;
-
-                const interval = setInterval(() => {
-                    if (index < message.length) {
-                        currentText += message[index];
-                        index++;
-
-                        const html = converter.makeHtml(currentText).replace(
-                            /```(\w*)\n([\s\S]*?)```/g,
-                            (match, lang, code) => {
-                                const escapedCode = Prism.highlight(code, Prism.languages[lang] || Prism.languages.markup, lang);
-                                return `
-                                    <div class="code-container">
-                                        <div class="code-header">
-                                            <span class="code-lang">${lang}</span>
-                                            <button class="copy-button" onclick="copyCode(this)">Copiar</button>
-                                        </div>
-                                        <pre class="language-${lang}"><code>${escapedCode}</code></pre>
-                                    </div>`;
-                            }
-                        );
-
-                        messageDiv.innerHTML = html;
-                        Prism.highlightAllUnder(chatOutput);
-                        chatOutput.scrollTop = chatOutput.scrollHeight;
-                    } else {
-                        clearInterval(interval);
+    if (sender === 'user') {
+        // Container para organizar texto e imagem
+        const contentDiv = document.createElement('div');
+        contentDiv.style.display = 'flex';
+        contentDiv.style.flexDirection = 'column';
+        contentDiv.style.alignItems = 'flex-end'; // Alinha à direita para mensagens do usuário
+        
+        // Adiciona o texto se houver
+        if (message) {
+            const textDiv = document.createElement('div');
+            textDiv.textContent = message;
+            contentDiv.appendChild(textDiv);
+        }
+        
+        // Adiciona a imagem se houver
+        if (imageUrl) {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.style.width = '380px';
+            img.style.height = '250px';
+            img.style.objectFit = 'contain';
+            img.style.marginTop = '8px';
+            img.style.borderRadius = '4px';
+            contentDiv.appendChild(img);
+        }
+        
+        messageDiv.appendChild(contentDiv);
+    } else {
+        // Processa mensagem do bot
+        const converter = new showdown.Converter({
+            tables: true,
+            ghCodeBlocks: true,
+            tasklists: true
+        });
+        
+        // Analisar a mensagem para identificar diferentes seções
+        const sections = [];
+        let currentSection = '';
+        let inCode = false;
+        let codeLanguage = '';
+        let hasCodeBlock = false;
+        
+        // Primeira passagem: identificar estrutura
+        for (let i = 0; i < message.length; i++) {
+            if (message.substring(i, i + 3) === '```') {
+                hasCodeBlock = true;  // Marca que encontrou um bloco de código
+                if (!inCode) {
+                    if (currentSection) {
+                        sections.push({ type: 'text', content: currentSection });
+                        currentSection = '';
                     }
-                }, 30);
+                    let langEnd = message.indexOf('\n', i + 3);
+                    if (langEnd > -1) {
+                        codeLanguage = message.substring(i + 3, langEnd).trim();
+                        i = langEnd;
+                    }
+                    inCode = true;
+                } else {
+                    sections.push({ type: 'code', language: codeLanguage, content: currentSection });
+                    currentSection = '';
+                    inCode = false;
+                    codeLanguage = '';
+                    i += 2;
+                }
             } else {
-                messageDiv.textContent = message;
+                currentSection += message[i];
             }
         }
-
-        function copyCode(button) {
-            const codeElement = button.parentElement.nextElementSibling.querySelector('code');
-            const code = codeElement.textContent;
-
-            navigator.clipboard.writeText(code).then(() => {
-                button.textContent = 'Copiado!';
-                setTimeout(() => {
-                    button.textContent = 'Copiar';
-                }, 2000);
-            }).catch(err => console.error('Erro ao copiar código:', err));
+        if (currentSection) {
+            sections.push({ type: inCode ? 'code' : 'text', language: codeLanguage, content: currentSection });
         }
+
+        // Criar estrutura HTML inicial
+        let structureHtml = '';
+        sections.forEach((section, idx) => {
+            if (section.type === 'text') {
+                structureHtml += `<div class="text-section-${idx}"></div>`;
+            } else {
+                structureHtml += `
+                    <div class="code-block rounded-md border border-gray-200 bg-gray-50 dark:bg-gray-900">
+                        <div class="code-header">
+                            <span class="code-language">${section.language}</span>
+                            <button class="copy-button" onclick="copyCode(this)" title="Copiar código">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <pre><code class="language-${section.language} code-section-${idx}"></code></pre>
+                        </div>
+                    </div>`;
+            }
+        });
+        messageDiv.innerHTML = structureHtml;
+
+        // Adicionar o ícone de cópia apenas se não houver blocos de código
+        if (!hasCodeBlock) {
+            const copyIcon = document.createElement('i');
+            copyIcon.className = 'fa-regular fa-copy copy-icon';
+            copyIcon.title = 'Copiar mensagem';
+            copyIcon.onclick = () => copyMessageContent(messageDiv, copyIcon);
+            messageDiv.appendChild(copyIcon);
+        }
+
+        // Fazer streaming do conteúdo
+        let currentSectionIndex = 0;
+        let currentChar = 0;
+        
+        const interval = setInterval(() => {
+            if (currentSectionIndex < sections.length) {
+                const section = sections[currentSectionIndex];
+                if (currentChar < section.content.length) {
+                    const selector = section.type === 'text' ? 
+                        `.text-section-${currentSectionIndex}` : 
+                        `.code-section-${currentSectionIndex}`;
+                    
+                    const element = messageDiv.querySelector(selector);
+                    if (section.type === 'text') {
+                        const textContent = section.content.substring(0, currentChar + 1);
+                        element.innerHTML = converter.makeHtml(textContent);
+                    } else {
+                        element.textContent = section.content.substring(0, currentChar + 1);
+                        Prism.highlightElement(element);
+                    }
+                    currentChar++;
+                } else {
+                    currentSectionIndex++;
+                    currentChar = 0;
+                }
+                chatOutput.scrollTop = chatOutput.scrollHeight;
+            } else {
+                clearInterval(interval);
+            }
+        }, 30);
+    }
+    
+    chatOutput.scrollTop = chatOutput.scrollHeight;
+}
+
+function copyMessageContent(messageDiv, copyIcon) {
+    // Remove o ícone de cópia temporariamente para copiar apenas o conteúdo
+    copyIcon.remove();
+    const text = messageDiv.innerText;
+    copyIcon.className = 'fa-solid fa-check copy-icon';
+    messageDiv.appendChild(copyIcon);
+
+    navigator.clipboard.writeText(text).then(() => {
+        setTimeout(() => {
+            copyIcon.className = 'fa-regular fa-copy copy-icon';
+        }, 2000);
+    }).catch(err => console.error('Erro ao copiar conteúdo:', err));
+}
+
+// Função atualizada para copiar o código
+function copyCode(button) {
+    const codeBlock = button.closest('.code-block').querySelector('code');
+    const codeText = codeBlock.textContent;
+    
+    navigator.clipboard.writeText(codeText).then(() => {
+        const icon = button.querySelector('i');
+        icon.className = 'fa-solid fa-check';
+        setTimeout(() => {
+            icon.className = 'fa-regular fa-copy';
+        }, 2000);
+    });
+}
+
     </script>
 </body>
 </html>
