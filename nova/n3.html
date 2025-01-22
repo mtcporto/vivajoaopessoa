@@ -16,7 +16,7 @@
     <style>
         /* Estilos existentes */
         body {
-    background-color: #f8f9fa;
+    background-color: #242d35;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -31,7 +31,7 @@
     width: 100%;
     max-width: 768px;
     min-height: 96vh;
-    background: white;
+    background: #242d35;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     position: relative;
@@ -42,26 +42,70 @@
 .chat-output {
     flex-grow: 1;
     padding: 10px;
-    background-color: #f1f3f5;
+    background-color: #242d35;
     box-sizing: border-box;
     margin-bottom: 150px; /* Espaço reservado para o input-container */
 }
 
 .input-container {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    max-width: 700px;
-    height: 150px; /* Altura fixa para o input-container */
-    padding: 10px;
-    border-top: 1px solid #dee2e6;
-    background-color: white;
-    gap: 10px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-}
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        max-width: 768px;
+        height: 120px;
+        padding: 10px;
+        border-top: 1px solid #364b55;
+        background-color: #364b55;
+        gap: 10px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        border-radius: 15px;
+    }
+
+    .message-input-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .message-input-wrapper {
+        flex-grow: 1;
+        position: relative;
+    }
+
+    #user-input {
+        width: 100%;
+        resize: none;
+        min-height: 40px;
+        max-height: 80px;
+        padding-right: 40px;
+    }
+
+    .attachment-button {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+    .attachment-button:hover {
+        color: #007bff;
+    }
+
+    #file-input {
+        display: none;
+    }
+
+    .file-preview {
+        margin-top: 10px;
+    }
 
 /* Estilos para mensagens */
 .message {
@@ -79,10 +123,17 @@
             margin-left: auto;
             background-color: #3a4046;
             color: white;
+            margin-bottom: 30px;
+
         }
         .message.bot {
     position: relative;
     padding-right: 30px; /* Espaço para o ícone de cópia */
+    text-align: justify;
+    max-width: 100%;
+    background-color: #364b55;
+    color: white;
+
 }
 
 .message.bot .copy-icon {
@@ -101,10 +152,6 @@
             color: #15ff00;
         }
 
-        .message-input-container {
-            display: flex;
-            gap: 10px;
-        }
         .input-container input[type="text"] {
             flex-grow: 1;
         }
@@ -182,38 +229,70 @@
             gap: 10px;
             align-items: center;
         }
-        .file-preview {
-            max-width: 200px;
-            max-height: 200px;
-            margin-top: 10px;
-        }
-        .uploaded-file {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 5px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        .remove-file {
-            color: red;
-            cursor: pointer;
-            font-weight: bold;
-        }
+
+        .uploaded-file img.file-preview {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.uploaded-file {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 5px;
+    background-color: #2c3e50;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    width: 90px;
+}
+
+.remove-file {
+    position: relative;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+.remove-file:hover {
+    color: #ff0000; /* Cor vermelha ao passar o mouse */
+}
+
+.file-preview {
+    position: relative; /* Necessário para posicionar elementos filhos absolutamente */
+}
+
+
+
+
+/* Ajuste na ordem de exibição do container */
+.input-container {
+    display: flex;
+    flex-direction: column-reverse; /* Inverte a ordem dos elementos */
+}
+
+.message-input-container {
+    margin-top: auto; /* Empurra para o final do container */
+}
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div id="chat-output" class="chat-output"></div>
         <div class="input-container">
-            <div class="file-upload-container">
-                <input type="file" id="file-input" class="form-control" accept="image/*,application/pdf">
-                <div id="file-preview"></div>
-            </div>
             <div class="message-input-container">
-                <input type="text" id="user-input" class="form-control" placeholder="Digite sua mensagem...">
-                <button id="send-button" class="btn btn-primary">Enviar</button>
+                <div class="message-input-wrapper">
+                    <textarea id="user-input" class="form-control" 
+                        placeholder="Digite sua mensagem..."></textarea>
+                    <button class="attachment-button" onclick="document.getElementById('file-input').click()" title="Anexar arquivos">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                </div>
             </div>
+            <input type="file" id="file-input" accept="image/*,application/pdf">
+            <div id="file-preview"></div>
         </div>
     </div>
 
@@ -230,44 +309,59 @@
         let currentFile = null;
 
         fileInput.addEventListener('change', handleFileSelect);
-        sendButton.addEventListener('click', handleSendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSendMessage();
+        
+        userInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // Previne o comportamento padrão do "Enter"
+                handleSendMessage(); // Função que envia a mensagem
+             }
+             if (event.key === 'Enter' && event.shiftKey) {
+                 event.preventDefault(); // Previne o comportamento padrão do "Enter"
+                 userInput.value += '\n'; // Adiciona uma nova linha no textarea
+                }
+           
         });
+       
 
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+function removerArquivo() {
+    console.log('Arquivo removido');
+    // Adicione aqui a lógica para remover o arquivo
+}
 
-            currentFile = file;
-            filePreview.innerHTML = '';
+// Modifique a função handleFileSelect
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-            const fileDisplay = document.createElement('div');
-            fileDisplay.className = 'uploaded-file';
+    currentFile = file;
+    filePreview.innerHTML = '';
 
-            if (file.type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                img.className = 'file-preview';
-                fileDisplay.appendChild(img);
-            } else {
-                const fileName = document.createElement('span');
-                fileName.textContent = file.name;
-                fileDisplay.appendChild(fileName);
-            }
+    const fileDisplay = document.createElement('div');
+    fileDisplay.className = 'uploaded-file';
 
-            const removeButton = document.createElement('span');
-            removeButton.textContent = '×';
-            removeButton.className = 'remove-file';
-            removeButton.onclick = () => {
-                filePreview.innerHTML = '';
-                fileInput.value = '';
-                currentFile = null;
-            };
-            fileDisplay.appendChild(removeButton);
+    if (file.type.startsWith('image/')) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.className = 'file-preview';
+        fileDisplay.appendChild(img);
+    } else {
+        const fileName = document.createElement('span');
+        fileName.textContent = file.name;
+        fileDisplay.appendChild(fileName);
+    }
 
-            filePreview.appendChild(fileDisplay);
-        }
+    // Criação do botão de remover com ícone do Font Awesome
+    const removeButton = document.createElement('i');
+    removeButton.className = 'fa-solid fa-circle-xmark remove-file';
+    removeButton.onclick = () => {
+        filePreview.innerHTML = '';
+        fileInput.value = '';
+        currentFile = null;
+    };
+    fileDisplay.appendChild(removeButton);
+
+    filePreview.appendChild(fileDisplay);
+}
 
         async function handleSendMessage() {
         const userMessage = userInput.value.trim();
@@ -364,17 +458,18 @@
         if (imageUrl) {
             const img = document.createElement('img');
             img.src = imageUrl;
-            img.style.width = '380px';
+            //img.style.width = '380px';
             img.style.height = '250px';
             img.style.objectFit = 'contain';
-            img.style.marginTop = '8px';
-            img.style.borderRadius = '4px';
+            img.style.marginTop = '10px';
+            img.style.borderRadius = '8px';
             contentDiv.appendChild(img);
         }
         
         messageDiv.appendChild(contentDiv);
     } else {
         // Processa mensagem do bot
+    messageDiv.style.position = 'relative'; // Make .message.bot relative
         const converter = new showdown.Converter({
             tables: true,
             ghCodeBlocks: true,
@@ -489,6 +584,9 @@
 });
 
 }
+
+
+
 
 function copyMessageContent(messageDiv, copyIcon) {
     // Remove o ícone de cópia temporariamente para copiar apenas o conteúdo
