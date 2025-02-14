@@ -1,5 +1,5 @@
 function loadSymplaEvents() {
-  const url = 'https://www.sympla.com.br/eventos/joao-pessoa-pb/show-musica-festa/shows?ordem=month_trending_score';
+  const url = 'https://www.sympla.com.br/eventos/joao-pessoa-pb/esta-semana?cl=17-festas-e-shows';
 
   let eventosCount = 0;
 
