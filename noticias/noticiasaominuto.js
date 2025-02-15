@@ -18,7 +18,7 @@ function loadNoticiasAoMinutoNews() {
               const linkElement = item.querySelector("link");
               const link = linkElement ? linkElement.textContent : '';
 
-              let imgURL = "https://via.placeholder.com/300x200.png?text=Sem+Imagem";
+              let imgURL = "https://placehold.co/300x200?text=Sem+Imagem";
               const imgElement = item.querySelector("enclosure");
               if (imgElement) {
                 imgURL = imgElement.getAttribute('url');
