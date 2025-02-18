@@ -87,13 +87,24 @@
     </header>
 
 
-    <div class="container">
 
-      <div id="joaopessoaEvents" class="event-buttons-container text-center" style="display: hidden;">
-        <canvas id='canvas'></canvas>
-        <p><i class="fas fa-exclamation-triangle"></i> Alertas meteorológicos</p>
-        <div class="event-buttons-wrapper"></div>
-    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <!-- Container para quando há alertas -->
+          <div id="joaopessoaEvents" class="event-buttons-container text-center" style="display: none;">
+            <canvas id="canvas"></canvas>
+            <p><i class="fas fa-exclamation-triangle"></i> Alertas meteorológicos</p>
+            <div class="event-buttons-wrapper"></div>
+          </div>
+    
+          <!-- Container para quando não há alertas -->
+          <div id="noAlertMessage" class="no-alert-container text-center" style="display: none;">
+            <p><i class="fas fa-check-circle"></i> Sem alertas pra hoje!</p>
+          </div>
+        </div>
+      </div>
+    
         
       <div id="weather-info">
         <div class="card-weather">
