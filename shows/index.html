@@ -13,6 +13,10 @@
     <div id="eventos" class="row"></div>
     <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Eventos</button>
   </div>
+
+<!-- Container para o footer -->
+<div id="footer-placeholder"></div>
+  
   <script src="sympla.js"></script>
   <script src="eventim.js"></script>
   <script src="bilheteriadigital.js"></script>
@@ -46,6 +50,11 @@ document.querySelector("#loadMore").addEventListener('click', loadEvents);
 loadEvents();
 
   </script>
+  <script>
+  $(function(){
+    $("#footer-placeholder").load("../footer.html");
+  });
+</script>
 </body>
 </html>
 </body>
