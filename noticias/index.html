@@ -16,6 +16,9 @@
     <div class="row" id="newsCards"></div>
     <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Notícias</button>
   </div>
+
+  <!-- Container para o footer -->
+<div id="footer-placeholder"></div>
   <script src="cnnbrasil.js"></script>
   <script src="bbcbrasil.js"></script>
   <script src="uol.js"></script>
@@ -45,5 +48,11 @@
     document.querySelector("#loadMore").addEventListener('click', loadNews);
     loadNews();
   </script>
+  
+<script>
+  $(function(){
+    $("#footer-placeholder").load("../footer.html");
+  });
+</script>
 </body>
 </html>
