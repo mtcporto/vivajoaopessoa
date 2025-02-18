@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Alertas meteorológicos</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
-    <link rel="stylesheet" type="text/css" href="/alertas/alertas.css">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <style>
-        #joaopessoaEvents {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Alertas meteorológicos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+  <link rel="stylesheet" type="text/css" href="/alertas/alertas.css">
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 </head>
 <body onresize='_pexresize()'>
-<div id="joaopessoaEvents" class="event-buttons-container text-center">
-    <canvas id='canvas'></canvas>
+  <!-- Container para alertas (quando existirem) -->
+  <div id="joaopessoaEvents" class="event-buttons-container text-center" style="visibility: hidden;">
+    <canvas id="canvas"></canvas>
     <p><i class="fas fa-exclamation-triangle"></i> Alertas meteorológicos</p>
     <div class="event-buttons-wrapper"></div>
-</div>
-<script src="/alertas/alertas.js"></script>
+  </div>
+
+  <!-- Container para quando NÃO houver alertas -->
+  <div id="noAlertMessage" class="no-alert-container text-center" style="display: none;">
+    <p><i class="fas fa-check-circle"></i> Sem alertas pra hoje!</p>
+  </div>
+
+  <script src="/alertas/alertas.js"></script>
 </body>
 </html>
