@@ -101,7 +101,11 @@ $(document).ready(function() {
                     }
                 });
 
-                if (municipios.includes("João Pessoa - PB")) {
+                    // if (municipios.trim().toLowerCase().includes("Acajutiba - BA")) {
+
+                    if (municipios.trim().toLowerCase().includes("joão pessoa - pb")) {
+                        console.log("Alerta encontrado!");
+
                     let iconClass = "";
                     switch(event) {
                         case "Chuvas Intensas":
@@ -165,7 +169,9 @@ $(document).ready(function() {
             const joaopessoaAlerts = resultados.filter(alert => alert !== null);
     
             if (joaopessoaAlerts.length > 0) {
+                // Caso haja alertas, mostra o container de alertas e esconde o "sem alertas"
                 exibirEventosJoaoPessoa(joaopessoaAlerts);
+                $('#noAlertMessage').hide();
             } else {
                 console.log("Não existem alertas no momento.");
                 ocultarEventosJoaoPessoa();
@@ -175,18 +181,55 @@ $(document).ready(function() {
         }
     }
     
+    
     function exibirEventosJoaoPessoa(alerts) {
+        // Monta os botões de alerta
         const joaopessoaHtml = alerts.map(alert => `
-            <a href="${alert.pageLink}" target="_blank" class="event-button" style="background-color: ${alert.colorRisk};" title="${alert.event}">
+            <a href="${alert.pageLink}" target="_blank" class="event-button" 
+               style="background-color: ${alert.colorRisk};" title="${alert.event}">
                 <i class="${alert.iconClass}"></i>
             </a>`).join('');
         $('#joaopessoaEvents .event-buttons-wrapper').html(joaopessoaHtml);
-        $('#joaopessoaEvents').show();
+    
+        // Mostra o container de alerta (agora com width/height > 0)
+        $('#joaopessoaEvents').css('visibility', 'visible').show();
+    
+        // Força o resize do canvas agora que o container tem dimensão
+        resizeCanvas();
+    
+        // AGORA sim, gerar as imagens de chuva
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        for (var l = 0; l < lcount; l++) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (var i = 0; i < count * (lcount - l) / 1.5; i++) {
+                // gerar pingos...
+                var myx = Math.floor(Math.random() * canvas.width);
+                var myy = Math.floor(Math.random() * canvas.height);
+                var myh = l * 3 + 4;
+                var myw = myh / 10;
+                ctx.beginPath();
+                ctx.moveTo(myx, myy);
+                ctx.lineTo(myx + myw, myy + myh);
+                ctx.arc(myx, myy + myh, myw, 0, Math.PI);
+                ctx.lineTo(myx - myw, myy + myh);
+                ctx.closePath();
+                ctx.fill();
+            }
+            layer[l] = new Image();
+            layer[l].src = canvas.toDataURL("image/png");
+            layery[l] = 0;
+        }
     }
     
+    
+    
     function ocultarEventosJoaoPessoa() {
+        // Oculta o container de alertas (com canvas e chuva)
         $('#joaopessoaEvents').hide();
+        // Exibe o container de “sem alertas”
+        $('#noAlertMessage').show();
     }
+    
 
     carregarLinksRSS();
 });
