@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 <body>
     <div class="header">
@@ -105,7 +107,8 @@
         <!-- Os cards dos artistas serão inseridos aqui -->
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<!-- Container para o footer -->
+<div id="footer-placeholder"></div>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
         // Add YouTube Player API script
@@ -210,5 +213,10 @@
                 });
             });
     </script>
+    <script>
+  $(function(){
+    $("#footer-placeholder").load("../footer.html");
+  });
+</script>
 </body>
 </html>
