@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.plyr.io/3.6.9/plyr.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  
   <style>
 body {
     font-family: Arial, sans-serif;
@@ -114,7 +115,15 @@ header {
     </div>
   </div>
 
-   
+<!-- Container para o footer -->
+<div id="footer-placeholder"></div>
+
+<script>
+  $(function(){
+    $("#footer-placeholder").load("../footer.html");
+  });
+</script>  
+  
 <script src="https://cdn.plyr.io/3.6.9/plyr.polyfilled.js"></script>  
 <!-- JS do Bootstrap e suas dependências (jQuery e Popper.js) -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
