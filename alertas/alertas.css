@@ -11,8 +11,8 @@
     align-items: center;
     justify-content: space-between; /* igual ao alerta */
     color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
+/*     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden; */
     background: linear-gradient(to bottom left, #023a58, #48cae4);
   }
   
@@ -106,8 +106,8 @@
     align-items: center;
     justify-content: space-between;
     color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
+/*     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden; */
     background: rgb(26, 27, 44);
 }
 
