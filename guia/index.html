@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guia de João Pessoa</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,8 +35,8 @@
 <div class="container">
     <!-- Os cards serão inseridos aqui pelo JavaScript -->
 </div>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- Container para o footer -->
+<div id="footer-placeholder"></div>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
    fetch('https://diversao.pages.dev/guia/data.json') // Use a URL completa para o arquivo JSON no Cloudflare
@@ -70,6 +71,10 @@
             });
         });
 </script>
-
+<script>
+  $(function(){
+    $("#footer-placeholder").load("../footer.html");
+  });
+</script>
 </body>
 </html>
