@@ -1,3 +1,70 @@
+/* Estilos gerais iguais aos do alerta, trocando só a cor */
+.no-alert-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px;   /* mesmo valor inicial */
+    height: 70px; 
+    border-radius: 10px;
+    padding: 10px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* igual ao alerta */
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    background: linear-gradient(to bottom left, #023a58, #48cae4);
+  }
+  
+  .no-alert-container p {
+    margin: 0;
+    font-size: 24px;
+    line-height: 50px;
+    font-weight: bold;
+    color: #fff; 
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    margin-left: 90px;
+
+  }
+  
+
+  @media (min-width: 768px) {
+    .no-alert-container {
+      width: 100%;
+      max-width: 100%;
+    }
+    .no-alert-container p {
+      font-size: 20px;
+      line-height: 40px;
+      margin-left: 90px;
+
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .no-alert-container {
+      height: 40px;
+      padding: 10px;
+    }
+    .no-alert-container p {
+      font-size: 16px;
+      line-height: 30px;
+      margin-left: 90px;
+    }
+  }
+  
+  
+  /* Se quiser criar uma “wrapper” vazia para ocupar o mesmo espaço 
+     onde ficariam os botões (para ficar REALMENTE igual) */
+  .no-alert-container .event-buttons-wrapper {
+    display: flex;
+    gap: 5px;
+  }
+  
+  
+
 .weather-icon {
     margin-left: 10px;
 }
