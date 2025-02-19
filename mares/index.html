@@ -2,17 +2,34 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Tábua de Marés</title>
+  
+  <!-- Bootstrap e Material Icons -->
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+
+  <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- D3 e Luxon (para VisTideChart) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/1.26.0/luxon.min.js" integrity="sha512-cYjGoxnM2sxryDRpKhwi8uTszEw2zufuDVz1dWlm1+wlvwnhQ4wu00BokHH4IKlogGJNL+2a2GYvHN+xaoUxjQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
+  <!-- VisTideChart e Tooltip -->
+  <script src="vis-tooltip.js"></script>
+  <script src="vis-tc.js"></script>
+  <link rel="stylesheet" href="vis-tc.css">
+  <link rel="stylesheet" href="vis-tooltip.css">
+  
+  <!-- Biblioteca de predição de marés -->
+  <script src="https://unpkg.com/@neaps/tide-predictor@0.1.1/dist/web/tide-predictor.min.js"></script>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding-bottom: 10px;
       background-color: #F5F5DC; /* Offwhite */
+      padding-bottom: 10px;
     }
     .header {
       background-color: black;
@@ -33,12 +50,6 @@
       width: 100%;
       margin: 20px 0;
     }
-    #container {
-      width: 100%;
-      height: 400px;
-      margin: 20px 0;
-    }
-    /* Estilos inspirados na segunda página */
     .high-tide {
       color: red;
     }
@@ -56,18 +67,22 @@
     td {
       transition: background-color 0.3s ease;
     }
+    #tide-chart-container {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
+
   <div class="header">
     <h1>Tábua de Marés</h1>
   </div>
-
   <div class="title">
     <h2>Próximos 5 dias</h2>
   </div>
 
   <div class="content">
+    <!-- Tabela com as marés dos próximos 5 dias -->
     <table class="table table-striped">
       <thead class="thead-dark">
         <tr>
@@ -79,21 +94,16 @@
         </tr>
       </thead>
       <tbody id="tide-table-body">
-        <!-- Linhas de dados serão inseridas aqui -->
+        <!-- Linhas inseridas via JS -->
       </tbody>
     </table>
 
-    <div id="container"></div>
+    <!-- Gráfico VisTideChart com as marés de HOJE -->
+    <div id="tide-chart-container"></div>
   </div>
 
-  <!-- Container para o footer -->
-  <div id="footer-placeholder"></div>
-
-  <!-- Bibliotecas -->
-  <script src="https://unpkg.com/@neaps/tide-predictor@0.1.1/dist/web/tide-predictor.min.js"></script>
-  <script src="https://code.highcharts.com/highcharts.js"></script>
   <script>
-    // Constituents e offsets conforme sua configuração original
+    // === CONFIGURAÇÃO DOS CONSTITUINTES E OFFSETS ===
     const constituents = [
       { name: 'M2', amplitude: 0.79, phase_GMT: 124.0, speed: 28.984105 },
       { name: 'S2', amplitude: 0.28, phase_GMT: 142.0, speed: 30.0 },
@@ -108,190 +118,176 @@
       { name: 'OO1', amplitude: 0.01, phase_GMT: 213.0, speed: 16.139101 }
     ];
 
+    // Offsets para horário e altura (baseados em observações locais)
     const timeOffset = {
-      high: -10, // Offset em minutos para maré alta
-      low: 18    // Offset em minutos para maré baixa
+      high: -10,  // minutos para maré alta
+      low: 18     // minutos para maré baixa
     };
-
     const heightOffset = {
-      high: 1.5,  // Offset de altura para maré alta
-      low: 1.35   // Offset de altura para maré baixa
+      high: 1.5,  // metros para maré alta
+      low: 1.35   // metros para maré baixa
     };
 
-    // Ajusta os constituintes
-    const adjustedConstituents = constituents.map(constituent => ({
-      ...constituent,
-      phase_GMT: constituent.phase_GMT % 360
+    // Ajusta os constituintes para manter phases no intervalo 0..360
+    const adjustedConstituents = constituents.map(c => ({
+      ...c,
+      phase_GMT: c.phase_GMT % 360
     }));
 
-    document.addEventListener('DOMContentLoaded', function() {
-      initTidePrediction();
-    });
+    // === QUANDO A PÁGINA CARREGAR, INICIA A PREDIÇÃO ===
+    document.addEventListener('DOMContentLoaded', initTidePrediction);
 
     function initTidePrediction() {
-      const now = new Date();
-      const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const endDate = new Date(startDate.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 dias
+      luxon.Settings.defaultLocale = 'pt';
 
+      // Data/hora local atual
+      const now = luxon.DateTime.local();
+      const hojeISO = now.toISODate();        // '2025-02-19', por ex.
+      const inicioHoje = now.startOf('day'); // 00:00 do dia atual
+      const fimHoje    = now.endOf('day');   // 23:59 do dia atual
+
+      // Vamos obter as marés para os próximos 5 dias
+      const startJS = inicioHoje.toJSDate();  // Data de hoje 00:00
+      const endJS   = new Date(startJS.getTime() + 5 * 24 * 60 * 60 * 1000);
+
+      // Cria o predictor e obtém as marés (altas/baixas)
       const predictor = tidePredictor(adjustedConstituents, { phaseKey: 'phase_GMT' });
-      const tides = predictor.getExtremesPrediction({ start: startDate, end: endDate });
+      const tides = predictor.getExtremesPrediction({ start: startJS, end: endJS });
 
+      // Estruturas para preencher a tabela e o gráfico
       const tableBody = document.getElementById('tide-table-body');
-      let chartData = [];
-      let categories = [];
-      let currentPoint = null;
+      const tidesByDay = {};    // agrupar marés por dia
+      let graphTideData = [];   // marés só do dia de hoje (para o gráfico)
 
-      // Ícones conforme o estilo da segunda página
+      // Ícones para maré alta/baixa
       const iconHigh = '<span class="mdi mdi-triangle high-tide tide-icon" title="maré alta"></span>';
-      const iconLow = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
+      const iconLow  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
 
-      // Agrupa as marés por dia (utilizando toDateString)
-      const tidesByDay = {};
-
+      // === Processa cada evento de maré ===
       tides.forEach(tide => {
-        // Cria uma nova data para evitar alterar o objeto original
-        let tideTime = new Date(tide.time);
+        // Converte a data para Luxon (horário local)
+        let dt = luxon.DateTime.fromJSDate(tide.time, { zone: 'local' });
 
-        // Ajusta horário e altura conforme se é alta ou baixa
+        // Aplica offsets de horário/altura
         if (tide.high) {
-          tideTime.setMinutes(tideTime.getMinutes() + timeOffset.high);
+          dt = dt.plus({ minutes: timeOffset.high });
           tide.level += heightOffset.high;
         } else {
-          tideTime.setMinutes(tideTime.getMinutes() + timeOffset.low);
+          dt = dt.plus({ minutes: timeOffset.low });
           tide.level += heightOffset.low;
         }
 
-        // Formata hora e altura
-        tide.formattedTime = tideTime.getHours().toString().padStart(2, '0') + ':' + tideTime.getMinutes().toString().padStart(2, '0');
-        tide.formattedHeight = tide.level < 1 ? tide.level.toFixed(2) + ' m' : tide.level.toFixed(1) + ' m';
+        // Formata hora/altura
+        const formattedTime = dt.toFormat("HH:mm");
+        const formattedHeight = tide.level < 1
+          ? tide.level.toFixed(2) + " m"
+          : tide.level.toFixed(1) + " m";
 
-        // Define a chave do dia
-        const dayKey = tideTime.toDateString();
-        if (!tidesByDay[dayKey]) {
-          tidesByDay[dayKey] = { date: tideTime, tides: [] };
+        // === Preenche a tabela (todas as marés dos próximos 5 dias) ===
+        const dayISO = dt.toISODate();  // ex: '2025-02-19'
+        if (!tidesByDay[dayISO]) {
+          tidesByDay[dayISO] = [];
         }
-        tidesByDay[dayKey].tides.push(tide);
+        tidesByDay[dayISO].push({
+          time: formattedTime,
+          height: formattedHeight,
+          icon: tide.high ? iconHigh : iconLow
+        });
 
-        // Para o gráfico: inclui apenas as marés de hoje
-        if (tideTime.toDateString() === now.toDateString()) {
-          categories.push(tide.formattedTime);
-          const point = {
-            y: tide.level,
-            marker: {
-              symbol: tide.high ? 'triangle' : 'triangle-down',
-              fillColor: tide.high ? 'red' : 'green'
-            }
-          };
-          chartData.push(point);
-
-          // Se o horário bater exatamente com o atual (opcional)
-          if (now.getHours() === tideTime.getHours() && now.getMinutes() === tideTime.getMinutes()) {
-            currentPoint = {
-              y: tide.level,
-              x: categories.length - 1,
-              marker: {
-                symbol: 'circle',
-                fillColor: 'red',
-                radius: 8
-              }
-            };
-          }
+        // === Se a maré é do dia de hoje, adiciona ao array do gráfico ===
+        if (dt >= inicioHoje && dt <= fimHoje) {
+          graphTideData.push({
+            date: dayISO,        // '2025-02-19'
+            time: formattedTime, // '01:38'
+            value: tide.level    // ex: 0.86
+          });
         }
       });
 
-      // Ordena os dias
-      const sortedDays = Object.keys(tidesByDay).sort((a, b) => new Date(a) - new Date(b));
+      // === Preenche a Tabela ===
+      // Ordena as chaves (dias) em ordem cronológica
+      const sortedDays = Object.keys(tidesByDay).sort((a, b) => a.localeCompare(b));
+      sortedDays.forEach(dayISO => {
+        // Ordena os eventos pelo horário (HH:mm)
+        tidesByDay[dayISO].sort((a, b) => a.time.localeCompare(b.time));
 
-      // Cria uma única linha por dia, similar à segunda página
-      sortedDays.forEach(dayKey => {
-        const dayData = tidesByDay[dayKey];
-        // Usa a data para extrair o número do dia e o nome do dia
-        const dateObj = new Date(dayKey);
-        const dayNumber = dateObj.getDate();
-        const weekday = dateObj.toLocaleDateString('pt-BR', { weekday: 'short' });
-        const dayName = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+        // Extra info (dia do mês e dia da semana)
+        const dt = luxon.DateTime.fromISO(dayISO);
+        const dayNumber = dt.day; // 19
+        const weekday   = dt.toFormat('ccc'); // 'Qua'
+        const dayName   = weekday.charAt(0).toUpperCase() + weekday.slice(1);
 
+        // Monta a linha com até 4 marés
         let rowHTML = `<tr>
-          <td style="text-align: left;">${dayNumber} (${dayName})</td>`;
+          <td style="text-align:left;">${dayNumber} (${dayName})</td>`;
 
-        // Ordena as marés do dia (garantindo a ordem cronológica)
-        dayData.tides.sort((a, b) => new Date(a.time) - new Date(b.time));
-
-        // Gera 4 colunas (se faltar alguma, deixa vazia)
         for (let i = 0; i < 4; i++) {
-          if (dayData.tides[i]) {
-            const tide = dayData.tides[i];
-            rowHTML += `<td>${tide.formattedTime} | ${tide.formattedHeight} ${tide.high ? iconHigh : iconLow}</td>`;
+          if (tidesByDay[dayISO][i]) {
+            const ev = tidesByDay[dayISO][i];
+            rowHTML += `<td>${ev.time} | ${ev.height} ${ev.icon}</td>`;
           } else {
             rowHTML += `<td></td>`;
           }
         }
-        rowHTML += `</tr>`;
+        rowHTML += '</tr>';
         tableBody.innerHTML += rowHTML;
       });
 
-      // Se houver um ponto atual, adiciona ao gráfico
-      if (currentPoint) {
-        chartData.push(currentPoint);
-        categories.push(now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0'));
-      }
+      // === Prepara dados para o gráfico (só hoje) ===
+      // Ordena pelo horário
+      graphTideData.sort((a, b) => a.time.localeCompare(b.time));
 
-      // Configura o gráfico Highcharts
-      Highcharts.setOptions({
-        time: {
-          useUTC: false,
-          timezoneOffset: -3 * 60 // GMT-3
-        }
-      });
+      // Se houver menos de 2 pontos, o VisTideChart não tem muito o que exibir,
+      // mas vamos prosseguir mesmo assim
+      if (graphTideData.length >= 2) {
+        // Adiciona pontos "dummy" no início (00:00) e no fim (23:59)
+        // para que a biblioteca não descarte a primeira e a última maré real.
+        const firstValue = graphTideData[0].value;
+        const lastValue  = graphTideData[graphTideData.length - 1].value;
+        const firstDate  = graphTideData[0].date;  // ex: '2025-02-19'
+        const lastDate   = graphTideData[graphTideData.length - 1].date;
 
-      setInterval(updateChart, 60000); // Atualiza a cada 1 minuto
-
-      function updateChart() {
-        const now = new Date();
-        const currentPoint = {
-          y: 0, // Ajuste se necessário
-          x: categories.length,
-          marker: {
-            symbol: 'circle',
-            fillColor: 'red',
-            radius: 8
-          }
+        // Dummy inicial e final
+        const dummyStart = {
+          date: firstDate,
+          time: "00:00",
+          value: firstValue
         };
-        chartData.push(currentPoint);
-        categories.push(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
-        chart.series[0].setData(chartData);
-        chart.xAxis[0].setCategories(categories);
+        // const dummyEnd = {
+        //   date: lastDate,
+        //   time: "23:59",
+        //   value: lastValue
+        // };
+        const dummyEnd = {
+        date: lastDate,   // "2025-02-19"
+        time: "23:59",
+        value: 1.0        // valor menor (arbitrário) só para a curva cair
+        };
+
+        // "Incha" o array
+        graphTideData = [dummyStart, ...graphTideData, dummyEnd];
       }
 
-      Highcharts.chart('container', {
-        title: {
-          text: 'Tábua de marés de hoje'
-        },
-        xAxis: {
-          categories: categories
-        },
-        yAxis: {
-          title: {
-            text: 'Altura da Maré (m)'
-          }
-        },
-        tooltip: {
-          valueDecimals: 1
-        },
-        series: [{
-          type: 'spline',
-          name: 'Altura da Maré',
-          data: chartData
-        }]
+      // Monta o objeto final para o VisTideChart
+      const tideDataForGraph = {
+        unit: "m",
+        currentDate: hojeISO,
+        currentTime: now.toFormat("HH:mm"),
+        tide: graphTideData,
+        sun: [] // se tiver dados de nascer/pôr do sol, inclua aqui
+      };
+
+      // === Renderiza o gráfico VisTideChart ===
+      new VisTideChart({
+        id: "tide-chart-container",
+        data: tideDataForGraph,
+        hideDateAxis: true, // ex: se quiser mostrar só horas
+        hideTimeAxis: false // ex: se quiser mostrar datas, troque para 'true'
       });
     }
   </script>
 
-  <script>
-    $(function(){
-      $("#footer-placeholder").load("../footer.html");
-    });
-  </script>
+  <!-- Popper/Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
