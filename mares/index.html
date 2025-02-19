@@ -1,299 +1,298 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tábua de Marés</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tábua de Marés</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding-bottom: 10px;
-            background-color: #F5F5DC; /* Cor de fundo offwhite */
-        }
-        .header {
-            background-color: black;
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-        .title {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .content {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        table {
-            width: 100%;
-            margin: 20px 0;
-        }
-        .day-row {
-            background-color: #f8f9fa;
-        }
-        #container {
-            width: 100%;
-            height: 400px;
-            margin: 20px 0;
-        }
-
-
-
-    </style>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding-bottom: 10px;
+      background-color: #F5F5DC; /* Offwhite */
+    }
+    .header {
+      background-color: black;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    .title {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .content {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    table {
+      width: 100%;
+      margin: 20px 0;
+    }
+    #container {
+      width: 100%;
+      height: 400px;
+      margin: 20px 0;
+    }
+    /* Estilos inspirados na segunda página */
+    .high-tide {
+      color: red;
+    }
+    .low-tide {
+      color: teal;
+    }
+    .tide-icon {
+      vertical-align: middle;
+    }
+    .current-tide {
+      background-color: #ff781e;
+      font-weight: bold;
+      border: 2px solid #ff0000;
+    }
+    td {
+      transition: background-color 0.3s ease;
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Tábua de Marés</h1>
-    </div>
-    
-    <div class="title">
-        <h2>Próximos 5 dias</h2>
-    </div>
+  <div class="header">
+    <h1>Tábua de Marés</h1>
+  </div>
 
-    <div class="content">
-        <table class="table table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Dia</th>
-                    <th>1ª Maré</th>
-                    <th>2ª Maré</th>
-                    <th>3ª Maré</th>
-                    <th>4ª Maré</th>
-                </tr>
-            </thead>
-            <tbody id="tide-table-body">
-                <!-- Linhas de dados serão inseridas aqui -->
-            </tbody>
-        </table>
+  <div class="title">
+    <h2>Próximos 5 dias</h2>
+  </div>
 
-        <div id="container"></div>
-    </div>
-<!-- Container para o footer -->
-<div id="footer-placeholder"></div>
-    <!-- Carregar a biblioteca tide-predictor -->
-    <script src="https://unpkg.com/@neaps/tide-predictor@0.1.1/dist/web/tide-predictor.min.js"></script>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initTidePrediction();
-        });
+  <div class="content">
+    <table class="table table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th>Dia</th>
+          <th>1ª Maré</th>
+          <th>2ª Maré</th>
+          <th>3ª Maré</th>
+          <th>4ª Maré</th>
+        </tr>
+      </thead>
+      <tbody id="tide-table-body">
+        <!-- Linhas de dados serão inseridas aqui -->
+      </tbody>
+    </table>
 
-        const constituents = [
-    { name: 'M2', amplitude: 0.79, phase_GMT: 124.0, speed: 28.984105 },
-    { name: 'S2', amplitude: 0.28, phase_GMT: 142.0, speed: 30.0 },
-    { name: 'N2', amplitude: 0.17, phase_GMT: 114.0, speed: 28.439730 },
-    { name: 'K1', amplitude: 0.05, phase_GMT: 235.0, speed: 15.041069 },
-    { name: 'O1', amplitude: 0.05, phase_GMT: 163.0, speed: 15.04107 },
-    { name: 'P1', amplitude: 0.02, phase_GMT: 228.0, speed: 14.958932 },
-    { name: 'Q1', amplitude: 0.01, phase_GMT: 276.0, speed: 13.398661 },
-    { name: 'K2', amplitude: 0.08, phase_GMT: 137.0, speed: 30.082138 },
-    { name: 'NO1', amplitude: 0.02, phase_GMT: 163.0, speed: 13.398660 },
-    { name: 'J1', amplitude: 0.02, phase_GMT: 288.0, speed: 15.0 },
-    { name: 'OO1', amplitude: 0.01, phase_GMT: 213.0, speed: 16.139101 }
-];
+    <div id="container"></div>
+  </div>
 
-const timeOffset = {
-    high: -10, // Offset de tempo para maré alta em minutos
-    low: 18   // Offset de tempo para maré baixa em minutos
-};
+  <!-- Container para o footer -->
+  <div id="footer-placeholder"></div>
 
-const heightOffset = {
-    high: 1.5, // Offset de altura para maré alta
-    low: 1.35   // Offset de altura para maré baixa
-};
+  <!-- Bibliotecas -->
+  <script src="https://unpkg.com/@neaps/tide-predictor@0.1.1/dist/web/tide-predictor.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script>
+    // Constituents e offsets conforme sua configuração original
+    const constituents = [
+      { name: 'M2', amplitude: 0.79, phase_GMT: 124.0, speed: 28.984105 },
+      { name: 'S2', amplitude: 0.28, phase_GMT: 142.0, speed: 30.0 },
+      { name: 'N2', amplitude: 0.17, phase_GMT: 114.0, speed: 28.439730 },
+      { name: 'K1', amplitude: 0.05, phase_GMT: 235.0, speed: 15.041069 },
+      { name: 'O1', amplitude: 0.05, phase_GMT: 163.0, speed: 15.04107 },
+      { name: 'P1', amplitude: 0.02, phase_GMT: 228.0, speed: 14.958932 },
+      { name: 'Q1', amplitude: 0.01, phase_GMT: 276.0, speed: 13.398661 },
+      { name: 'K2', amplitude: 0.08, phase_GMT: 137.0, speed: 30.082138 },
+      { name: 'NO1', amplitude: 0.02, phase_GMT: 163.0, speed: 13.398660 },
+      { name: 'J1', amplitude: 0.02, phase_GMT: 288.0, speed: 15.0 },
+      { name: 'OO1', amplitude: 0.01, phase_GMT: 213.0, speed: 16.139101 }
+    ];
 
+    const timeOffset = {
+      high: -10, // Offset em minutos para maré alta
+      low: 18    // Offset em minutos para maré baixa
+    };
 
-        const adjustedConstituents = constituents.map(constituent => {
-            return {
-                ...constituent,
-                phase_GMT: constituent.phase_GMT % 360,
-                amplitude: constituent.amplitude
-            };
-        });
+    const heightOffset = {
+      high: 1.5,  // Offset de altura para maré alta
+      low: 1.35   // Offset de altura para maré baixa
+    };
 
-        console.log(adjustedConstituents);
+    // Ajusta os constituintes
+    const adjustedConstituents = constituents.map(constituent => ({
+      ...constituent,
+      phase_GMT: constituent.phase_GMT % 360
+    }));
 
-        function initTidePrediction() {
-            const now = new Date();
-            const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const endDate = new Date(startDate.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 dias a partir de hoje
+    document.addEventListener('DOMContentLoaded', function() {
+      initTidePrediction();
+    });
 
-            const predictor = tidePredictor(adjustedConstituents, {
-                phaseKey: 'phase_GMT'
-            });
+    function initTidePrediction() {
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endDate = new Date(startDate.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 dias
 
-            const tides = predictor.getExtremesPrediction({ start: startDate, end: endDate });
+      const predictor = tidePredictor(adjustedConstituents, { phaseKey: 'phase_GMT' });
+      const tides = predictor.getExtremesPrediction({ start: startDate, end: endDate });
 
-            const tableBody = document.getElementById('tide-table-body');
-            const chartData = [];
-            const categories = [];
-            let currentPoint = null;
+      const tableBody = document.getElementById('tide-table-body');
+      let chartData = [];
+      let categories = [];
+      let currentPoint = null;
 
-            let previousDate = '';
+      // Ícones conforme o estilo da segunda página
+      const iconHigh = '<span class="mdi mdi-triangle high-tide tide-icon" title="maré alta"></span>';
+      const iconLow = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
 
-            tides.forEach(tide => {
-                const date = new Date(tide.time);
-                const day = date.getDate().toString().padStart(2, '0');
-                const weekday = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
-                const formattedDayCell = `${weekday.charAt(0).toUpperCase() + weekday.slice(1)} ${day}`;
-                const formattedDayOnly = `${day}`;
-                const formattedWeekdayOnly = `${weekday.charAt(0).toUpperCase() + weekday.slice(1)}`;
-                const time = new Date(date.getTime()); // Mantendo o fuso horário GMT-3 (João Pessoa)
-                const formattedTime = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
+      // Agrupa as marés por dia (utilizando toDateString)
+      const tidesByDay = {};
 
-                // Ajustar os horários das marés altas e baixas
-                if (tide.high) {
-                    date.setMinutes(date.getMinutes() + timeOffset.high);
-                    tide.level += heightOffset.high;
-                } else {
-                    date.setMinutes(date.getMinutes() + timeOffset.low);
-                    tide.level += heightOffset.low;
-                }
+      tides.forEach(tide => {
+        // Cria uma nova data para evitar alterar o objeto original
+        let tideTime = new Date(tide.time);
 
-                const height = tide.level < 1 ? `${tide.level.toFixed(2)} m` : `${tide.level.toFixed(1)} m`;
-                const typeIcon = tide.high ? '<span class="mdi mdi-triangle" style="color: red;"></span>' : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
-
-                // Adiciona os dados ao gráfico apenas se for o dia atual
-                if (date.toDateString() === now.toDateString()) {
-                    categories.push(formattedTime);
-                    const point = {
-                        y: tide.level,
-                        marker: {
-                            symbol: tide.high ? 'triangle' : 'triangle-down',
-                            fillColor: tide.high ? 'red' : 'green'
-                        }
-                    };
-                    chartData.push(point);
-
-                    // Verifica se é o ponto atual
-                    if (now.getHours() === date.getHours() && now.getMinutes() === date.getMinutes()) {
-                        currentPoint = {
-                            y: tide.level,
-                            x: categories.length - 1,
-                            marker: {
-                                symbol: 'circle',
-                                fillColor: 'red',
-                                radius: 8
-                            }
-                        };
-                    }
-                }
-
-                if (previousDate !== formattedDayCell) {
-                    const dayRow = document.createElement('tr');
-                    dayRow.setAttribute('data-date', formattedDayCell);
-
-                    const dayColumn = document.createElement('td');
-                    dayColumn.textContent = formattedWeekdayOnly;
-                    dayRow.appendChild(dayColumn);
-
-                    for (let i = 0; i < 4; i++) {
-                        const timeColumn = document.createElement('td');
-                        timeColumn.classList.add('time-column');
-                        dayRow.appendChild(timeColumn);
-                    }
-
-                    tableBody.appendChild(dayRow);
-
-                    const tideRow = document.createElement('tr');
-                    tideRow.setAttribute('data-date', formattedDayCell);
-
-                    const dateColumn = document.createElement('td');
-                    dateColumn.textContent = formattedDayOnly;
-                    tideRow.appendChild(dateColumn);
-
-                    for (let i = 0; i < 4; i++) {
-                        const tideColumn = document.createElement('td');
-                        tideColumn.classList.add('tide-column');
-                        tideRow.appendChild(tideColumn);
-                    }
-
-                    tableBody.appendChild(tideRow);
-
-                    previousDate = formattedDayCell;
-                }
-
-                const dayRow = tableBody.querySelector(`tr[data-date="${formattedDayCell}"]`);
-                const cellsTime = dayRow.querySelectorAll('.time-column');
-                const tideRow = dayRow.nextElementSibling;
-                const cellsTide = tideRow.querySelectorAll('.tide-column');
-
-                for (let i = 0; i < cellsTime.length; i++) {
-                    if (cellsTime[i].textContent === "") {
-                        cellsTime[i].textContent = `${formattedTime}`;
-                        cellsTide[i].innerHTML = `${height} ${typeIcon}`;
-                        break;
-                    }
-                }
-            });
-
-            // Adiciona o ponto atual ao gráfico
-            if (currentPoint) {
-                chartData.push(currentPoint);
-                categories.push(now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0'));
-            }
-
-            Highcharts.setOptions({
-                time: {
-                    useUTC: false,
-                    timezoneOffset: -3 * 60 // Fuso horário GMT-3 (João Pessoa)
-                }
-            });
-
-            setInterval(updateChart, 60000); // 60000 milissegundos = 1 minuto
-
-            function updateChart() {
-                const now = new Date();
-                const currentPoint = {
-                    y: 0, // Defina a altura atual correta
-                    x: categories.length,
-                    marker: {
-                        symbol: 'circle',
-                        fillColor: 'red',
-                        radius: 8
-                    }
-                };
-                chartData.push(currentPoint);
-                categories.push(`${now.getHours()}:${now.getMinutes()}`);
-                chart.series[0].setData(chartData);
-                chart.xAxis[0].setCategories(categories);
-            }
-
-            // Configura o gráfico Highcharts
-            Highcharts.chart('container', {
-                title: {
-                    text: 'Tábua de marés de hoje'
-                },
-                xAxis: {
-                    categories: categories
-                },
-                yAxis: {
-                    title: {
-                        text: 'Altura da Maré (m)'
-                    }
-                },
-                tooltip: {
-                    valueDecimals: 1
-                },
-                series: [{
-                    type: 'spline',
-                    name: 'Altura da Maré',
-                    data: chartData
-                }]
-            });
+        // Ajusta horário e altura conforme se é alta ou baixa
+        if (tide.high) {
+          tideTime.setMinutes(tideTime.getMinutes() + timeOffset.high);
+          tide.level += heightOffset.high;
+        } else {
+          tideTime.setMinutes(tideTime.getMinutes() + timeOffset.low);
+          tide.level += heightOffset.low;
         }
-    </script>
-<script>
-  $(function(){
-    $("#footer-placeholder").load("../footer.html");
-  });
-</script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+        // Formata hora e altura
+        tide.formattedTime = tideTime.getHours().toString().padStart(2, '0') + ':' + tideTime.getMinutes().toString().padStart(2, '0');
+        tide.formattedHeight = tide.level < 1 ? tide.level.toFixed(2) + ' m' : tide.level.toFixed(1) + ' m';
+
+        // Define a chave do dia
+        const dayKey = tideTime.toDateString();
+        if (!tidesByDay[dayKey]) {
+          tidesByDay[dayKey] = { date: tideTime, tides: [] };
+        }
+        tidesByDay[dayKey].tides.push(tide);
+
+        // Para o gráfico: inclui apenas as marés de hoje
+        if (tideTime.toDateString() === now.toDateString()) {
+          categories.push(tide.formattedTime);
+          const point = {
+            y: tide.level,
+            marker: {
+              symbol: tide.high ? 'triangle' : 'triangle-down',
+              fillColor: tide.high ? 'red' : 'green'
+            }
+          };
+          chartData.push(point);
+
+          // Se o horário bater exatamente com o atual (opcional)
+          if (now.getHours() === tideTime.getHours() && now.getMinutes() === tideTime.getMinutes()) {
+            currentPoint = {
+              y: tide.level,
+              x: categories.length - 1,
+              marker: {
+                symbol: 'circle',
+                fillColor: 'red',
+                radius: 8
+              }
+            };
+          }
+        }
+      });
+
+      // Ordena os dias
+      const sortedDays = Object.keys(tidesByDay).sort((a, b) => new Date(a) - new Date(b));
+
+      // Cria uma única linha por dia, similar à segunda página
+      sortedDays.forEach(dayKey => {
+        const dayData = tidesByDay[dayKey];
+        // Usa a data para extrair o número do dia e o nome do dia
+        const dateObj = new Date(dayKey);
+        const dayNumber = dateObj.getDate();
+        const weekday = dateObj.toLocaleDateString('pt-BR', { weekday: 'short' });
+        const dayName = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+
+        let rowHTML = `<tr>
+          <td style="text-align: left;">${dayNumber} (${dayName})</td>`;
+
+        // Ordena as marés do dia (garantindo a ordem cronológica)
+        dayData.tides.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+        // Gera 4 colunas (se faltar alguma, deixa vazia)
+        for (let i = 0; i < 4; i++) {
+          if (dayData.tides[i]) {
+            const tide = dayData.tides[i];
+            rowHTML += `<td>${tide.formattedTime} | ${tide.formattedHeight} ${tide.high ? iconHigh : iconLow}</td>`;
+          } else {
+            rowHTML += `<td></td>`;
+          }
+        }
+        rowHTML += `</tr>`;
+        tableBody.innerHTML += rowHTML;
+      });
+
+      // Se houver um ponto atual, adiciona ao gráfico
+      if (currentPoint) {
+        chartData.push(currentPoint);
+        categories.push(now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0'));
+      }
+
+      // Configura o gráfico Highcharts
+      Highcharts.setOptions({
+        time: {
+          useUTC: false,
+          timezoneOffset: -3 * 60 // GMT-3
+        }
+      });
+
+      setInterval(updateChart, 60000); // Atualiza a cada 1 minuto
+
+      function updateChart() {
+        const now = new Date();
+        const currentPoint = {
+          y: 0, // Ajuste se necessário
+          x: categories.length,
+          marker: {
+            symbol: 'circle',
+            fillColor: 'red',
+            radius: 8
+          }
+        };
+        chartData.push(currentPoint);
+        categories.push(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
+        chart.series[0].setData(chartData);
+        chart.xAxis[0].setCategories(categories);
+      }
+
+      Highcharts.chart('container', {
+        title: {
+          text: 'Tábua de marés de hoje'
+        },
+        xAxis: {
+          categories: categories
+        },
+        yAxis: {
+          title: {
+            text: 'Altura da Maré (m)'
+          }
+        },
+        tooltip: {
+          valueDecimals: 1
+        },
+        series: [{
+          type: 'spline',
+          name: 'Altura da Maré',
+          data: chartData
+        }]
+      });
+    }
+  </script>
+
+  <script>
+    $(function(){
+      $("#footer-placeholder").load("../footer.html");
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
