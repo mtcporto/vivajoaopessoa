@@ -6,7 +6,6 @@
   <title>Notícias</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
   <div class="header">
@@ -16,18 +15,17 @@
     <div class="row" id="newsCards"></div>
     <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Notícias</button>
   </div>
-
-  <!-- Container para o footer -->
-<div id="footer-placeholder"></div>
   <script src="cnnbrasil.js"></script>
   <script src="bbcbrasil.js"></script>
   <script src="uol.js"></script>
+  <script src="g1.js"></script>
   <script src="noticiasaominuto.js"></script>
   <script>
     let newsLoaded = 0;
 
     function loadNews() {
       const newsLoadPromises = [
+        loadG1News(),
         loadCNNBrasilNews(),
         loadBBCBrasilNews(),
         loadUOLNews(),
@@ -48,11 +46,5 @@
     document.querySelector("#loadMore").addEventListener('click', loadNews);
     loadNews();
   </script>
-  
-<script>
-  $(function(){
-    $("#footer-placeholder").load("../footer.html");
-  });
-</script>
 </body>
 </html>
