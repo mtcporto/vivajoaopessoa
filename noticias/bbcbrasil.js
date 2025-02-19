@@ -40,7 +40,7 @@ function loadBBCBrasilNews() {
                   <img src="${imgURL}" class="bd-placeholder-img card-img-top" width="100%" height="225">
                   <div class="card-body">
                     <p class="fonte">
-                      <span class="badge badge-danger">Fonte: BBC Brasil</span>
+                      <span class="badge badge-success">Fonte: BBC Brasil</span>
                     </p>                           
                     <h5 class="card-title">${title}</h5>
                     <div class="d-flex justify-content-between align-items-center">
@@ -65,3 +65,4 @@ function loadBBCBrasilNews() {
   document.querySelector("#loadMore").addEventListener('click', loadNews);
   loadNews();
 }
+
