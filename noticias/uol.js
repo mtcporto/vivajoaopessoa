@@ -20,16 +20,18 @@ function loadUOLNews() {
             // Filtra itens relacionados a filmes ou splash:
             if (
               link.toLowerCase().includes("ingresso.com/filme") ||
-              link.toLowerCase().includes("uol.com.br/splash")
+              link.toLowerCase().includes("uol.com.br/splash")  ||
+              link.toLowerCase().includes("uol.com.br/guia-de-compras")
             ) {
               return; // Pula este item
             }
 
-            let imgURL = "https://placehold.co/300x200?text=Sem+Imagem";
+            // let imgURL = "https://placehold.co/300x200?text=Sem+Imagem";
             const imgElement = item.querySelector("*[url]");
-            if (imgElement) {
-              imgURL = imgElement.getAttribute('url');
+            if (!imgElement || !imgElement.getAttribute('url')) {
+              return; // Pula este item se não houver imagem
             }
+            const imgURL = imgElement.getAttribute('url');
 
             // Formata a data de publicação
             const pubDateElement = item.querySelector("pubDate");
@@ -79,3 +81,4 @@ function loadUOLNews() {
   document.querySelector("#loadMore").addEventListener('click', loadNews);
   loadNews();
 }
+
