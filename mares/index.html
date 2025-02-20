@@ -395,7 +395,7 @@
 
             // Ícones para maré alta/baixa
             const iconHigh = '<span class="mdi mdi-triangle high-tide tide-icon" title="maré alta"></span>';
-            const iconLow = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
+            const iconLow = '<svg xmlns="https://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
 
             // === Processa cada evento de maré ===
             tides.forEach(tide => {
@@ -599,7 +599,7 @@
         function updateMoonPhase() {
             const now = luxon.DateTime.local();
             const timestamp = Math.floor(now.toSeconds());
-            const moonApiUrl = `http://api.farmsense.net/v1/moonphases/?d=${timestamp}`;
+            const moonApiUrl = `https://api.farmsense.net/v1/moonphases/?d=${timestamp}`;
 
             fetch(moonApiUrl)
                 .then(response => response.json())
