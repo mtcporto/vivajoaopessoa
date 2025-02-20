@@ -225,30 +225,58 @@
 
         .moon-phase {
             position: absolute;
-            right: 150px;
+            right: 10px;
             font-size: 7.5rem;
         }
 
         @media (max-width: 768px) {
+            .current-tide {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinha tudo à esquerda */
+    padding-left: 10px; /* Espaço de 10px da borda */
+    text-align: left; /* Garante que o texto fique alinhado à esquerda */
+}
+
+.current-tide-value {
+    display: flex;
+    flex-direction: column;
+    text-align: left; /* Garante que o texto também fique alinhado à esquerda */
+    align-items: flex-start; /* Alinha os itens à esquerda */
+}
+
+            .icon-large {
+            font-size: 80px !important;
+            }
             .tide-card {
                 margin: 10px;
                 padding: 15px;
                 height: 365px;
             }
 
-            .tide-header {
-                margin-left: 0;
-                justify-content: center;
+                .tide-header {
+        margin-left: 0;
+        justify-content: left;
             }
 
             .tide-container {
-                flex-wrap: wrap;
-                padding: 20px 0;
+                display: flex;
+                justify-content: space-around;
+                width: 100%;
             }
 
+            .tide-level {
+            font-size: 1.0em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            }
             .tide-item {
-                flex: 0 0 50%;
-                margin-bottom: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-around;
             }
         }
     </style>
@@ -272,8 +300,8 @@
                     <div class="current-tide-legend">Nível Atual da Maré</div>
                     <div class="current-tide-value">
                         <span class="material-symbols-outlined icon-large">water</span>
-                        0.0 m
                     </div>
+                    
                 </div>
             </div>
             <div class="tide-container">
