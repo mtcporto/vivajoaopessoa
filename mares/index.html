@@ -17,9 +17,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
         integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/1.26.0/luxon.min.js"
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/1.26.0/luxon.min.js"
         integrity="sha512-cYjGoxnM2sxryDRpKhwi8uTszEw2zufuDVz1dWlm1+wlvwnhQ4wu00BokHH4IKlogGJNL+2a2GYvHN+xaoUxjQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 
     <!-- VisTideChart e Tooltip -->
     <script src="vis-tooltip.js"></script>
@@ -395,7 +396,7 @@
 
             // Ícones para maré alta/baixa
             const iconHigh = '<span class="mdi mdi-triangle high-tide tide-icon" title="maré alta"></span>';
-            const iconLow = '<svg xmlns="https://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
+            const iconLow = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="16" style="fill: teal;"><title>triangle-down</title><path d="M1 3H23L12 22"></path></svg>';
 
             // === Processa cada evento de maré ===
             tides.forEach(tide => {
@@ -525,75 +526,84 @@
         }
 
 
-        // === Função para atualizar o card ===
         function updateTideCard(tidesByDay) {
-            const now = luxon.DateTime.local();
-            const nextFourTides = [];
+    const now = luxon.DateTime.local();
 
-            // Combina as marés de todos os dias em um único array, mantendo as propriedades necessárias
-            let allTides = Object.values(tidesByDay).flat();
+    // Combina as marés de todos os dias em um único array
+    let allTides = Object.values(tidesByDay).flat();
 
-            // Filtra as marés futuras e as ordena
-            allTides = allTides.filter(tide => tide.dateTime <= now).sort((a, b) => a.dateTime - b.dateTime);
+    // Filtra as marés do dia atual e mantém a ordem original
+    let todayTides = allTides.filter(tide => 
+        tide.dateTime.toISODate() === now.toISODate()
+    );
 
-            // Seleciona as próximas 4 marés
-            const nextTides = allTides.slice(0, 4);
+    // Encontra a maré mais próxima do horário atual
+    let closestTide = null;
+    let minDiff = Infinity;
 
-            // Função para formatar o nível da maré
-            function formatTideLevel(level) {
-                return level < 1 ? level.toFixed(2) : level.toFixed(1);
-            }
-
-            // Atualiza o cabeçalho com a próxima maré (se houver)
-            const currentTideValueEl = document.querySelector('.current-tide-value');
-            if (nextTides.length > 0) {
-                const nextTide = nextTides[0];
-                currentTideValueEl.innerHTML = `
-                    <span class="material-symbols-outlined icon-large">
-                        ${nextTide.high ? 'waves' : 'water'}
-                    </span>
-                    ${formatTideLevel(nextTide.level)} m
-                `;
-            } else {
-                currentTideValueEl.innerHTML = `
-                    <span class="material-symbols-outlined icon-large">water</span>
-                    --
-                `;
-            }
-
-            // Atualiza os itens do card com as próximas marés
-            const tideItems = document.querySelectorAll('.tide-item');
-            tideItems.forEach((item, index) => {
-                if (index < nextTides.length) {
-                    const tide = nextTides[index];
-                    const iconEl = item.querySelector('.material-symbols-outlined');
-                    const levelEl = item.querySelector('.tide-level');
-                    const timestampEl = item.querySelector('.tide-timestamp');
-
-                    iconEl.textContent = tide.high ? 'waves' : 'water';
-                    levelEl.innerHTML = `
-                        ${formatTideLevel(tide.level)} m
-                        <i class="wi ${tide.high ? 'wi-direction-up tide-arrow up' : 'wi-direction-down tide-arrow down'}"></i>
-                    `;
-                    timestampEl.textContent = tide.time;  // Usa a hora formatada do array original
-
-                    // Adiciona destaque à próxima maré (primeiro item do array)
-                    if (index === 0) {
-                        item.classList.add('highlight');
-                    } else {
-                        item.classList.remove('highlight'); // Remove o highlight de outros itens
-                    }
-                } else {
-                    // Limpa os itens restantes se não houver marés suficientes
-                    item.classList.remove('highlight');
-                    item.querySelector('.material-symbols-outlined').textContent = 'water';
-                    item.querySelector('.tide-level').innerHTML = '0.0 m';
-                    item.querySelector('.tide-timestamp').textContent = '00:00';
-                }
-            });
+    todayTides.forEach(tide => {
+        const diff = Math.abs(tide.dateTime.diff(now).as('minutes'));
+        if (diff < minDiff) {
+            minDiff = diff;
+            closestTide = tide;
         }
+    });
 
+    // Pega as primeiras 4 marés do dia, mantendo a ordem original
+    let nextTides = todayTides.slice(0, 4);
 
+    // Formata o nível da maré
+    function formatTideLevel(level) {
+        return level < 1 ? level.toFixed(2) : level.toFixed(1);
+    }
+
+    // Atualiza o cabeçalho com a maré mais próxima
+    const currentTideValueEl = document.querySelector('.current-tide-value');
+    if (closestTide) {
+        currentTideValueEl.innerHTML = `
+            <span class="material-symbols-outlined icon-large">
+                ${closestTide.high ? 'waves' : 'water'}
+            </span>
+            ${formatTideLevel(closestTide.level)} m
+        `;
+    } else {
+        currentTideValueEl.innerHTML = `
+            <span class="material-symbols-outlined icon-large">water</span>
+            --
+        `;
+    }
+
+    // Atualiza os itens do card com as marés
+    const tideItems = document.querySelectorAll('.tide-item');
+    tideItems.forEach((item, index) => {
+        if (index < nextTides.length) {
+            const tide = nextTides[index];
+            const iconEl = item.querySelector('.material-symbols-outlined');
+            const levelEl = item.querySelector('.tide-level');
+            const timestampEl = item.querySelector('.tide-timestamp');
+
+            iconEl.textContent = tide.high ? 'waves' : 'water';
+            levelEl.innerHTML = `
+                ${formatTideLevel(tide.level)} m
+                <i class="wi ${tide.high ? 'wi-direction-up tide-arrow up' : 'wi-direction-down tide-arrow down'}"></i>
+            `;
+            timestampEl.textContent = tide.time;
+
+            // Aplica o destaque apenas se esta for a maré mais próxima
+            if (tide === closestTide) {
+                item.classList.add('highlight');
+            } else {
+                item.classList.remove('highlight');
+            }
+        } else {
+            // Limpa os itens restantes se não houver marés suficientes
+            item.classList.remove('highlight');
+            item.querySelector('.material-symbols-outlined').textContent = 'water';
+            item.querySelector('.tide-level').innerHTML = '0.0 m';
+            item.querySelector('.tide-timestamp').textContent = '00:00';
+        }
+    });
+}
 
         // === Função que consulta a Farmsense Moon Phase API e atualiza o ícone da lua ===
         function updateMoonPhase() {
