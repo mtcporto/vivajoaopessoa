@@ -42,8 +42,15 @@
         </div>
       </div>
       <div class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top">
-        <p class="text-gray-300">&copy; 2024 Viva João Pessoa</p>
+  <p class="text-gray-300">&copy; <span id="current-year"></span> Viva João Pessoa</p>
       </div>
     </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+  });
+</script>
+
   </footer>
   
