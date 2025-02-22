@@ -24,19 +24,8 @@
             },
             "contato": {
                 "email": "tapuiapb@gmail.com"
-            },
-            "singles": [
-                {
-                    "nome": "Miscreated",
-                    "ano": 2023,
-                    "spotify": "https://open.spotify.com/intl-pt/track/5bBhKT0R0oYhOhcMb4GRqn"
-                },
-                {
-                    "nome": "Outsider",
-                    "ano": 2023,
-                    "spotify": "https://open.spotify.com/intl-pt/track/1U3ntsIZq6jqv9sMpb7VPt"
-                }
-            ]
+            }
+           
         },
         {
             "imagem": "imagens/lilysanfoneira.jpeg",
@@ -51,14 +40,8 @@
             "contato": {
                 "email": "lilysanfoneira@gmail.com",
                 "whatsapp": "+55 83 98726-0756"
-            },
-            "albuns": [
-                {
-                    "nome": "Menina-flor",
-                    "ano": 2024,
-                    "spotify": "https://open.spotify.com/intl-pt/album/4MzqAJEmqkbzlO6oGDgCVw"
-                }
-            ]
+            }
+            
         },
         {
             "imagem": "imagens/chicocorrea.jpeg",
@@ -68,14 +51,7 @@
                 "youtube": "https://www.youtube.com/@ChicoCorrea/videos",
                 "instagram": "https://www.instagram.com/chicocorrea/",
                 "spotify": "https://open.spotify.com/intl-pt/artist/7wDpWdfVXnLkin6t6VUcSQ"
-            },
-            "albuns": [
-                {
-                    "nome": "Chico Correa & Eletronic Band",
-                    "ano": 2006,
-                    "spotify": "https://open.spotify.com/intl-pt/album/500liPbFDOmctUoCDfujHi"
-                }
-            ]
+            }
         },
         {
             "imagem": "imagens/seupereira.jpeg",
@@ -85,24 +61,7 @@
                 "youtube": "https://www.youtube.com/@TVSEUPEREIRA/videos",
                 "instagram": "https://www.instagram.com/seupereiraecoletivo401/",
                 "spotify": "https://open.spotify.com/intl-pt/artist/5dk0R5am4zMYmG6uyZwfkW"
-            },
-            "albuns": [
-                {
-                    "nome": "Seu Pereira e Coletivo 401",
-                    "ano": 2012,
-                    "spotify": "https://open.spotify.com/intl-pt/album/68EvMId14n2rNu6dUeU6za"
-                },
-                {
-                    "nome": "Eu nao sou boa influencia pra voce",
-                    "ano": 2017,
-                    "spotify": "https://open.spotify.com/intl-pt/album/1cmFBmekEtPb2fK9I0H5cc"
-                },
-                {
-                    "nome": "Seu Pereira e Coletivo 401 no Estudio Showlivre (ao Vivo)",
-                    "ano": 2018,
-                    "spotify": "https://open.spotify.com/intl-pt/album/3iBaVTmqkbEFN83TcTqZRS"
-                }
-            ]
+            }
         },
         {
             "imagem": "imagens/valdonato.jpeg",
@@ -114,14 +73,7 @@
                 "spotify": "https://open.spotify.com/intl-pt/artist/4zOnAX9cemPxJ6UGIYhAi3"
             },
             "contato": {
-            },
-            "albuns": [
-                {
-                    "nome": "Café Amargo",
-                    "ano": 2015,
-                    "spotify": "https://open.spotify.com/intl-pt/album/68XJWzxjLtG3drXxiS93dJ"
-                }
-            ]
+            }
         },
         {
             "imagem": "imagens/pedrofaissal.png",
@@ -135,24 +87,7 @@
             },
             "contato": {
             "whatsapp": "+5583999209990"
-            },
-            "albuns": [
-                {
-                    "nome": "Peso de Menino e Jeito de Homem",
-                    "ano": 2012,
-                    "spotify": "https://open.spotify.com/intl-pt/album/7IUbzZV9sT2r5JyWF7cNdb"
-                },
-                {
-                    "nome": "Pessoa Minha",
-                    "ano": 2013,
-                    "spotify": "https://open.spotify.com/intl-pt/album/2S3t3ibpElSzEH1O14Ee80"
-                },
-                {
-                    "nome": "Half Livre",
-                    "ano": 2015,
-                    "spotify": "https://open.spotify.com/intl-pt/album/3Uq29CYFKHlRc74qtMaUTY"
-                }
-            ]
+            }
         },
         {
             "imagem": "imagens/furmigadub.jpg",
@@ -167,24 +102,7 @@
             "contato": {
                 "email": "fabiano.formiga@gmail.com",
                 "whatsapp": "+55 83 9888718480"
-            },
-            "albuns": [
-                {
-                    "nome": "FurmigaDub e Seu Bando e os Mestres da Paraíba",
-                    "ano": 2019,
-                    "spotify": "https://open.spotify.com/intl-pt/album/7ouNVmW1I6fBtgR7GPMr4t"
-                },
-                {
-                    "nome": "FurmigaDub e Seu Bando no Estudio Showlivre",
-                    "ano": 2019,
-                    "spotify": "https://open.spotify.com/intl-pt/album/0QbVtQlQ1KOgwNHGUbImwx"
-                },
-                {
-                    "nome": "Grave na Mata, Vol 2",
-                    "ano": 2023,
-                    "spotify": "https://open.spotify.com/intl-pt/album/6Rto82ltFP2icSAkwcxtaE"
-                }
-            ]
+            }
         }
     ]
 }
