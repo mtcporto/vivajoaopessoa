@@ -15,8 +15,9 @@ body {
 
 /* Carousel Styles */
 .carousel-video {
+    height: 383px;
     width: 100%;
-    max-width: 1140px;
+    max-width: 1116px;
     margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;
