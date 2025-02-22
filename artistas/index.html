@@ -1,222 +1,361 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Artistas</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Artistas</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .badge-danger {
+      background-color: red;
+      color: white;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 5px;
+      margin-left: 5px;
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Artistas</h1>
-    </div>
+  <div class="header">
+    <h1>Artistas</h1>
+  </div>
+  
+  <div id="videoCarousel" class="carousel slide carousel-video" data-ride="carousel" data-interval="10000">
+    <a class="carousel-control-prev" href="#videoCarousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Anterior</span>
+    </a>
+    <a class="carousel-control-next" href="#videoCarousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Próximo</span>
+    </a>
+    <ol class="carousel-indicators">
+      <li data-target="#videoCarousel" data-slide-to="0" class="active"></li>
+      <li data-target="#videoCarousel" data-slide-to="1"></li>
+      <li data-target="#videoCarousel" data-slide-to="2"></li>
+      <li data-target="#videoCarousel" data-slide-to="3"></li>
+      <li data-target="#videoCarousel" data-slide-to="4"></li>
+      <li data-target="#videoCarousel" data-slide-to="5"></li>
+      <li data-target="#videoCarousel" data-slide-to="6"></li>
+      <li data-target="#videoCarousel" data-slide-to="7"></li>
+    </ol>
     
-    <div id="videoCarousel" class="carousel slide carousel-video" data-ride="carousel" data-interval="10000">
-        <a class="carousel-control-prev" href="#videoCarousel" role="button" data-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Anterior</span>
-        </a>
-        <a class="carousel-control-next" href="#videoCarousel" role="button" data-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Próximo</span>
-        </a>
-        <ol class="carousel-indicators">
-            <li data-target="#videoCarousel" data-slide-to="0" class="active"></li>
-            <li data-target="#videoCarousel" data-slide-to="1"></li>
-            <li data-target="#videoCarousel" data-slide-to="2"></li>
-            <li data-target="#videoCarousel" data-slide-to="3"></li>
-            <li data-target="#videoCarousel" data-slide-to="4"></li>
-            <li data-target="#videoCarousel" data-slide-to="5"></li>
-            <li data-target="#videoCarousel" data-slide-to="6"></li>
-            <li data-target="#videoCarousel" data-slide-to="7"></li>
-        </ol>
-        
-        
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="video-container">
-                    <iframe id="ytplayer1" src="https://www.youtube.com/embed/9mS5zZfWMSU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=9mS5zZfWMSU&start=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
-                </div>
-                <div class="carousel-caption">
-                    <h5>Lily - Menina-flor (Álbum completo)</h5>
-                </div>
-            </div>
-            <div class="carousel-item ">
-                <div class="video-container">
-                    <iframe id="ytplayer2" src="https://www.youtube.com/embed/2GFfvLVnhD0?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=2GFfvLVnhD0&start=16" allowfullscreen allowtransparency allow="autoplay"></iframe>
-                </div>
-                <div class="carousel-caption">
-                    <h5>Val Donato - Lágrimas de Crocodilo (Clipe Oficial)</h5>
-                </div>
-            </div>
-            <div class="carousel-item ">
-                <div class="video-container">
-                    <iframe id="ytplayer3" src="https://www.youtube.com/embed/PpTlkAa1F0E?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=PpTlkAa1F0E&start=22" allowfullscreen allowtransparency allow="autoplay"></iframe>
-                </div>
-                <div class="carousel-caption">
-                    <h5>ChicoCorrea&ElectronicBand - LELE</h5>
-                </div>
-            </div>
-            <div class="carousel-item ">
-                <div class="video-container">
-                    <iframe id="ytplayer4" src="https://www.youtube.com/embed/ELGUa782Nx0?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=ELGUa782Nx0&start=5" allowfullscreen allowtransparency allow="autoplay"></iframe>
-                </div>
-                <div class="carousel-caption">
-                    <h5>PEDRO FAISSAL & O MEIOFREE - Live Session 2023 (completo)</h5>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <div class="video-container">
-                    <iframe id="ytplayer5" src="https://www.youtube.com/embed/YBKWvPt2omU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=YBKWvPt2omU&start=20" allowfullscreen allowtransparency allow="autoplay"></iframe>
-                </div>
-                <div class="carousel-caption">
-                    <h5>EU NÃO SOU BOA INFLUÊNCIA PRA VOCE - DVD Seu Pereira e Coletivo 401</h5>
-                </div>
-            </div>
-            <div class="carousel-item ">
-                <div class="video-container">
-                    <iframe id="ytplayer6" src="https://www.youtube.com/embed/SpdmtyAYGTQ?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=SpdmtyAYGTQ&start=49" allowfullscreen allowtransparency allow="autoplay"></iframe>
-                </div>
-                <div class="carousel-caption">
-                    <h5>"Às vezes nenhé, mas é." Grupo iNsight dança Rabeca Nervosa de FurmigaDub</h5>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <div class="video-container">
-                    <iframe id="ytplayer7" src="https://www.youtube.com/embed/CjoXcW2BQH4?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=CjoXcW2BQH4&start=32" allowfullscreen allowtransparency allow="autoplay"></iframe>
-                </div>
-                <div class="carousel-caption">
-                    <h5>Tapuia - Outsider (Official Lyric Video)</h5>
-                </div>
-            </div>  
-            <div class="carousel-item">
-                <div class="video-container">
-                    <iframe id="ytplayer8" src="https://www.youtube.com/embed/esFSlvLKsFw?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=esFSlvLKsFw" allowfullscreen allowtransparency allow="autoplay"></iframe>
-                </div>
-                <div class="carousel-caption">
-                    <h5>Banda Odile - Medley (I Will Survive, Maniac, Somebody to Love, I Feel Good, Uptown Funk)</h5>
-                </div>
-            </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="video-container">
+          <iframe id="ytplayer1" src="https://www.youtube.com/embed/9mS5zZfWMSU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=9mS5zZfWMSU&start=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
         </div>
+        <div class="carousel-caption">
+          <h5>Lily - Menina-flor (Álbum completo)</h5>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="video-container">
+          <iframe id="ytplayer2" src="https://www.youtube.com/embed/2GFfvLVnhD0?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=2GFfvLVnhD0&start=16" allowfullscreen allowtransparency allow="autoplay"></iframe>
+        </div>
+        <div class="carousel-caption">
+          <h5>Val Donato - Lágrimas de Crocodilo (Clipe Oficial)</h5>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="video-container">
+          <iframe id="ytplayer3" src="https://www.youtube.com/embed/PpTlkAa1F0E?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=PpTlkAa1F0E&start=22" allowfullscreen allowtransparency allow="autoplay"></iframe>
+        </div>
+        <div class="carousel-caption">
+          <h5>ChicoCorrea&ElectronicBand - LELE</h5>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="video-container">
+          <iframe id="ytplayer4" src="https://www.youtube.com/embed/ELGUa782Nx0?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=ELGUa782Nx0&start=5" allowfullscreen allowtransparency allow="autoplay"></iframe>
+        </div>
+        <div class="carousel-caption">
+          <h5>PEDRO FAISSAL & O MEIOFREE - Live Session 2023 (completo)</h5>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="video-container">
+          <iframe id="ytplayer5" src="https://www.youtube.com/embed/YBKWvPt2omU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=YBKWvPt2omU&start=20" allowfullscreen allowtransparency allow="autoplay"></iframe>
+        </div>
+        <div class="carousel-caption">
+          <h5>EU NÃO SOU BOA INFLUÊNCIA PRA VOCE - DVD Seu Pereira e Coletivo 401</h5>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="video-container">
+          <iframe id="ytplayer6" src="https://www.youtube.com/embed/SpdmtyAYGTQ?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=SpdmtyAYGTQ&start=49" allowfullscreen allowtransparency allow="autoplay"></iframe>
+        </div>
+        <div class="carousel-caption">
+          <h5>"Às vezes nenhé, mas é." Grupo iNsight dança Rabeca Nervosa de FurmigaDub</h5>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="video-container">
+          <iframe id="ytplayer7" src="https://www.youtube.com/embed/CjoXcW2BQH4?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=CjoXcW2BQH4&start=32" allowfullscreen allowtransparency allow="autoplay"></iframe>
+        </div>
+        <div class="carousel-caption">
+          <h5>Tapuia - Outsider (Official Lyric Video)</h5>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="video-container">
+          <iframe id="ytplayer8" src="https://www.youtube.com/embed/esFSlvLKsFw?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=esFSlvLKsFw" allowfullscreen allowtransparency allow="autoplay"></iframe>
+        </div>
+        <div class="carousel-caption">
+          <h5>Banda Odile - Medley (I Will Survive, Maniac, Somebody to Love, I Feel Good, Uptown Funk)</h5>
+        </div>
+      </div>
     </div>
-    <div class="container mt-20 card-columns" id="artistCards">
-        <!-- Os cards dos artistas serão inseridos aqui -->
-    </div>
+  </div>
+  
+  <div class="container mt-20 card-columns" id="artistCards">
+    <!-- Os cards dos artistas serão inseridos aqui -->
+  </div>
 
-<!-- Container para o footer -->
-<div id="footer-placeholder"></div>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script>
-        // Add YouTube Player API script
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    // Add YouTube Player API script
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        // YouTube API ready callback
-        var ytPlayers = [];
-        function onYouTubeIframeAPIReady() {
-            ytPlayers = ['ytplayer1', 'ytplayer2', 'ytplayer3', 'ytplayer4', 'ytplayer5', 'ytplayer6', 'ytplayer7', 'ytplayer8'].map((id) => {
-                return new YT.Player(id, {
-                    events: {
-                        'onReady': onPlayerReady
-                    }
-                });
-            });
-        }
-
-        function onPlayerReady(event) {
-            event.target.mute(); // Mute the video
-            if (event.target.getIframe().closest('.carousel-item').classList.contains('active')) {
-                event.target.playVideo();
-            }
-        }
-
-        // Function to pause the current player
-        function pauseCurrentPlayer(e) {
-            const currentPlayer = e.target.getElementsByTagName('iframe')[$('.carousel-item.active').index()];
-            if (currentPlayer && currentPlayer.contentWindow && currentPlayer.contentWindow.postMessage) {
-                currentPlayer.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-            }
-        }
-
-        // Function to play the next player
-        function playNextPlayer(e) {
-            const nextPlayer = e.target.getElementsByTagName('iframe')[$(e.relatedTarget).index()];
-            if (nextPlayer && nextPlayer.contentWindow && nextPlayer.contentWindow.postMessage) {
-                nextPlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                nextPlayer.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-            }
-        }
-
-        $('#videoCarousel').on('slide.bs.carousel', function (e) {
-            pauseCurrentPlayer(e);
-            playNextPlayer(e);
+    var ytPlayers = [];
+    function onYouTubeIframeAPIReady() {
+      ytPlayers = ['ytplayer1', 'ytplayer2', 'ytplayer3', 'ytplayer4', 'ytplayer5', 'ytplayer6', 'ytplayer7', 'ytplayer8'].map((id) => {
+        return new YT.Player(id, {
+          events: {
+            'onReady': onPlayerReady
+          }
         });
+      });
+    }
 
-        // Load artist data from JSON file
-        fetch('data.json')
-            .then(response => response.json())
-            .then(data => {
-                const artistCards = document.getElementById('artistCards');
-                // Função para randomizar a ordem dos cards
-                function shuffleArray(array) {
-                    for (let i = array.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [array[i], array[j]] = [array[j], array[i]];
-                    }
-                    return array;
-                }
+    function onPlayerReady(event) {
+      event.target.mute();
+      if (event.target.getIframe().closest('.carousel-item').classList.contains('active')) {
+        event.target.playVideo();
+      }
+    }
 
-                // Randomizar a ordem dos artistas
-                data.artistas = shuffleArray(data.artistas);
-                data.artistas.forEach(artista => {
-                    const card = document.createElement('div');
-                    card.className = 'card artist-card';
-                    const cardBody = document.createElement('div');
-                    cardBody.className = 'card-body';
-                    const cardImage = document.createElement('img');
-                    cardImage.src = artista.imagem || 'placeholder-image.png';
-                    cardImage.alt = artista.nome;
-                    cardBody.appendChild(cardImage);
-                    const cardTitle = document.createElement('h2');
-                    cardTitle.className = 'card-title';
-                    cardTitle.textContent = artista.nome;
-                    cardBody.appendChild(cardTitle);
-                    const iconList = document.createElement('div');
-                    iconList.className = 'icon-list';
-                    iconList.innerHTML = `
-                        ${artista.canais.youtube ? `<a href="${artista.canais.youtube}" target="_blank"><i class="fab fa-youtube"></i></a>` : ''}
-                        ${artista.canais.instagram ? `<a href="${artista.canais.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>` : ''}
-                        ${artista.canais.spotify ? `<a href="${artista.canais.spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ''}
-                        ${artista.canais.website ? `<a href="${artista.canais.website}" target="_blank"><i class="fas fa-globe"></i></a>` : ''}
-                        ${artista.contato && artista.contato.whatsapp ? `<a href="https://wa.me/${artista.contato.whatsapp.replace(/\D/g, '')}" target="_blank"><i class="fab fa-whatsapp"></i></a>` : ''}
-                    `;
-                    cardBody.appendChild(iconList);
-                    const cardTextContainer = document.createElement('div');
-                    cardTextContainer.className = 'card-text-container';
-                    const albumsList = document.createElement('ul');
-                    albumsList.className = 'albums-list';
-                    albumsList.innerHTML = artista.albuns ? `<li><strong>Albuns:</strong>${artista.albuns.map(album =>` <br><a href="${album.spotify}" target="_blank">${album.nome} (${album.ano})</a>`).join('')}</li>` : '';
-                    const singlesList = document.createElement('ul');
-                    singlesList.className = 'singles-list';
-                    singlesList.innerHTML = artista.singles ? `<li><strong>Singles:</strong>${artista.singles.map(single =>` <br><a href="${single.spotify}" target="_blank">${single.nome} (${single.ano})</a>`).join('')}</li>` : '';
-                    cardTextContainer.appendChild(albumsList);
-                    cardTextContainer.appendChild(singlesList);
-                    cardBody.appendChild(cardTextContainer);
-                    card.appendChild(cardBody);
-                    artistCards.appendChild(card);
-                });
+    function pauseCurrentPlayer(e) {
+      const currentPlayer = e.target.getElementsByTagName('iframe')[$('.carousel-item.active').index()];
+      if (currentPlayer && currentPlayer.contentWindow && currentPlayer.contentWindow.postMessage) {
+        currentPlayer.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+      }
+    }
+
+    function playNextPlayer(e) {
+      const nextPlayer = e.target.getElementsByTagName('iframe')[$(e.relatedTarget).index()];
+      if (nextPlayer && nextPlayer.contentWindow && nextPlayer.contentWindow.postMessage) {
+        nextPlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        nextPlayer.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+      }
+    }
+
+    $('#videoCarousel').on('slide.bs.carousel', function (e) {
+      pauseCurrentPlayer(e);
+      playNextPlayer(e);
+    });
+
+    // ==============================
+    // Integração com API do Spotify
+    // ==============================
+    const CLIENT_ID = "81fe610cb0784b629af48e2ae0b30fdf";
+    const CLIENT_SECRET = "b6cbe5ba48584b458bb334242b912bb5";
+    const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
+    const SPOTIFY_API_BASE = "https://api.spotify.com/v1/artists/";
+
+    async function getSpotifyToken() {
+      const response = await fetch(SPOTIFY_TOKEN_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `grant_type=client_credentials&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`
+      });
+      const data = await response.json();
+      return data.access_token;
+    }
+
+    async function fetchArtistReleases(artistId, token) {
+      const response = await fetch(`${SPOTIFY_API_BASE}${artistId}/albums?include_groups=album,single&limit=50`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await response.json();
+      return data.items || [];
+    }
+
+    async function fetchArtistDetails(artistId, token) {
+      const response = await fetch(`${SPOTIFY_API_BASE}${artistId}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      return response.json();
+    }
+
+    function isNewRelease(dateString) {
+      let releaseDate = new Date(dateString);
+      if(isNaN(releaseDate)) {
+        return false;
+      }
+      const today = new Date();
+      const diffTime = today - releaseDate;
+      return diffTime < (30 * 24 * 60 * 60 * 1000);
+    }
+
+    function extractSpotifyArtistId(url) {
+      try {
+        const parts = url.split("/");
+        const lastPart = parts[parts.length - 1];
+        const artistId = lastPart.split("?")[0];
+        return artistId;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // ==============================
+    // Carregar dados do JSON e atualizar cards
+    // ==============================
+    document.addEventListener("DOMContentLoaded", async function() {
+      const response = await fetch('data.json');
+      const data = await response.json();
+      const artistCards = document.getElementById('artistCards');
+      
+      // Embaralhar a ordem dos artistas
+      data.artistas.sort(() => Math.random() - 0.5);
+      
+      // Obter token do Spotify uma vez
+      const token = await getSpotifyToken();
+
+      data.artistas.forEach(artista => {
+        const card = document.createElement('div');
+        card.className = 'card artist-card';
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body';
+        
+        // Imagem e título do artista
+        const cardImage = document.createElement('img');
+        // Imagem padrão do JSON enquanto a capa do Spotify é carregada
+        cardImage.src = artista.imagem || 'placeholder-image.png';
+        cardImage.alt = artista.nome;
+        cardBody.appendChild(cardImage);
+        
+        const cardTitle = document.createElement('h2');
+        cardTitle.className = 'card-title';
+        cardTitle.textContent = artista.nome;
+        cardBody.appendChild(cardTitle);
+        
+        // Lista de ícones
+        const iconList = document.createElement('div');
+        iconList.className = 'icon-list';
+        iconList.innerHTML = `
+          ${artista.canais.youtube ? `<a href="${artista.canais.youtube}" target="_blank"><i class="fab fa-youtube"></i></a>` : ''}
+          ${artista.canais.instagram ? `<a href="${artista.canais.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>` : ''}
+          ${artista.canais.spotify ? `<a href="${artista.canais.spotify}" target="_blank"><i class="fab fa-spotify"></i></a>` : ''}
+          ${artista.canais.website ? `<a href="${artista.canais.website}" target="_blank"><i class="fas fa-globe"></i></a>` : ''}
+          ${artista.contato && artista.contato.whatsapp ? `<a href="https://wa.me/${artista.contato.whatsapp.replace(/\D/g, '')}" target="_blank"><i class="fab fa-whatsapp"></i></a>` : ''}
+        `;
+        cardBody.appendChild(iconList);
+        
+        // Container para álbuns e singles
+        const cardTextContainer = document.createElement('div');
+        cardTextContainer.className = 'card-text-container';
+        // Cria dois contêineres: um para Álbuns e outro para Singles
+        const albumsList = document.createElement('div');
+        albumsList.className = 'albums-list';
+        const singlesList = document.createElement('div');
+        singlesList.className = 'singles-list';
+        
+        // Exibir dados estáticos iniciais, se houver
+        if(artista.albuns) {
+          albumsList.innerHTML = `<strong>Álbuns:</strong><ul>${artista.albuns.map(album => {
+            return `<li><a href="${album.spotify}" target="_blank">${album.nome} (${album.ano})</a></li>`;
+          }).join('')}</ul>`;
+        }
+        if(artista.singles) {
+          singlesList.innerHTML = `<strong>Singles:</strong><ul>${artista.singles.map(single => {
+            return `<li><a href="${single.spotify}" target="_blank">${single.nome} (${single.ano})</a></li>`;
+          }).join('')}</ul>`;
+        }
+        cardTextContainer.appendChild(albumsList);
+        cardTextContainer.appendChild(singlesList);
+        cardBody.appendChild(cardTextContainer);
+        card.appendChild(cardBody);
+        artistCards.appendChild(card);
+
+        // Se o artista tiver link do Spotify, atualizar com dados dinâmicos
+        if(artista.canais.spotify) {
+          const artistId = extractSpotifyArtistId(artista.canais.spotify);
+          if(artistId) {
+            // Atualizar o nome do artista com o nome oficial da API
+            fetchArtistDetails(artistId, token).then(artistDetails => {
+              if(artistDetails && artistDetails.name) {
+                cardTitle.textContent = artistDetails.name;
+              }
+            }).catch(err => {
+              console.error("Erro ao buscar detalhes do artista para", artista.nome, err);
             });
-    </script>
-    <script>
-  $(function(){
-    $("#footer-placeholder").load("../footer.html");
-  });
-</script>
+            
+            fetchArtistReleases(artistId, token).then(releases => {
+              if(releases.length > 0) {
+                // Remover duplicatas (comparando nomes ignorando caixa)
+                releases = releases.filter((album, index, self) => 
+                  self.findIndex(a => a.name.toLowerCase() === album.name.toLowerCase()) === index
+                );
+                // Ordenar lançamentos: mais novo primeiro
+                releases.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
+                
+                // Separar em Álbuns e Singles
+                const albumsData = releases.filter(release => release.album_type === "album");
+                const singlesData = releases.filter(release => release.album_type === "single");
+
+                // Atualiza a imagem do card com uma capa aleatória (preferencialmente de um álbum, se existir)
+                let selectedRelease = null;
+                if(albumsData.length > 0) {
+                  selectedRelease = albumsData[Math.floor(Math.random() * albumsData.length)];
+                } else if(singlesData.length > 0) {
+                  selectedRelease = singlesData[Math.floor(Math.random() * singlesData.length)];
+                }
+                if(selectedRelease && selectedRelease.images && selectedRelease.images.length > 0) {
+                  cardImage.src = selectedRelease.images[0].url;
+                }
+                
+                // Montar HTML para Álbuns
+                let albumsHTML = "";
+                if(albumsData.length > 0) {
+                  albumsHTML = `<strong>Álbuns:</strong><ul>` + albumsData.map(release => {
+                    const newBadge = isNewRelease(release.release_date) ? '<span class="badge badge-danger">NOVO</span>' : '';
+                    const releaseYear = release.release_date ? release.release_date.slice(0,4) : '';
+                    return `<li><a href="${release.external_urls.spotify}" target="_blank">${release.name} (${releaseYear}) ${newBadge}</a></li>`;
+                  }).join('') + `</ul>`;
+                }
+                
+                // Montar HTML para Singles
+                let singlesHTML = "";
+                if(singlesData.length > 0) {
+                  singlesHTML = `<strong>Singles:</strong><ul>` + singlesData.map(release => {
+                    const newBadge = isNewRelease(release.release_date) ? '<span class="badge badge-danger">NOVO</span>' : '';
+                    const releaseYear = release.release_date ? release.release_date.slice(0,4) : '';
+                    return `<li><a href="${release.external_urls.spotify}" target="_blank">${release.name} (${releaseYear}) ${newBadge}</a></li>`;
+                  }).join('') + `</ul>`;
+                }
+                
+                // Atualiza os contêineres do card com os lançamentos separados
+                albumsList.innerHTML = albumsHTML;
+                singlesList.innerHTML = singlesHTML;
+              }
+            }).catch(err => {
+              console.error("Erro ao buscar lançamentos do Spotify para", artista.nome, err);
+            });
+          }
+        }
+      });
+    });
+  </script>
 </body>
 </html>
