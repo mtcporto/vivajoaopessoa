@@ -15,13 +15,78 @@ body {
 
 /* Carousel Styles */
 .carousel-video {
-    height: 383px;
+    position: relative; /* Permite que .carousel-indicators e .carousel-control-* fiquem sobre o vídeo */
     width: 100%;
     max-width: 1116px;
     margin: 0 auto;
-    border-radius: 15px;
+    border-radius: 10px;
     overflow: hidden;
-}
+    height: 365px; /* Se você realmente quer fixar essa altura */
+  }
+  
+  /* Botões de navegação (anterior/próximo) */
+  .carousel-video .carousel-control-prev,
+  .carousel-video .carousel-control-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 40px;       /* Ajuste conforme desejar */
+    height: 40px;      /* Ajuste conforme desejar */
+    background: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    color: #fff;
+    border: none;
+  }
+  
+  .carousel-video .carousel-control-prev {
+    left: 15px;
+  }
+  
+  .carousel-video .carousel-control-next {
+    right: 15px;
+  }
+  
+  /* Indicadores (bolinhas) */
+  .carousel-video .carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    margin: 0; /* Remova margens padrão do Bootstrap, se quiser centralizar melhor */
+    padding: 0;
+    list-style: none;
+  }
+  
+  .carousel-video .carousel-indicators li {
+    background-color: #999;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0 5px; /* Espaçamento horizontal entre as bolinhas */
+    cursor: pointer;
+  }
+  
+  .carousel-video .carousel-indicators .active {
+    background-color: #fff; /* Destaque para a bolinha ativa */
+  }
+  
+  /* Ajustes no .carousel-inner e .carousel-item */
+  .carousel-inner {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .carousel-item {
+    width: 100%;
+    height: 100%;
+  }
+  
+  
+  
 
 .carousel-inner {
     width: 100%;
@@ -59,11 +124,6 @@ body {
     display: none;
 }
 
-.carousel-control-prev,
-.carousel-control-next {
-    top: 50%;
-    display: block; /* Exibe os controles de navegação */
-}
 
 /* Card Styles */
 .card {
@@ -184,6 +244,11 @@ body {
     }
 
     .carousel-video {
+        height: 365px;
         width: 100%;
+        max-width: 1116px;
+        margin: 0 auto;
+        border-radius: 10px;
+        overflow: hidden;
     }
 }
