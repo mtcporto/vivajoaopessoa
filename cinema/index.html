@@ -445,32 +445,39 @@
               sessionsContainer.appendChild(movieElement);
             }
   
-            // Popula o carousel usando os mesmos filmes
-            const featuredCarouselInner = document.getElementById('featuredCarouselInner');
-            const indicators = document.getElementById('carouselIndicators');
-            let indicatorIndex = 0;
-            for (let movieId in movies) {
-              // Se o filme não tiver imagem horizontal, não adiciona ao carousel
-              if (!movies[movieId].images || !movies[movieId].images.find(img => img.type === "PosterHorizontal")) {
-                continue;
-              }
-              const slide = createFeaturedMovieSlide(movies[movieId]);
-              if (!slide) continue;
+ // Popula o carousel usando os mesmos filmes
+const featuredCarouselInner = document.getElementById('featuredCarouselInner');
+const indicators = document.getElementById('carouselIndicators');
+let slideIndex = 0;
+for (let movieId in movies) {
+  // Se o filme não tiver imagem horizontal, ignora-o
+  if (!movies[movieId].images || !movies[movieId].images.find(img => img.type === "PosterHorizontal")) {
+    continue;
+  }
+  const slide = createFeaturedMovieSlide(movies[movieId]);
+  if (!slide) continue;
   
-              if (indicatorIndex === 0) {
-                slide.classList.add('active');
-              }
-              featuredCarouselInner.appendChild(slide);
-  
-              // Cria indicador para esse slide
-              const li = document.createElement('li');
-              li.setAttribute('data-target', '#featuredMovieCarousel');
-              li.setAttribute('data-slide-to', indicatorIndex);
-              if (indicatorIndex === 0) li.classList.add('active');
-              indicators.appendChild(li);
-  
-              indicatorIndex++;
-            }
+  // Não define nenhum slide como ativo aqui
+  featuredCarouselInner.appendChild(slide);
+
+  // Cria o indicador para esse slide
+  const li = document.createElement('li');
+  li.setAttribute('data-target', '#featuredMovieCarousel');
+  li.setAttribute('data-slide-to', slideIndex);
+  indicators.appendChild(li);
+
+  slideIndex++;
+}
+
+// Após criar todos os slides, escolhe um aleatoriamente para ser o ativo
+if (slideIndex > 0) {
+  const slides = featuredCarouselInner.querySelectorAll('.carousel-item');
+  const indicatorItems = indicators.querySelectorAll('li');
+  const randomIndex = Math.floor(Math.random() * slides.length);
+  slides[randomIndex].classList.add('active');
+  indicatorItems[randomIndex].classList.add('active');
+}
+
           });
         } else {
           console.error('Dados de cinema não encontrados');
