@@ -80,14 +80,15 @@ $(document).ready(function() {
         try {
             const data = await $.get(url);
             const event = $(data).find("event").text();
-            const onset = $(data).find("onset").text();
+            
+            const sent = $(data).find("sent").text();
             const expires = $(data).find("expires").text();
-
-            const onsetDate = new Date(onset);
+            
+            const sentDate = new Date(sent);
             const expiresDate = new Date(expires);
             const now = new Date();
-
-            if (onsetDate <= now && expiresDate >= now) {
+            
+            if (sentDate <= now && expiresDate >= now) {
                 let colorRisk = "";
                 let municipios = "";
 
@@ -100,9 +101,10 @@ $(document).ready(function() {
                         municipios = value;
                     }
                 });
+                // console.log(municipios.trim().toLowerCase().includes("joão pessoa - pb"));
 
-                    // if (municipios.trim().toLowerCase().includes("Acajutiba - BA")) {
-
+                    //  if (municipios.trim().toLowerCase().includes("ariquemes - ro")) {
+                   //     manter o nome do muncipio em letras minusculas, caso contrário, nao funciona. 
                     if (municipios.trim().toLowerCase().includes("joão pessoa - pb")) {
                         console.log("Alerta encontrado!");
 
