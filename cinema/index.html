@@ -4,106 +4,174 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Filmes em cartaz</title>
-<!-- CSS do Bootstrap -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.plyr.io/3.6.9/plyr.css" />
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">  
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  
-  
+  <!-- CSS do Bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <!-- Plyr CSS -->
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.6.9/plyr.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <style>
-body {
-    font-family: Arial, sans-serif;
-    padding-bottom: 10px;
-    background-color: #F5F5DC; /* Cor de fundo offwhite */
-}
-/* Header styles */
-header {
-  background-color: #000;
-  color: #fff;
-  padding: 10px;
-  text-align: center;
-  margin-bottom: 20px; /* Espaçamento entre o header e os cards */
-}
+    /* Carousel de destaque */
+    .carousel-video {
+      position: relative;
+      width: 100%;
+      max-width: 1116px;
+      margin: 20px auto;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 365px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    /* Indicadores do carousel */
+    .carousel-indicators li {
+      background-color: #fff;
+    }
+    /* Eleva os controles para ficarem clicáveis */
+    .carousel-control-prev,
+    .carousel-control-next {
+      z-index: 10;
+    }
+    .featured-movie-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .featured-movie-card img {
+      width: 100%;
+      height: 365px;
+      object-fit: cover;
+    }
+    .featured-info {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      color: #fff;
+      z-index: 2;
+    }
+    .featured-info .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.8), transparent);
+      z-index: 1;
+    }
+    .featured-info .content {
+      position: relative;
+      z-index: 2;
+      text-align: left; /* Título e demais informações centralizadas */
+      top: -120px;
+    }
+    .featured-info .content .title {
+      text-align: left;
+      margin-bottom: 10px;
+      white-space: nowrap;
+      /* Removido white-space: nowrap para permitir quebra de linha */
+    }
+    .sessions-container {
+      max-width: 1116px;
+      margin: 20px auto;
+    }
+    /* Estilos dos cards pequenos e gerais */
+    body {
+      font-family: Inter, sans-serif;
+      font-weight: 400;
+      background-color: #F5F5DC;
+      padding-bottom: 10px;
+    }
+    header {
+      background-color: #000;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
     .event-container {
-        border: none;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        margin-bottom: 20px;
-        display: inline-block;
-        text-align: center;
-        background-color: #fff;
+      border: none;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+      display: inline-block;
+      text-align: center;
+      background-color: #fff;
     }
     .event-image {
-    width: 300px;
-    height: auto;
-    cursor: pointer;
-    overflow: visible; /* Add this */
+      width: 300px;
+      height: auto;
+      cursor: pointer;
+      overflow: visible;
     }
     @media only screen and (max-width: 400px) {
-    .event-image {
-    width: 300px !important; /* Add !important to override other styles */
-    }
+      .event-image {
+        width: 300px !important;
+      }
     }
     .event-title {
-        font-size: 18px;
-        text-align: center;
-    }
-    .icons-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 10px;
-    }
-    .icon {
-        width: 20px;
-        height: 20px;
-        margin: 0 5px;
-    }
-    .event-container:not(:last-child) {
-        margin-right: 10px;
+      font-size: 18px;
+      text-align: center;
     }
     #eventContainer {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
     }
     .badge {
-  font-size: 16px; /* Adjust as needed */
+      font-size: 16px;
     }
     .card.top-level {
-      width: 350px; /* Ajuste para o valor desejado */
-      margin: 10px; /* Adiciona algum espaço ao redor dos cards */
-      display: inline-block; /* Faz os cards se alinharem lado a lado */
-      margin-left: 50px; /* Adiciona uma margem à esquerda de 50px */
-      margin-right: 50px; /* Adiciona uma margem à esquerda de 50px */
-
+      width: 350px;
+      margin: 10px;
+      display: inline-block;
     }
     .card-container {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 50px; /* Espaço entre os cards */
+      gap: 50px;
     }
     .badge-orange {
-      color: #fff; /* Cor do texto */
-      background-color: #ff7f00; /* Cor de fundo */
+      color: #fff;
+      background-color: #ff7f00;
     }
-    /* Estilos para telas grandes (desktops, laptops) */
     @media (min-width: 992px) {
       .accordion {
-        display: none; /* Oculta o acordeão */
+        display: none;
       }
     }
-</style>
+  </style>
 </head>
 <body>
   <header>
     <h1>Filmes em cartaz</h1>
-    </header>
+  </header>
   <main>
     <div class="card-container">
-      <section class="sessions-container"></section>      
+      <!-- Carousel de Filmes em Destaque -->
+      <div id="featuredMovieCarousel" class="carousel slide carousel-video" data-ride="carousel" data-interval="10000">
+        <!-- Indicadores (serão preenchidos via JS) -->
+        <ol class="carousel-indicators" id="carouselIndicators"></ol>
+        <!-- Contêiner para os slides -->
+        <div class="carousel-inner" id="featuredCarouselInner"></div>
+        <a class="carousel-control-prev" href="#featuredMovieCarousel" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Anterior</span>
+        </a>
+        <a class="carousel-control-next" href="#featuredMovieCarousel" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Próximo</span>
+        </a>
+      </div>
+      <!-- Cards pequenos (populados via JS) -->
+      <section class="sessions-container" id="eventContainer"></section>
     </div>
   </main>
   <div class="modal fade" id="trailerModal" tabindex="-1" role="dialog" aria-labelledby="trailerModalLabel" aria-hidden="true">
@@ -117,21 +185,322 @@ header {
       </div>
     </div>
   </div>
-
-<!-- Container para o footer -->
-<div id="footer-placeholder"></div>
-
-<script>
-  $(function(){
-    $("#footer-placeholder").load("../footer.html");
-  });
-</script>  
   
-<script src="https://cdn.plyr.io/3.6.9/plyr.polyfilled.js"></script>  
-<!-- JS do Bootstrap e suas dependências (jQuery e Popper.js) -->
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script src="sessoes.js"></script>
+  <!-- Scripts: Plyr, jQuery, Popper, Bootstrap -->
+  <script src="https://cdn.plyr.io/3.6.9/plyr.polyfilled.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  
+  <!-- Seu arquivo de sessões (sessoes.js) -->
+  <script>
+    // Função global para definir a cor do badge de rating
+    function getBadgeColor(rating) {
+      switch (rating) {
+        case 'Livre': return 'badge-success';
+        case '10 anos': return 'badge-primary';
+        case '12 anos': return 'badge-warning';
+        case '14 anos': return 'badge-orange';
+        case '16 anos': return 'badge-danger';
+        case '18 anos': return 'badge-dark';
+        default: return 'badge-secondary';
+      }
+    }
+  
+    // Função para criar o slide de destaque usando imagem horizontal
+    function createFeaturedMovieSlide(movieData) {
+      // Se o filme não possuir imagem horizontal, retorna null para que possamos ignorá-lo
+      if (!movieData.images || !movieData.images.find(img => img.type === "PosterHorizontal")) {
+        return null;
+      }
+  
+      const carouselItem = document.createElement('div');
+      carouselItem.classList.add('carousel-item');
+  
+      const featuredCard = document.createElement('div');
+      featuredCard.classList.add('featured-movie-card', 'position-relative');
+  
+      const horizontalImage = movieData.images.find(img => img.type === "PosterHorizontal");
+  
+      const img = document.createElement('img');
+      img.src = horizontalImage ? horizontalImage.url : '';
+      img.alt = movieData.title + ' (Poster Horizontal)';
+      img.style.width = '100%';
+      img.style.height = '365px';
+      img.style.objectFit = 'cover';
+      featuredCard.appendChild(img);
+  
+      const featuredInfo = document.createElement('div');
+      featuredInfo.classList.add('featured-info');
+  
+      const overlay = document.createElement('div');
+      overlay.classList.add('overlay');
+  
+      const content = document.createElement('div');
+      content.classList.add('content');
+  
+      // Título centralizado (o CSS já força text-align: center)
+      const titleH2 = document.createElement('h2');
+      titleH2.classList.add('title');
+      titleH2.textContent = movieData.title;
+      content.appendChild(titleH2);
+  
+      // Informações: classificação, gêneros e duração
+      const infoP = document.createElement('p');
+      infoP.classList.add('card-text');
+  
+      let ratingSpan = '';
+      if (movieData.contentRating) {
+        ratingSpan = `<span class="badge ${getBadgeColor(movieData.contentRating)}">${movieData.contentRating}</span>`;
+      }
+      let genresText = '';
+      if (movieData.genres && movieData.genres.length > 0) {
+        genresText = movieData.genres.join(', ');
+      }
+      let durationText = '';
+      if (movieData.duration) {
+        durationText = movieData.duration + ' min.';
+      }
+  
+      infoP.innerHTML = `${ratingSpan} ${genresText} - ${durationText}`.trim();
+      content.appendChild(infoP);
+  
+      featuredInfo.appendChild(overlay);
+      featuredInfo.appendChild(content);
+      featuredCard.appendChild(featuredInfo);
+      carouselItem.appendChild(featuredCard);
+  
+      return carouselItem;
+    }
+  
+    // Função para criar os cards pequenos
+    function createMovieElement(movieId, movieData) {
+      const movieElement = document.createElement('div');
+      movieElement.classList.add('card', 'top-level');
+      
+      if (movieData.images && movieData.images.length > 0) {
+        const movieImageLink = document.createElement('a');
+        movieImageLink.href = movieData.siteURL;
+        movieImageLink.target = '_blank';
+  
+        const movieImage = document.createElement('img');
+        const verticalImage = movieData.images.find(img => img.type === "PosterPortrait") || movieData.images[0];
+        movieImage.src = verticalImage.url;
+        movieImage.alt = movieData.title;
+        movieImage.style.width = '350px';
+        movieImage.classList.add('card-img-top');
+  
+        movieImageLink.appendChild(movieImage);
+        movieElement.appendChild(movieImageLink);
+      }
+      
+      const cardBody = document.createElement('div');
+      cardBody.classList.add('card-body');
+      movieElement.appendChild(cardBody);
+      
+      const movieTitle = document.createElement('h5');
+      movieTitle.textContent = movieData.title;
+      movieTitle.classList.add('card-title');
+      cardBody.appendChild(movieTitle);
+  
+      const movieDetails = document.createElement('p');
+      movieDetails.classList.add('card-text');
+      cardBody.appendChild(movieDetails);
+  
+      const movieRating = document.createElement('span');
+      movieRating.textContent = movieData.contentRating;
+      movieRating.classList.add('badge', getBadgeColor(movieData.contentRating));
+      movieDetails.appendChild(movieRating);
+  
+      movieDetails.appendChild(document.createTextNode(` ${movieData.genres.join(', ')} - ${movieData.duration} min.`));
+  
+      if (movieData.trailers && movieData.trailers.length > 0) {
+        const trailerButton = document.createElement('button');
+        trailerButton.innerHTML = '<i class="fa-solid fa-play"></i> Trailer';
+        trailerButton.classList.add('btn', 'btn-primary');
+  
+        var trailerUrl = movieData.trailers[0].embeddedUrl;
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+          trailerButton.onclick = function() {
+            window.location.href = trailerUrl;
+          };
+        } else {
+          trailerButton.dataset.toggle = 'modal';
+          trailerButton.dataset.target = '#trailerModal';
+          trailerButton.dataset.trailer = trailerUrl;
+        }
+  
+        trailerButton.style.marginBottom = '20px';
+        cardBody.appendChild(trailerButton);
+      }
+  
+      const accordion = document.createElement('div');
+      accordion.classList.add('accordion');
+      accordion.id = `accordion${movieId}`;
+      cardBody.appendChild(accordion);
+  
+      let cinemaId = 0;
+      for (let cinema in movieData.cinemas) {
+        const cinemaCard = document.createElement('div');
+        cinemaCard.classList.add('card');
+        accordion.appendChild(cinemaCard);
+  
+        const cinemaHeader = document.createElement('div');
+        cinemaHeader.classList.add('card-header');
+        cinemaHeader.id = `heading${movieId}${cinemaId}`;
+        cinemaCard.appendChild(cinemaHeader);
+  
+        const cinemaButton = document.createElement('button');
+        cinemaButton.classList.add('btn', 'btn-link');
+        cinemaButton.type = 'button';
+        cinemaButton.dataset.toggle = 'collapse';
+        cinemaButton.dataset.target = `#collapse${movieId}${cinemaId}`;
+        cinemaButton.textContent = cinema;
+        cinemaHeader.appendChild(cinemaButton);
+  
+        const cinemaCollapse = document.createElement('div');
+        cinemaCollapse.id = `collapse${movieId}${cinemaId}`;
+        cinemaCollapse.classList.add('collapse');
+        cinemaCollapse.dataset.parent = `#accordion${movieId}`;
+        cinemaCard.appendChild(cinemaCollapse);
+  
+        const cinemaBody = document.createElement('div');
+        cinemaBody.classList.add('card-body');
+        cinemaCollapse.appendChild(cinemaBody);
+  
+        movieData.cinemas[cinema].forEach(room => {
+          const roomName = document.createElement('h5');
+          roomName.textContent = room.name;
+          cinemaBody.appendChild(roomName);
+  
+          room.sessions.forEach(session => {
+            const sessionDetails = document.createElement('p');
+            sessionDetails.classList.add('session-details');
+            sessionDetails.textContent = `${session.date} - ${session.time} - ${session.type}`;
+            cinemaBody.appendChild(sessionDetails);
+          });
+        });
+  
+        cinemaId++;
+      }
+  
+      return movieElement;
+    }
+  
+    // Agora, usamos o mesmo objeto 'movies' (criado a partir das sessões) para alimentar
+    // tanto os cards pequenos quanto o carousel.
+    const cityId = 32;
+    const urlCinemas = `https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/theaters/city/${cityId}?partnership=marcotulio`;
+  
+    let movies = {};
+  
+    fetch(urlCinemas)
+      .then(response => response.json())
+      .then(data => {
+        console.log("Dados de cinema recebidos:", data);
+  
+        if (data) {
+          let promises = data.map(cinema => {
+            const theaterId = cinema.id;
+            const urlSessions = `https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/sessions/city/${cityId}/theater/${theaterId}?partnership=marcotulio`;
+            return fetch(urlSessions)
+              .then(response => response.json())
+              .then(sessionData => {
+                if (sessionData && sessionData[0] && sessionData[0].movies) {
+                  sessionData[0].movies.forEach(movie => {
+                    if (!movies[movie.id]) {
+                      movies[movie.id] = {
+                        title: movie.title,
+                        images: movie.images,
+                        duration: movie.duration,
+                        contentRating: movie.contentRating,
+                        genres: movie.genres,
+                        siteURL: movie.siteURL,
+                        trailers: movie.trailers,
+                        cinemas: {}
+                      };
+                    }
+                    movies[movie.id].cinemas[cinema.name] = movie.rooms.map(room => ({
+                      name: room.name,
+                      sessions: room.sessions.map(session => ({
+                        date: session.date.dayAndMonth,
+                        time: session.time,
+                        type: session.types[0].name,
+                      }))
+                    }));
+                  });
+                } else {
+                  console.error('Dados de sessão não encontrados');
+                }
+              })
+              .catch(error => console.error('Erro ao obter sessões:', error));
+          });
+  
+          Promise.all(promises).then(() => {
+            // Popula os cards pequenos
+            const sessionsContainer = document.getElementById('eventContainer');
+            for (let movieId in movies) {
+              const movieElement = createMovieElement(movieId, movies[movieId]);
+              sessionsContainer.appendChild(movieElement);
+            }
+  
+            // Popula o carousel usando os mesmos filmes
+            const featuredCarouselInner = document.getElementById('featuredCarouselInner');
+            const indicators = document.getElementById('carouselIndicators');
+            let indicatorIndex = 0;
+            for (let movieId in movies) {
+              // Se o filme não tiver imagem horizontal, não adiciona ao carousel
+              if (!movies[movieId].images || !movies[movieId].images.find(img => img.type === "PosterHorizontal")) {
+                continue;
+              }
+              const slide = createFeaturedMovieSlide(movies[movieId]);
+              if (!slide) continue;
+  
+              if (indicatorIndex === 0) {
+                slide.classList.add('active');
+              }
+              featuredCarouselInner.appendChild(slide);
+  
+              // Cria indicador para esse slide
+              const li = document.createElement('li');
+              li.setAttribute('data-target', '#featuredMovieCarousel');
+              li.setAttribute('data-slide-to', indicatorIndex);
+              if (indicatorIndex === 0) li.classList.add('active');
+              indicators.appendChild(li);
+  
+              indicatorIndex++;
+            }
+          });
+        } else {
+          console.error('Dados de cinema não encontrados');
+        }
+      })
+      .catch(error => console.error('Erro ao obter cinemas:', error));
+  
+    // Configuração do modal para trailer usando jQuery e Plyr
+    $(document).ready(function() {
+      var player;
+    
+      $('#trailerModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var trailerUrl = 'https:' + button.data('trailer');
+    
+        var modal = $(this);
+        var trailerIframe = modal.find('#trailer');
+        trailerIframe.attr('src', trailerUrl);
+    
+        player = Plyr.setup(trailerIframe.get(0));
+      });
+    
+      $('#trailerModal').on('hide.bs.modal', function (event) {
+        var modal = $(this);
+        modal.find('#trailer').attr('src', '');
+    
+        if (player) {
+          player.destroy();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
