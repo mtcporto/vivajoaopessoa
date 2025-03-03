@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconhecimento Facial com Face API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <style>
+        #recognitionMessage {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .recognized {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .not-recognized {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #video { display: none; }
+        #canvas {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 20px;
+        }
+        .container { max-width: 640px; }
+        .face-controls {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        #faceList {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .face-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 4px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="container mt-5">
+    <div id="status" class="status" style="display: none;">Carregando modelos...</div>
+    <h1 class="text-center">Reconhecimento Facial com Face API</h1>
+
+    <div class="text-center">
+        <canvas id="canvas" willReadFrequently="true"></canvas>
+        <video id="video" autoplay playsinline></video>
+        <div id="recognitionMessage" class="mt-3"></div>
+    
+        <div class="face-controls">
+            <h3>Cadastro de Faces</h3>
+            <div class="mb-3">
+                <label for="imageUpload" class="form-label">Enviar Imagem:</label>
+                <input class="form-control" type="file" id="imageUpload" accept="image/*">
+            </div>
+            <div class="input-group mb-3">
+                <input type="text" id="personName" class="form-control" placeholder="Nome da pessoa">
+                <button id="captureFace" class="btn btn-success">Cadastrar Face</button>
+            </div>
+            <div id="faceList"></div>
+            <div id="cadastroStatus" class="status" style="display: none;"></div>
+        </div>
+    </div>
+    <script>
+const imageUpload = document.getElementById('imageUpload');
+
+imageUpload.addEventListener('change', async () => {
+    const file = imageUpload.files[0];
+    if (!file) {
+        return;
+    }
+
+    const img = await faceapi.bufferToImage(file);
+    document.body.append(img)
+    showStatus('Processando imagem...');
+
+    try {
+        const detections = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptors();
+
+        if (detections.length > 0) {
+            const name = personNameInput.value.trim();
+            if (!name) {
+                showStatus('Por favor, digite um nome para a pessoa.');
+                return;
+            }
+
+            const descriptor = detections[0].descriptor;
+
+            const existingIndex = labeledFaceDescriptors.findIndex(fd => fd.label === name);
+            if (existingIndex >= 0) {
+                labeledFaceDescriptors[existingIndex] = new faceapi.LabeledFaceDescriptors(name, [descriptor]);
+                Array.from(faceList.children).forEach(item => {
+                    if (item.querySelector('span').textContent === name) {
+                        item.remove();
+                    }
+                });
+            } else {
+                labeledFaceDescriptors.push(new faceapi.LabeledFaceDescriptors(name, [descriptor]));
+            }
+
+            updateFaceMatcher();
+
+            const faceItem = document.createElement('div');
+            faceItem.className = 'face-item';
+            faceItem.innerHTML = `
+                <span>${name}</span>
+                <button class="btn btn-danger btn-sm" onclick="removeFace('${name}', this.parentElement)">Remover</button>
+            `;
+            faceList.appendChild(faceItem);
+            personNameInput.value = '';
+
+            showStatus('Face cadastrada com sucesso a partir da imagem!');
+            // Tenta reconhecer a face recém-cadastrada
+            detectFaces();
+
+            img.remove()
+        } else {
+            showStatus('Nenhuma face detectada na imagem. Tente outra.');
+        }
+    } catch (error) {
+        console.error('Erro ao processar imagem:', error);
+        showStatus('Erro ao processar imagem. Tente novamente.');
+    }
+});
+
+const MODELS_PATH = './models/';
+const FACE_MATCH_THRESHOLD = 0.6;
+
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+const video = document.getElementById('video');
+const captureFaceButton = document.getElementById('captureFace');
+const personNameInput = document.getElementById('personName');
+const faceList = document.getElementById('faceList');
+const statusElement = document.getElementById('status');
+const recognitionMessageElement = document.getElementById('recognitionMessage');
+
+let currentStream = null;
+let faceApiReady = false;
+let isProcessing = false;
+let labeledFaceDescriptors = [];
+let faceMatcher = null;
+let recognitionTimer = null;
+
+const cadastroStatusElement = document.getElementById('cadastroStatus');
+
+function showStatus(message) {
+    cadastroStatusElement.textContent = message;
+    cadastroStatusElement.style.display = 'block';
+}
+
+function hideStatus() {
+    cadastroStatusElement.style.display = 'none';
+}
+
+function updateFaceMatcher() {
+    if (labeledFaceDescriptors.length > 0) {
+        faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, FACE_MATCH_THRESHOLD);
+        console.log("Face matcher atualizado com:", labeledFaceDescriptors.map(ld => ld.label));
+    } else {
+        faceMatcher = null;
+    }
+}
+
+function removeFace(name, element) {
+    labeledFaceDescriptors = labeledFaceDescriptors.filter(fd => fd.label !== name);
+    updateFaceMatcher();
+    element.remove();
+}
+
+function showRecognitionMessage(message, isRecognized) {
+    recognitionMessageElement.textContent = message;
+    recognitionMessageElement.classList.remove('recognized', 'not-recognized');
+    
+    if (isRecognized === true) {
+        recognitionMessageElement.classList.add('recognized');
+    } else if (isRecognized === false) {
+        recognitionMessageElement.classList.add('not-recognized');
+    }
+    
+    // Limpar temporizador anterior se existir
+    if (recognitionTimer) {
+        clearTimeout(recognitionTimer);
+    }
+    
+    // Configura um novo temporizador para limpar a mensagem após 5 segundos
+    recognitionTimer = setTimeout(() => {
+        recognitionMessageElement.textContent = '';
+        recognitionMessageElement.classList.remove('recognized', 'not-recognized');
+    }, 5000);
+}
+
+captureFaceButton.addEventListener('click', captureFace);
+
+async function loadFaceApiModels() {
+    showStatus('Carregando modelos de reconhecimento facial...');
+    try {
+        window.removeFace = removeFace;
+
+        await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODELS_PATH),
+            faceapi.nets.faceLandmark68Net.loadFromUri(MODELS_PATH),
+            faceapi.nets.faceRecognitionNet.loadFromUri(MODELS_PATH)
+        ]);
+
+        faceApiReady = true;
+        console.log('Modelos Face-API carregados!');
+    } catch (error) {
+        console.error('Erro ao carregar modelos Face-API:', error);
+        alert(`Erro ao carregar modelos faciais: ${error.message}. Verifique se os modelos estão na pasta: ${MODELS_PATH}`);
+        throw error;
+    }
+}
+
+async function startCamera() {
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+    }
+
+    try {
+        const constraints = {
+            video: {
+                facingMode: "user",
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            }
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        currentStream = stream;
+
+        video.onloadedmetadata = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            console.log(`Canvas dimensionado para: ${canvas.width}x${canvas.height}`);
+        };
+
+        return new Promise((resolve) => {
+            video.onloadeddata = resolve;
+        });
+    } catch (err) {
+        console.error("Erro ao acessar a webcam: ", err);
+        alert('Erro ao acessar a câmera. Verifique as permissões.');
+    }
+}
+
+async function captureFace() {
+    if (!faceApiReady) {
+        alert('Os modelos de reconhecimento facial ainda não foram carregados.');
+        return;
+    }
+
+    if (!personNameInput.value.trim()) {
+        alert('Por favor, digite um nome para a pessoa');
+        return;
+    }
+
+    showStatus('Capturando face...');
+
+    try {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const detections = await faceapi.detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptors();
+
+        if (detections.length > 0) {
+            const name = personNameInput.value.trim();
+            const descriptor = detections[0].descriptor;
+
+            const existingIndex = labeledFaceDescriptors.findIndex(fd => fd.label === name);
+            if (existingIndex >= 0) {
+                labeledFaceDescriptors[existingIndex] = new faceapi.LabeledFaceDescriptors(name, [descriptor]);
+                Array.from(faceList.children).forEach(item => {
+                    if (item.querySelector('span').textContent === name) {
+                        item.remove();
+                    }
+                });
+            } else {
+                labeledFaceDescriptors.push(new faceapi.LabeledFaceDescriptors(name, [descriptor]));
+            }
+
+            updateFaceMatcher();
+
+            const faceItem = document.createElement('div');
+            faceItem.className = 'face-item';
+            faceItem.innerHTML = `
+                <span>${name}</span>
+                <button class="btn btn-danger btn-sm" onclick="removeFace('${name}', this.parentElement)">Remover</button>
+            `;
+            faceList.appendChild(faceItem);
+            personNameInput.value = '';
+
+            // Desenha um retângulo na face capturada para feedback
+            const box = detections[0].detection.box;
+            context.strokeStyle = 'green';
+            context.lineWidth = 2;
+            context.strokeRect(box.x, box.y, box.width, box.height);
+
+            showStatus('Face cadastrada com sucesso!');
+            showRecognitionMessage(`Face de ${name} cadastrada com sucesso!`, true);
+
+            // Tenta reconhecer a face recém-cadastrada
+            detectFaces();
+        } else {
+            showStatus('Nenhuma face detectada! Posicione o rosto no centro da câmera.');
+            showRecognitionMessage('Nenhuma face detectada! Posicione o rosto no centro da câmera.', false);
+        }
+    } catch (error) {
+        console.error('Erro ao capturar face:', error);
+        showStatus('Erro ao capturar face. Tente novamente.');
+    }
+}
+
+let lastRecognizedName = null;
+let lastRecognitionTime = null;
+
+async function detectFaces() {
+    if (!faceApiReady || isProcessing) {
+        requestAnimationFrame(detectFaces);
+        return;
+    }
+
+    isProcessing = true;
+
+    try {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const detections = await faceapi.detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptors();
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        if (detections.length > 0) {
+            detections.forEach(detection => {
+                const box = detection.detection.box;
+                const drawBox = new faceapi.draw.DrawBox(box, { label: 'Detectando...' });
+                drawBox.draw(canvas);
+
+                if (faceMatcher) {
+                    const match = faceMatcher.findBestMatch(detection.descriptor);
+                    const label = match.label;
+
+                    if (label === 'unknown') {
+                        // Se o usuário é diferente do último reconhecido
+                        if (lastRecognizedName !== 'unknown') {
+                            const now = new Date();
+                            const timestamp = now.toLocaleString();
+                            showRecognitionMessage(`Usuário não reconhecido em ${timestamp}.`, false);
+                            lastRecognizedName = 'unknown';
+                            lastRecognitionTime = now;
+                        }
+                    } else {
+                        // Verifica se o nome é diferente do último reconhecido ou se não há timestamp
+                        if (label !== lastRecognizedName || !lastRecognitionTime) {
+                            const now = new Date();
+                            const timestamp = now.toLocaleString();
+                            showRecognitionMessage(`Usuário ${label} reconhecido em ${timestamp}.`, true);
+                            lastRecognizedName = label;
+                            lastRecognitionTime = now;
+                        }
+                    }
+
+                    const drawBox = new faceapi.draw.DrawBox(box, { 
+                        label: label,
+                        boxColor: label === 'unknown' ? 'red' : 'green'
+                    });
+                    drawBox.draw(canvas);
+                    console.log(match);
+                }
+            });
+        } else {
+            // Se não há detecção por um tempo, limpar o último reconhecimento
+            if (lastRecognizedName) {
+                const now = new Date();
+                // Se passaram mais de 2 segundos sem rosto detectado
+                if (!lastRecognitionTime || (now - lastRecognitionTime) > 2000) {
+                    lastRecognizedName = null;
+                    lastRecognitionTime = null;
+                }
+            }
+        }
+
+    } catch (error) {
+        console.error("Erro na detecção:", error);
+    }
+
+    isProcessing = false;
+    requestAnimationFrame(detectFaces);
+}
+
+async function init() {
+    showStatus('Inicializando...');
+
+    try {
+        await loadFaceApiModels();
+        await startCamera();
+        detectFaces();
+        hideStatus();
+    } catch (error) {
+        console.error("Erro ao inicializar:", error);
+        showStatus('Erro ao inicializar: ' + error.message);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
