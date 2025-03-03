@@ -1,18 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detecção de Objetos com Reconhecimento Facial</title>
+    <title>Detecção de Objetos com Contagem Acumulativa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     <style>
-        #video {
-            display: none;
-        }
+        #video { display: none; }
         #canvas {
             width: 100%;
             max-width: 640px;
@@ -22,383 +18,425 @@
             display: block;
             margin: 0 auto;
         }
-        .container {
-            max-width: 640px;
-        }
-        .controls {
-            margin-top: 15px;
-            text-align: center;
-        }
-        .confidence-label {
-            margin: 10px 0;
-            font-weight: bold;
-        }
-        .face-controls {
+        .container { max-width: 640px; }
+        .controls { margin-top: 15px; text-align: center; }
+        .confidence-label { margin: 10px 0; font-weight: bold; }
+        .counts-container {
+            display: flex;
+            justify-content: space-around;
             margin-top: 20px;
-            padding: 15px;
+        }
+        .count-box {
             border: 1px solid #ddd;
             border-radius: 8px;
+            padding: 15px;
+            width: 48%;
         }
-        #faceList {
-            margin-top: 10px;
-            max-height: 200px;
+        .count-box h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .count-list {
+            max-height: 300px;
             overflow-y: auto;
         }
-        .face-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px;
-            margin: 5px 0;
-            background: #f8f9fa;
-            border-radius: 4px;
+        .button-group {
+            margin-top: 15px;
         }
-        .status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border-radius: 4px;
-            z-index: 1000;
+        .button-group button {
+            margin: 0 5px;
         }
     </style>
 </head>
 <body class="container mt-5">
-    <div id="status" class="status" style="display: none;">Carregando modelos...</div>
-    
-    <h1 class="text-center">Detecção de Objetos com Reconhecimento Facial</h1>
+    <h1 class="text-center">Detecção de Objetos com Contagem Acumulativa</h1>
     <div class="text-center">
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" willReadFrequently="true"></canvas>
         <video id="video" autoplay playsinline></video>
-        
         <div class="controls">
-            <button id="switchCamera" class="btn btn-primary">Trocar Câmera</button>
             <div class="confidence-label">Limiar de Confiança: <span id="confidenceValue">0.6</span></div>
             <input type="range" id="confidenceThreshold" min="0" max="1" step="0.1" value="0.6" class="form-range">
         </div>
         
-        <div class="face-controls">
-            <h3>Cadastro de Faces</h3>
-            <div class="input-group mb-3">
-                <input type="text" id="personName" class="form-control" placeholder="Nome da pessoa">
-                <button id="captureFace" class="btn btn-success">Cadastrar Face</button>
+        <div class="button-group">
+            <button id="resetCountsBtn" class="btn btn-warning">Zerar Contagem</button>
+            <button id="exportDataBtn" class="btn btn-primary">Exportar Dados</button>
+        </div>
+        
+        <div class="counts-container">
+            <div class="count-box">
+                <h3>Contagem no Quadro Atual:</h3>
+                <div id="currentCounts" class="count-list"></div>
             </div>
-            <div id="faceList"></div>
+            <div class="count-box">
+                <h3>Contagem Acumulada:</h3>
+                <div id="totalCounts" class="count-list"></div>
+            </div>
         </div>
     </div>
-
+    
     <script>
-    // Configurações
-    const MODELS_PATH = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-    const FACE_CHECK_INTERVAL = 500; // ms
-    const FACE_DETECTION_SIZE = 320;
-    const FACE_MATCH_THRESHOLD = 0.6;
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const video = document.getElementById('video');
+        const confidenceThreshold = document.getElementById('confidenceThreshold');
+        const confidenceValue = document.getElementById('confidenceValue');
+        const currentCountsDiv = document.getElementById('currentCounts');
+        const totalCountsDiv = document.getElementById('totalCounts');
+        const resetCountsBtn = document.getElementById('resetCountsBtn');
+        const exportDataBtn = document.getElementById('exportDataBtn');
 
-    // Elementos do DOM
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
-    const video = document.getElementById('video');
-    const switchCameraButton = document.getElementById('switchCamera');
-    const confidenceThreshold = document.getElementById('confidenceThreshold');
-    const confidenceValue = document.getElementById('confidenceValue');
-    const captureFaceButton = document.getElementById('captureFace');
-    const personNameInput = document.getElementById('personName');
-    const faceList = document.getElementById('faceList');
-    const statusElement = document.getElementById('status');
+        let cocoModel = null;
+        let currentStream = null;
+        let isProcessing = false;
+        let totalObjectCounts = {}; // Armazena a contagem acumulativa
+        let trackedObjects = new Map(); // Para rastrear objetos entre quadros
+        let lastTrackedIds = new Set(); // IDs dos objetos vistos no último quadro
+        let nextObjectId = 1; // ID para rastrear objetos
 
-    // Estado global
-    let currentStream = null;
-    let facingMode = "user";
-    let cocoModel = null;
-    let faceApiReady = false;
-    let isProcessing = false;
-    let labeledFaceDescriptors = [];
-    let lastFaceCheck = 0;
-
-    // Traduções
-    const translations = {
-        "person": "pessoa",
-        "bicycle": "bicicleta",
-        "car": "carro",
-        "motorcycle": "moto",
-        "airplane": "avião",
-        "bus": "ônibus",
-        "train": "trem",
-        "truck": "caminhão",
-        "boat": "barco",
-        "traffic light": "semáforo",
-        "fire hydrant": "hidrante",
-        "stop sign": "placa pare",
-        "bench": "banco",
-        "bird": "pássaro",
-        "cat": "gato",
-        "dog": "cachorro",
-        "chair": "cadeira",
-        "couch": "sofá",
-        "tv": "televisão",
-        "laptop": "notebook",
-        "mouse": "mouse",
-        "remote": "controle remoto",
-        "keyboard": "teclado",
-        "cell phone": "celular",
-        "book": "livro",
-        "clock": "relógio",
-        "vase": "vaso",
-        "scissors": "tesoura",
-        "teddy bear": "ursinho de pelúcia",
-        "hair drier": "secador de cabelo",
-        "toothbrush": "escova de dentes"
-    };
-
-    // Funções auxiliares
-    function showStatus(message) {
-        statusElement.textContent = message;
-        statusElement.style.display = 'block';
-    }
-
-    function hideStatus() {
-        statusElement.style.display = 'none';
-    }
-
-    function resizeDetection(detection, scale) {
-        return {
-            ...detection,
-            bbox: detection.bbox.map(coord => coord * scale)
+        // Tradução de objetos
+        const translations = {
+            "person": "pessoa",
+            "bicycle": "bicicleta",
+            "car": "carro",
+            "motorcycle": "motocicleta",
+            "airplane": "avião",
+            "bus": "ônibus",
+            "train": "trem",
+            "truck": "caminhão",
+            "boat": "barco",
+            "traffic light": "semáforo",
+            "fire hydrant": "hidrante",
+            "stop sign": "placa de pare",
+            "parking meter": "parquímetro",
+            "bench": "banco",
+            "bird": "pássaro",
+            "cat": "gato",
+            "dog": "cachorro",
+            "horse": "cavalo",
+            "sheep": "ovelha",
+            "cow": "vaca",
+            "elephant": "elefante",
+            "bear": "urso",
+            "zebra": "zebra",
+            "giraffe": "girafa",
+            "backpack": "mochila",
+            "umbrella": "guarda-chuva",
+            "handbag": "bolsa",
+            "tie": "gravata",
+            "suitcase": "mala",
+            "frisbee": "frisbee",
+            "skis": "esqui",
+            "snowboard": "snowboard",
+            "sports ball": "bola esportiva",
+            "kite": "pipa",
+            "baseball bat": "taco de beisebol",
+            "baseball glove": "luva de beisebol",
+            "skateboard": "skate",
+            "surfboard": "prancha de surf",
+            "tennis racket": "raquete de tênis",
+            "bottle": "garrafa",
+            "wine glass": "taça de vinho",
+            "cup": "xícara",
+            "fork": "garfo",
+            "knife": "faca",
+            "spoon": "colher",
+            "bowl": "tigela",
+            "banana": "banana",
+            "apple": "maçã",
+            "sandwich": "sanduíche",
+            "orange": "laranja",
+            "broccoli": "brócolis",
+            "carrot": "cenoura",
+            "hot dog": "cachorro-quente",
+            "pizza": "pizza",
+            "donut": "rosquinha",
+            "cake": "bolo",
+            "chair": "cadeira",
+            "couch": "sofá",
+            "potted plant": "planta em vaso",
+            "bed": "cama",
+            "dining table": "mesa de jantar",
+            "toilet": "vaso sanitário",
+            "tv": "TV",
+            "laptop": "laptop",
+            "mouse": "mouse",
+            "remote": "controle remoto",
+            "keyboard": "teclado",
+            "cell phone": "celular",
+            "microwave": "micro-ondas",
+            "oven": "forno",
+            "toaster": "torradeira",
+            "sink": "pia",
+            "refrigerator": "geladeira",
+            "book": "livro",
+            "clock": "relógio",
+            "vase": "vaso",
+            "scissors": "tesoura",
+            "teddy bear": "ursinho de pelúcia",
+            "hair drier": "secador de cabelo",
+            "toothbrush": "escova de dentes"
         };
-    }
 
-    // Eventos
-    confidenceThreshold.addEventListener('input', (e) => {
-        confidenceValue.textContent = e.target.value;
-    });
+        confidenceThreshold.addEventListener('input', (e) => {
+            confidenceValue.textContent = e.target.value;
+        });
 
-    switchCameraButton.addEventListener('click', () => {
-        facingMode = facingMode === "user" ? "environment" : "user";
-        startCamera();
-    });
+        resetCountsBtn.addEventListener('click', () => {
+            totalObjectCounts = {};
+            trackedObjects.clear();
+            lastTrackedIds.clear();
+            nextObjectId = 1;
+            updateCountDisplay();
+        });
 
-    captureFaceButton.addEventListener('click', captureFace);
-
-    // Face API
-    async function loadFaceApiModels() {
-        showStatus('Carregando modelos de reconhecimento facial...');
-        try {
-            await Promise.all([
-                faceapi.nets.faceRecognitionNet.loadFromUri(MODELS_PATH),
-                faceapi.nets.faceLandmark68Net.loadFromUri(MODELS_PATH),
-                faceapi.nets.ssdMobilenetv1.loadFromUri(MODELS_PATH)
-            ]);
-            faceApiReady = true;
-            console.log('Modelos Face-API carregados!');
-        } catch (error) {
-            console.error('Erro ao carregar modelos Face-API:', error);
-            throw error;
-        }
-    }
-
-    async function detectFaces(canvas, personBox) {
-        const now = Date.now();
-        if (now - lastFaceCheck < FACE_CHECK_INTERVAL) return null;
-        
-        try {
-            const tempCanvas = document.createElement('canvas');
-            const tempContext = tempCanvas.getContext('2d');
+        exportDataBtn.addEventListener('click', () => {
+            const data = {
+                date: new Date().toLocaleString(),
+                totalCounts: {...totalObjectCounts}
+            };
             
-            const [x, y, width, height] = personBox;
-            tempCanvas.width = FACE_DETECTION_SIZE;
-            tempCanvas.height = FACE_DETECTION_SIZE;
-            
-            const scale = FACE_DETECTION_SIZE / Math.max(width, height);
-            
-            tempContext.drawImage(
-                canvas, 
-                x, y, width, height,
-                0, 0, tempCanvas.width, tempCanvas.height
-            );
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `contagem-objetos-${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
 
-            const detections = await faceapi.detectAllFaces(tempCanvas)
-                .withFaceLandmarks()
-                .withFaceDescriptors();
-
-            lastFaceCheck = now;
-
-            return detections.map(d => resizeDetection(d, 1/scale));
-        } catch (error) {
-            console.error('Erro na detecção facial:', error);
-            return null;
-        }
-    }
-
-    async function captureFace() {
-        if (!faceApiReady || !personNameInput.value.trim()) {
-            alert('Por favor, digite um nome para a pessoa');
-            return;
-        }
-
-        showStatus('Capturando face...');
-        try {
-            const detections = await faceapi.detectAllFaces(video)
-                .withFaceLandmarks()
-                .withFaceDescriptors();
-
-            if (detections.length > 0) {
-                const name = personNameInput.value.trim();
-                const descriptor = detections[0].descriptor;
-                
-                labeledFaceDescriptors.push(new faceapi.LabeledFaceDescriptors(
-                    name, [descriptor]
-                ));
-
-                const faceItem = document.createElement('div');
-                faceItem.className = 'face-item';
-                faceItem.innerHTML = `
-                    <span>${name}</span>
-                    <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remover</button>
-                `;
-                faceList.appendChild(faceItem);
-
-                personNameInput.value = '';
-                showStatus('Face cadastrada com sucesso!');
-                setTimeout(hideStatus, 2000);
-            } else {
-                alert('Nenhuma face detectada! Posicione o rosto no centro da câmera.');
+        async function startCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
             }
-        } catch (error) {
-            console.error('Erro ao capturar face:', error);
-            alert('Erro ao capturar face. Tente novamente.');
-        }
-        hideStatus();
-    }
 
-    // Câmera
-    async function startCamera() {
-        if (currentStream) {
-            currentStream.getTracks().forEach(track => track.stop());
-        }
-        try {
-            const constraints = {
-                video: {
-                    facingMode: facingMode,
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            };
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            video.srcObject = stream;
-            currentStream = stream;
-            video.onloadedmetadata = () => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-            };
-        } catch (err) {
-            console.error("Erro ao acessar a webcam: ", err);
-            alert('Erro ao acessar a câmera. Verifique as permissões.');
-        }
-    }
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: "user",
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                };
 
-    // Detecção principal
-    async function detectObjects() {
-        if (!cocoModel || !faceApiReady || isProcessing) return requestAnimationFrame(detectObjects);
-        
-        isProcessing = true;
-        
-        try {
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                currentStream = stream;
+
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    console.log(`Canvas dimensionado para: ${canvas.width}x${canvas.height}`);
+                };
+
+                return new Promise((resolve) => {
+                    video.onloadeddata = resolve;
+                });
+            } catch (err) {
+                console.error("Erro ao acessar a webcam: ", err);
+                alert('Erro ao acessar a câmera. Verifique as permissões.');
+            }
+        }
+
+        // Função para calcular o IOU (Intersection Over Union) entre duas caixas delimitadoras
+        function calculateIOU(box1, box2) {
+            const [x1, y1, width1, height1] = box1;
+            const [x2, y2, width2, height2] = box2;
             
-            const predictions = await cocoModel.detect(canvas);
+            const xA = Math.max(x1, x2);
+            const yA = Math.max(y1, y2);
+            const xB = Math.min(x1 + width1, x2 + width2);
+            const yB = Math.min(y1 + height1, y2 + height2);
             
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            // Área de interseção
+            const intersectionArea = Math.max(0, xB - xA) * Math.max(0, yB - yA);
+            
+            // Áreas das duas caixas
+            const box1Area = width1 * height1;
+            const box2Area = width2 * height2;
+            
+            // Área de união
+            const unionArea = box1Area + box2Area - intersectionArea;
+            
+            return intersectionArea / unionArea;
+        }
 
-            const threshold = parseFloat(confidenceThreshold.value);
-            const filteredPredictions = predictions.filter(pred => pred.score >= threshold);
-
-            for (const prediction of filteredPredictions) {
-                const [x, y, width, height] = prediction.bbox;
-                let label = translations[prediction.class] || prediction.class;
-                const confidence = Math.round(prediction.score * 100);
-
-                if (prediction.class === 'person' && labeledFaceDescriptors.length > 0) {
-                    const faceDetections = await detectFaces(canvas, prediction.bbox);
-                    
-                    if (faceDetections && faceDetections.length > 0) {
-                        const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, FACE_MATCH_THRESHOLD);
-                        
-                        for (const detection of faceDetections) {
-                            const match = faceMatcher.findBestMatch(detection.descriptor);
-                            if (match && match.label !== 'unknown') {
-                                label = match.label;
-                                break;
-                            }
+        // Função para rastrear objetos entre quadros
+        function trackObjects(predictions) {
+            const currentIds = new Set();
+            const threshold = 0.5; // Limiar para considerar o mesmo objeto
+            
+            for (const prediction of predictions) {
+                let matched = false;
+                
+                // Tenta associar com objetos existentes
+                for (const [id, obj] of trackedObjects.entries()) {
+                    if (prediction.class === obj.class && !currentIds.has(id)) {
+                        const iou = calculateIOU(prediction.bbox, obj.bbox);
+                        if (iou > threshold) {
+                            // Atualiza o objeto rastreado
+                            trackedObjects.set(id, {
+                                class: prediction.class,
+                                bbox: prediction.bbox,
+                                score: prediction.score,
+                                lastSeen: Date.now()
+                            });
+                            
+                            currentIds.add(id);
+                            matched = true;
+                            break;
                         }
                     }
                 }
-
-                // Desenha a caixa
-                context.strokeStyle = `hsl(${confidence * 3.6}, 100%, 50%)`;
-                context.lineWidth = 4;
-                context.strokeRect(x, y, width, height);
-
-                // Fundo do texto com gradiente
-                const gradient = context.createLinearGradient(x, y, x + width, y);
-                gradient.addColorStop(0, 'rgba(0, 0, 0, 0.8)');
-                gradient.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
-                context.fillStyle = gradient;
-
-                context.font = "bold 24px Arial";
-                const textWidth = context.measureText(`${label} ${confidence}%`).width;
-                const textHeight = 30;
-                const padding = 8;
-                context.fillRect(x, y > textHeight ? y - textHeight - padding : y + height, 
-                               textWidth + padding * 2, textHeight + padding);
-
-                // Texto com sombra
-                context.shadowColor = 'black';
-                context.shadowBlur = 4;
-                context.fillStyle = "white";
-                context.fillText(
-                    `${label} ${confidence}%`,
-                    x + padding,
-                    y > textHeight ? y - padding : y + height + textHeight
-                );
-                context.shadowBlur = 0;
+                
+                // Se não houver correspondência, cria um novo objeto
+                if (!matched) {
+                    if (!lastTrackedIds.has(prediction.class)) {
+                        // Este objeto não estava presente no quadro anterior
+                        // Incrementa a contagem total
+                        totalObjectCounts[prediction.class] = (totalObjectCounts[prediction.class] || 0) + 1;
+                    }
+                    
+                    const id = `${prediction.class}_${nextObjectId++}`;
+                    trackedObjects.set(id, {
+                        class: prediction.class,
+                        bbox: prediction.bbox,
+                        score: prediction.score,
+                        lastSeen: Date.now()
+                    });
+                    
+                    currentIds.add(id);
+                }
             }
-        } catch (error) {
-            console.error("Erro na detecção:", error);
+            
+            // Limpa objetos que não foram vistos recentemente
+            const now = Date.now();
+            for (const [id, obj] of trackedObjects.entries()) {
+                if (now - obj.lastSeen > 2000) { // 2 segundos sem ser visto
+                    trackedObjects.delete(id);
+                }
+            }
+            
+            // Atualiza o conjunto de classes vistas no quadro atual
+            lastTrackedIds = new Set(predictions.map(p => p.class));
+            
+            return currentIds;
         }
-        
-        isProcessing = false;
-        requestAnimationFrame(detectObjects);
-    }
 
-    // Inicialização
-    async function init() {
-        showStatus('Inicializando...');
-        try {
-            showStatus('Carregando modelo de detecção de objetos...');
-            cocoModel = await cocoSsd.load({ base: 'mobilenet_v2' });
+        function updateCountDisplay() {
+            // Contagem atual (no quadro)
+            const currentObjectCounts = {};
+            for (const obj of trackedObjects.values()) {
+                currentObjectCounts[obj.class] = (currentObjectCounts[obj.class] || 0) + 1;
+            }
             
-            showStatus('Carregando modelo de reconhecimento facial...');
-            await loadFaceApiModels();
+            // Exibir contagem atual
+            let currentCountsHTML = '';
+            for (const className in currentObjectCounts) {
+                const translatedName = translations[className] || className;
+                currentCountsHTML += `<p>${translatedName}: ${currentObjectCounts[className]}</p>`;
+            }
+            currentCountsDiv.innerHTML = currentCountsHTML || '<p>Nenhum objeto detectado</p>';
             
-            showStatus('Iniciando câmera...');
-            await startCamera();
+            // Exibir contagem total acumulada
+            let totalCountsHTML = '';
+            const sortedClasses = Object.keys(totalObjectCounts).sort((a, b) => 
+                totalObjectCounts[b] - totalObjectCounts[a]
+            );
             
-            hideStatus();
-            
-            video.addEventListener('loadeddata', () => {
+            for (const className of sortedClasses) {
+                const translatedName = translations[className] || className;
+                totalCountsHTML += `<p>${translatedName}: ${totalObjectCounts[className]}</p>`;
+            }
+            totalCountsDiv.innerHTML = totalCountsHTML || '<p>Nenhum objeto contado ainda</p>';
+        }
+
+        async function detectObjects() {
+            if (!cocoModel || isProcessing) {
+                requestAnimationFrame(detectObjects);
+                return;
+            }
+
+            isProcessing = true;
+
+            try {
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const predictions = await cocoModel.detect(canvas);
+
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                const threshold = parseFloat(confidenceThreshold.value);
+                const filteredPredictions = predictions.filter(pred => pred.score >= threshold);
+
+                // Rastrear objetos entre quadros
+                trackObjects(filteredPredictions);
+                
+                // Atualizar exibição de contagem
+                updateCountDisplay();
+
+                // Desenhar caixas e rótulos
+                for (const prediction of filteredPredictions) {
+                    const [x, y, width, height] = prediction.bbox;
+                    let label = translations[prediction.class] || prediction.class;
+                    const confidence = Math.round(prediction.score * 100);
+
+                    context.strokeStyle = `hsl(${confidence * 3.6}, 100%, 50%)`;
+                    context.lineWidth = 4;
+                    context.strokeRect(x, y, width, height);
+
+                    const gradient = context.createLinearGradient(x, y, x + width, y);
+                    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.8)');
+                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
+                    context.fillStyle = gradient;
+
+                    context.font = "bold 24px Arial";
+                    const textWidth = context.measureText(`${label} ${confidence}%`).width;
+                    const textHeight = 30;
+                    const padding = 8;
+
+                    context.fillRect(
+                        x,
+                        y > textHeight ? y - textHeight - padding : y + height,
+                        textWidth + padding * 2,
+                        textHeight + padding
+                    );
+
+                    context.shadowColor = 'black';
+                    context.shadowBlur = 4;
+                    context.fillStyle = "white";
+                    context.fillText(
+                        `${label} ${confidence}%`,
+                        x + padding,
+                        y > textHeight ? y - padding : y + height + textHeight
+                    );
+                    context.shadowBlur = 0;
+                }
+
+            } catch (error) {
+                console.error("Erro na detecção:", error);
+            }
+
+            isProcessing = false;
+            requestAnimationFrame(detectObjects);
+        }
+
+        async function init() {
+            try {
+                cocoModel = await cocoSsd.load({ base: 'mobilenet_v2' });
+                console.log('Modelo COCO-SSD carregado!');
+                await startCamera();
                 detectObjects();
-            });
-        } catch (error) {
-            console.error("Erro ao inicializar:", error);
-            showStatus('Erro ao inicializar. Recarregue a página.');
+            } catch (error) {
+                console.error("Erro ao inicializar:", error);
+                alert('Erro ao inicializar: ' + error.message);
+            }
         }
-    }
 
-    // Inicia quando o DOM estiver pronto
-    document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
