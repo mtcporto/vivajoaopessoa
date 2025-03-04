@@ -16,6 +16,14 @@
       border-radius: 5px;
       margin-left: 5px;
     }
+        /* Personalização dos indicadores do carousel: forma de traço */
+        .carousel-indicators li {
+      width: 30px;
+      height: 4px;
+      border-radius: 0;
+      background-color: #fff;
+      margin: 5px;
+    }
   </style>
 </head>
 <body>
@@ -23,7 +31,9 @@
     <h1>Artistas</h1>
   </div>
   
+  <!-- Carousel de Vídeos -->
   <div id="videoCarousel" class="carousel slide carousel-video" data-ride="carousel" data-interval="10000">
+    <!-- Controles -->
     <a class="carousel-control-prev" href="#videoCarousel" role="button" data-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="sr-only">Anterior</span>
@@ -32,8 +42,9 @@
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="sr-only">Próximo</span>
     </a>
+    <!-- Indicadores -->
     <ol class="carousel-indicators">
-      <li data-target="#videoCarousel" data-slide-to="0" class="active"></li>
+      <li data-target="#videoCarousel" data-slide-to="0"></li>
       <li data-target="#videoCarousel" data-slide-to="1"></li>
       <li data-target="#videoCarousel" data-slide-to="2"></li>
       <li data-target="#videoCarousel" data-slide-to="3"></li>
@@ -43,66 +54,123 @@
       <li data-target="#videoCarousel" data-slide-to="7"></li>
     </ol>
     
+    <!-- Slides do Carousel -->
     <div class="carousel-inner">
-      <div class="carousel-item active">
+      <!-- Slide 1 -->
+      <div class="carousel-item">
         <div class="video-container">
-          <iframe id="ytplayer1" src="https://www.youtube.com/embed/9mS5zZfWMSU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=9mS5zZfWMSU&start=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
+          <iframe id="ytplayer1"
+                  src="https://www.youtube.com/embed/9mS5zZfWMSU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=9mS5zZfWMSU&start=1"
+                  loading="lazy"
+                  allow="autoplay; fullscreen"
+                  allowfullscreen
+                  allowtransparency>
+          </iframe>
         </div>
         <div class="carousel-caption">
           <h5>Lily - Menina-flor (Álbum completo)</h5>
         </div>
       </div>
+      <!-- Slide 2 -->
       <div class="carousel-item">
         <div class="video-container">
-          <iframe id="ytplayer2" src="https://www.youtube.com/embed/2GFfvLVnhD0?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=2GFfvLVnhD0&start=16" allowfullscreen allowtransparency allow="autoplay"></iframe>
+          <iframe id="ytplayer2"
+                  src="https://www.youtube.com/embed/2GFfvLVnhD0?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=2GFfvLVnhD0&start=16"
+                  loading="lazy"
+                  allow="autoplay; fullscreen"
+                  allowfullscreen
+                  allowtransparency>
+          </iframe>
         </div>
         <div class="carousel-caption">
           <h5>Val Donato - Lágrimas de Crocodilo (Clipe Oficial)</h5>
         </div>
       </div>
+      <!-- Slide 3 -->
       <div class="carousel-item">
         <div class="video-container">
-          <iframe id="ytplayer3" src="https://www.youtube.com/embed/PpTlkAa1F0E?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=PpTlkAa1F0E&start=22" allowfullscreen allowtransparency allow="autoplay"></iframe>
+          <iframe id="ytplayer3"
+                  src="https://www.youtube.com/embed/PpTlkAa1F0E?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=PpTlkAa1F0E&start=22"
+                  loading="lazy"
+                  allow="autoplay; fullscreen"
+                  allowfullscreen
+                  allowtransparency>
+          </iframe>
         </div>
         <div class="carousel-caption">
-          <h5>ChicoCorrea&ElectronicBand - LELE</h5>
+          <h5>ChicoCorrea & ElectronicBand - LELE</h5>
         </div>
       </div>
+      <!-- Slide 4 -->
       <div class="carousel-item">
         <div class="video-container">
-          <iframe id="ytplayer4" src="https://www.youtube.com/embed/ELGUa782Nx0?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=ELGUa782Nx0&start=5" allowfullscreen allowtransparency allow="autoplay"></iframe>
+          <iframe id="ytplayer4"
+                  src="https://www.youtube.com/embed/ELGUa782Nx0?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=ELGUa782Nx0&start=5"
+                  loading="lazy"
+                  allow="autoplay; fullscreen"
+                  allowfullscreen
+                  allowtransparency>
+          </iframe>
         </div>
         <div class="carousel-caption">
           <h5>PEDRO FAISSAL & O MEIOFREE - Live Session 2023 (completo)</h5>
         </div>
       </div>
+      <!-- Slide 5 -->
       <div class="carousel-item">
         <div class="video-container">
-          <iframe id="ytplayer5" src="https://www.youtube.com/embed/YBKWvPt2omU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=YBKWvPt2omU&start=20" allowfullscreen allowtransparency allow="autoplay"></iframe>
+          <iframe id="ytplayer5"
+                  src="https://www.youtube.com/embed/YBKWvPt2omU?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=YBKWvPt2omU&start=20"
+                  loading="lazy"
+                  allow="autoplay; fullscreen"
+                  allowfullscreen
+                  allowtransparency>
+          </iframe>
         </div>
         <div class="carousel-caption">
-          <h5>EU NÃO SOU BOA INFLUÊNCIA PRA VOCE - DVD Seu Pereira e Coletivo 401</h5>
+          <h5>EU NÃO SOU BOA INFLUÊNCIA PRA VOCÊ - DVD Seu Pereira e Coletivo 401</h5>
         </div>
       </div>
+      <!-- Slide 6 -->
       <div class="carousel-item">
         <div class="video-container">
-          <iframe id="ytplayer6" src="https://www.youtube.com/embed/SpdmtyAYGTQ?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=SpdmtyAYGTQ&start=49" allowfullscreen allowtransparency allow="autoplay"></iframe>
+          <iframe id="ytplayer6"
+                  src="https://www.youtube.com/embed/SpdmtyAYGTQ?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=SpdmtyAYGTQ&start=49"
+                  loading="lazy"
+                  allow="autoplay; fullscreen"
+                  allowfullscreen
+                  allowtransparency>
+          </iframe>
         </div>
         <div class="carousel-caption">
           <h5>"Às vezes nenhé, mas é." Grupo iNsight dança Rabeca Nervosa de FurmigaDub</h5>
         </div>
       </div>
+      <!-- Slide 7 -->
       <div class="carousel-item">
         <div class="video-container">
-          <iframe id="ytplayer7" src="https://www.youtube.com/embed/CjoXcW2BQH4?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=CjoXcW2BQH4&start=32" allowfullscreen allowtransparency allow="autoplay"></iframe>
+          <iframe id="ytplayer7"
+                  src="https://www.youtube.com/embed/CjoXcW2BQH4?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=CjoXcW2BQH4&start=32"
+                  loading="lazy"
+                  allow="autoplay; fullscreen"
+                  allowfullscreen
+                  allowtransparency>
+          </iframe>
         </div>
         <div class="carousel-caption">
           <h5>Tapuia - Outsider (Official Lyric Video)</h5>
         </div>
       </div>
+      <!-- Slide 8 -->
       <div class="carousel-item">
         <div class="video-container">
-          <iframe id="ytplayer8" src="https://www.youtube.com/embed/esFSlvLKsFw?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=esFSlvLKsFw" allowfullscreen allowtransparency allow="autoplay"></iframe>
+          <iframe id="ytplayer8"
+                  src="https://www.youtube.com/embed/esFSlvLKsFw?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=esFSlvLKsFw"
+                  loading="lazy"
+                  allow="autoplay; fullscreen"
+                  allowfullscreen
+                  allowtransparency>
+          </iframe>
         </div>
         <div class="carousel-caption">
           <h5>Banda Odile - Medley (I Will Survive, Maniac, Somebody to Love, I Feel Good, Uptown Funk)</h5>
@@ -115,8 +183,76 @@
     <!-- Os cards dos artistas serão inseridos aqui -->
   </div>
 
+  <!-- Scripts: jQuery Slim e Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  
+  <!-- YouTube Iframe API com async e defer -->
+  <script>
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    tag.async = true;
+    tag.defer = true;
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var ytPlayers = [];
+    function onYouTubeIframeAPIReady() {
+      ytPlayers = ['ytplayer1', 'ytplayer2', 'ytplayer3', 'ytplayer4', 'ytplayer5', 'ytplayer6', 'ytplayer7', 'ytplayer8'].map((id) => {
+        return new YT.Player(id, {
+          events: {
+            'onReady': onPlayerReady
+          }
+        });
+      });
+    }
+
+    function onPlayerReady(event) {
+      event.target.mute();
+      // Se o iframe pertence ao slide ativo, toca o vídeo
+      if (event.target.getIframe().closest('.carousel-item').classList.contains('active')) {
+        event.target.playVideo();
+      }
+    }
+
+    function pauseCurrentPlayer(e) {
+      const currentPlayer = e.target.getElementsByTagName('iframe')[$('.carousel-item.active').index()];
+      if (currentPlayer && currentPlayer.contentWindow && currentPlayer.contentWindow.postMessage) {
+        currentPlayer.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+      }
+    }
+
+    function playNextPlayer(e) {
+      const nextPlayer = e.target.getElementsByTagName('iframe')[$(e.relatedTarget).index()];
+      if (nextPlayer && nextPlayer.contentWindow && nextPlayer.contentWindow.postMessage) {
+        nextPlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        nextPlayer.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+      }
+    }
+
+    $('#videoCarousel').on('slide.bs.carousel', function (e) {
+      pauseCurrentPlayer(e);
+      playNextPlayer(e);
+    });
+  </script>
+  
+  <!-- Script para definir aleatoriamente o slide ativo no carousel -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const carouselInner = document.querySelector("#videoCarousel .carousel-inner");
+      const items = carouselInner.querySelectorAll(".carousel-item");
+      const indicators = document.querySelectorAll("#videoCarousel .carousel-indicators li");
+      
+      // Remove qualquer classe 'active' existente
+      items.forEach(item => item.classList.remove("active"));
+      indicators.forEach(ind => ind.classList.remove("active"));
+      
+      // Escolhe um índice aleatório
+      const randomIndex = Math.floor(Math.random() * items.length);
+      items[randomIndex].classList.add("active");
+      indicators[randomIndex].classList.add("active");
+    });
+  </script>
   
   <script>
     // ========= Funções de Cache =========
