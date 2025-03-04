@@ -63,13 +63,13 @@ body {
   
   .carousel-video .carousel-indicators li {
     background-color: #999;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+    width: 30px;
+    height: 4px;
+    border-radius: 0;
     margin: 0 5px; /* Espaçamento horizontal entre as bolinhas */
     cursor: pointer;
   }
-  
+
   .carousel-video .carousel-indicators .active {
     background-color: #fff; /* Destaque para a bolinha ativa */
   }
