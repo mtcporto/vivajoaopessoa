@@ -69,20 +69,18 @@
     .featured-info .content {
       position: relative;
       z-index: 2;
-      text-align: left; /* Título e demais informações centralizadas */
+      text-align: left;
       top: -120px;
     }
     .featured-info .content .title {
       text-align: left;
       margin-bottom: 10px;
-      /* Removido white-space: nowrap para permitir quebra de linha */
     }
     .sessions-container {
       max-width: 1116px;
       margin: 20px auto;
       margin-top: 0px;
     }
-    /* Estilos dos cards pequenos e gerais */
     body {
       font-family: Inter, sans-serif;
       font-weight: 400;
@@ -94,7 +92,6 @@
       color: #fff;
       padding: 10px;
       text-align: center;
-      /* margin-bottom: 20px; */
     }
     .event-container {
       border: none;
@@ -136,15 +133,14 @@
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      /* gap: 50px; */
     }
     .badge-orange {
-      color: #fff;
+      color: #000000;
       background-color: #ff7f00;
     }
     @media (min-width: 992px) {
       .accordion {
-        display: true;
+        display: block;
       }
     }
     /* Estilos para as tags dos filmes */
@@ -155,8 +151,9 @@
       padding: 3px 8px;
       border-radius: 5px;
       background-color: #f0ad4e;
-      color: #fff;
+      color: #000000;
       font-size: 0.85rem;
+      font-weight: bold;
     }
     /* Justificar texto da sinopse */
     #synopsisText {
@@ -240,6 +237,42 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   
   <script>
+    // === CONFIGURAÇÃO DO CACHE ===
+    const NOW_PLAYING_CACHE_KEY = 'nowPlayingData';
+    const NOW_PLAYING_CACHE_DATE_KEY = 'nowPlayingDataDate';
+
+    const THEATERS_CACHE_KEY = 'theatersData';
+    const THEATERS_CACHE_DATE_KEY = 'theatersDataDate';
+
+    // Para sessões, vamos criar uma chave por cinema:
+    const SESSIONS_CACHE_KEY_PREFIX = 'sessionsData_';
+    const SESSIONS_CACHE_DATE_KEY_PREFIX = 'sessionsDataDate_';
+
+    // Retorna a data atual no formato "YYYY-MM-DD"
+    function getTodayDateString() {
+      const now = new Date();
+      return now.toISOString().split('T')[0];
+    }
+
+    // Verifica se o cache para uma chave de data é válido (se é de hoje)
+    function isCacheValid(cacheDateKey) {
+      const cachedDate = localStorage.getItem(cacheDateKey);
+      return cachedDate === getTodayDateString();
+    }
+
+    // Salva dados e a data atual para uma chave específica
+    function saveCache(cacheKey, data, cacheDateKey) {
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheDateKey, getTodayDateString());
+    }
+
+    // Recupera dados do cache
+    function getCache(cacheKey) {
+      const data = localStorage.getItem(cacheKey);
+      return data ? JSON.parse(data) : null;
+    }
+    // === FIM CONFIGURAÇÃO DO CACHE ===
+
     // Função global para definir a cor do badge de rating
     function getBadgeColor(rating) {
       switch (rating) {
@@ -253,9 +286,8 @@
       }
     }
   
-    // Função para criar o slide de destaque usando imagem horizontal
+    // Função para criar o slide de destaque usando a imagem horizontal
     function createFeaturedMovieSlide(movieData) {
-      // Se o filme não possuir imagem horizontal, retorna null para que possamos ignorá-lo
       if (!movieData.images || !movieData.images.find(img => img.type === "PosterHorizontal")) {
         return null;
       }
@@ -267,7 +299,6 @@
       featuredCard.classList.add('featured-movie-card', 'position-relative');
   
       const horizontalImage = movieData.images.find(img => img.type === "PosterHorizontal");
-  
       const img = document.createElement('img');
       img.src = horizontalImage ? horizontalImage.url : '';
       img.alt = movieData.title + ' (Poster Horizontal)';
@@ -285,28 +316,16 @@
       const content = document.createElement('div');
       content.classList.add('content');
   
-      // Título centralizado (o CSS já força text-align: center)
       const titleH2 = document.createElement('h2');
       titleH2.classList.add('title');
       titleH2.textContent = movieData.title;
       content.appendChild(titleH2);
   
-      // Informações: classificação, gêneros e duração
       const infoP = document.createElement('p');
       infoP.classList.add('card-text');
-  
-      let ratingSpan = '';
-      if (movieData.contentRating) {
-        ratingSpan = `<span class="badge ${getBadgeColor(movieData.contentRating)}">${movieData.contentRating}</span>`;
-      }
-      let genresText = '';
-      if (movieData.genres && movieData.genres.length > 0) {
-        genresText = movieData.genres.join(', ');
-      }
-      let durationText = '';
-      if (movieData.duration) {
-        durationText = movieData.duration + ' min.';
-      }
+      let ratingSpan = movieData.contentRating ? `<span class="badge ${getBadgeColor(movieData.contentRating)}">${movieData.contentRating}</span>` : '';
+      let genresText = movieData.genres && movieData.genres.length > 0 ? movieData.genres.join(', ') : '';
+      let durationText = movieData.duration ? movieData.duration + ' min.' : '';
   
       infoP.innerHTML = `${ratingSpan} ${genresText} - ${durationText}`.trim();
       content.appendChild(infoP);
@@ -348,8 +367,7 @@
       movieTitle.textContent = movieData.title;
       movieTitle.classList.add('card-title');
       cardBody.appendChild(movieTitle);
-
-      // Exibir tags (se existirem)
+  
       if (movieData.tags && movieData.tags.length > 0) {
         movieData.tags.forEach(tag => {
           const tagSpan = document.createElement('span');
@@ -370,12 +388,11 @@
   
       movieDetails.appendChild(document.createTextNode(` ${movieData.genres.join(', ')} - ${movieData.duration} min.`));
   
-      // Botões de Ação
+      // Botões de ação
       const buttonContainer = document.createElement('div');
       buttonContainer.classList.add('mt-2', 'mb-3');
       cardBody.appendChild(buttonContainer);
-
-      // Botão de Trailer (se existir)
+  
       if (movieData.trailers && movieData.trailers.length > 0) {
         const trailerButton = document.createElement('button');
         trailerButton.innerHTML = '<i class="fa-solid fa-play"></i> Trailer';
@@ -394,8 +411,8 @@
   
         buttonContainer.appendChild(trailerButton);
       }
-
-      // Botão de Sinopse
+  
+      // Botão de sinopse
       const synopsisButton = document.createElement('button');
       synopsisButton.classList.add('btn', 'btn-secondary');
       synopsisButton.innerHTML = '<i class="fa-solid fa-book"></i> Sinopse';
@@ -406,16 +423,15 @@
       synopsisButton.dataset.rating = movieData.contentRating;
       synopsisButton.dataset.genres = movieData.genres.join(', ');
       synopsisButton.dataset.duration = movieData.duration + ' min.';
-
-      //Garanto que a sinopse está sendo passada corretamente para o dataset
+  
       let synopsisText = movieData.synopsis && movieData.synopsis.trim() !== ''
           ? movieData.synopsis
           : 'Sinopse não disponível.';
-
       synopsisButton.dataset.synopsis = synopsisText;
-
+  
       buttonContainer.appendChild(synopsisButton);
   
+      // Cria o accordion para os cinemas e sessões
       const accordion = document.createElement('div');
       accordion.classList.add('accordion');
       accordion.id = `accordion${movieId}`;
@@ -450,14 +466,12 @@
         cinemaBody.classList.add('card-body');
         cinemaCollapse.appendChild(cinemaBody);
   
-        // Verifica se sessionMovie.rooms existe antes de tentar mapeá-lo
         if (movieData.cinemas[cinema] && Array.isArray(movieData.cinemas[cinema])) {
           movieData.cinemas[cinema].forEach(room => {
             const roomName = document.createElement('h5');
             roomName.textContent = room.name;
             cinemaBody.appendChild(roomName);
-        
-            // Corrigido aqui: session estava indefinido, agora usamos session corretamente
+  
             if (room.sessions && Array.isArray(room.sessions)) {
               room.sessions.forEach(session => {
                 const sessionDetails = document.createElement('p');
@@ -474,171 +488,195 @@
   
       return movieElement;
     }
-
-    function getSynopsis(movieId, nowPlayingData) {
-  if (nowPlayingData[movieId] && nowPlayingData[movieId].synopsis && nowPlayingData[movieId].synopsis.trim() !== '') {
-    console.log(`Sinopse encontrada para o filme com ID: ${movieId}`);
-    return nowPlayingData[movieId].synopsis;
-  } else {
-    console.warn(`Nenhuma sinopse encontrada para o filme com ID: ${movieId}`);
-    return 'Sinopse não disponível.';
-  }
-}
-
   
-    // Carrega os dados de filmes usando múltiplos endpoints
+    // Função para buscar a sinopse do filme a partir do cache nowPlaying (usando o id)
+    function getSynopsis(movieId, nowPlayingData) {
+      if (nowPlayingData[movieId] && nowPlayingData[movieId].synopsis && nowPlayingData[movieId].synopsis.trim() !== '') {
+        console.log(`Sinopse encontrada para o filme com ID: ${movieId}`);
+        return nowPlayingData[movieId].synopsis;
+      } else {
+        console.warn(`Nenhuma sinopse encontrada para o filme com ID: ${movieId}`);
+        return 'Sinopse não disponível.';
+      }
+    }
+  
+    // ==== Fluxo de carregamento dos dados com cache ====
     const cityId = 32;
     const urlNowPlaying = `https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/templates/nowplaying/${cityId}?partnership=marcotulio`;
     const urlTheaters = `https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/theaters/city/${cityId}?partnership=marcotulio`;
-
-    // Objeto que irá armazenar todos os dados dos filmes
+  
     let movies = {};
     let nowPlayingData = {};
     let theaters = [];
-
-    // Primeiro, busca informações de "nowplaying" que contém sinopses e dados adicionais
-    fetch(urlNowPlaying)
-      .then(response => response.json())
-      .then(data => {
-        console.log("Dados de filmes em cartaz recebidos (nowPlaying):", data);
-        
-        if (data) {
-  let moviesArray = [];
-  if (data.items) {
-    moviesArray = data.items;
-  } else if (Array.isArray(data)) {
-    moviesArray = data;
-  }
   
-  moviesArray.forEach(nowPlayingMovie => {
-    if (nowPlayingMovie.title) {
-      // Processamento igual ao acima
-      nowPlayingData[nowPlayingMovie.id] = {
-    id: nowPlayingMovie.id,
-    title: nowPlayingMovie.title,
-    originalTitle: nowPlayingMovie.originalTitle,
-    synopsis: nowPlayingMovie.synopsis || '',
-    imageFeatured: nowPlayingMovie.imageFeatured || '',
-    cast: nowPlayingMovie.cast || '',
-    director: nowPlayingMovie.director || '',
-    distributor: nowPlayingMovie.distributor || '',
-    countryOrigin: nowPlayingMovie.countryOrigin || '',
-    urlKey: nowPlayingMovie.urlKey
-};
+    // --- Fetch e cache do nowPlaying ---
+    let nowPlayingPromise;
+    if (isCacheValid(NOW_PLAYING_CACHE_DATE_KEY)) {
+      nowPlayingPromise = Promise.resolve(getCache(NOW_PLAYING_CACHE_KEY));
+      console.log('Usando cache do nowPlaying');
     } else {
-      console.warn("Filme sem title encontrado em nowPlaying:", nowPlayingMovie);
+      nowPlayingPromise = fetch(urlNowPlaying)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Dados de nowPlaying recebidos:", data);
+          saveCache(NOW_PLAYING_CACHE_KEY, data, NOW_PLAYING_CACHE_DATE_KEY);
+          return data;
+        });
     }
-  });
-}
-
-
-        
-        // Em seguida, busca os cinemas
-        return fetch(urlTheaters);
-      })
-      .then(response => response.json())
-      .then(data => {
+  
+    // --- Fetch e cache dos cinemas ---
+    let theatersPromise;
+    if (isCacheValid(THEATERS_CACHE_DATE_KEY)) {
+      theatersPromise = Promise.resolve(getCache(THEATERS_CACHE_KEY));
+      console.log('Usando cache dos cinemas');
+    } else {
+      theatersPromise = fetch(urlTheaters)
+        .then(response => response.json())
+        .then(data => {
           console.log("Dados dos cinemas recebidos:", data);
-          theaters = data;
-
-          // Agora, busca as sessões para cada cinema
-          let sessionPromises = theaters.map(theater => {
-              const theaterId = theater.id;
-              const urlSessions = `https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/sessions/city/${cityId}/theater/${theaterId}?partnership=marcotulio`;
-
-              return fetch(urlSessions)
-                  .then(response => response.json())
-                  .then(sessionData => {
-                      console.log(`Sessoes do cinema ${theater.name} recebidas:`, sessionData);
-                      if (sessionData && sessionData[0] && sessionData[0].movies) {
-                          sessionData[0].movies.forEach(sessionMovie => { // Renomeado para sessionMovie para evitar confusão
-                              if (!movies[sessionMovie.id]) {
-                                  movies[sessionMovie.id] = {
-                                      id: sessionMovie.id,
-                                      title: sessionMovie.title,
-                                      originalTitle: sessionMovie.originalTitle,
-                                      images: sessionMovie.images,
-                                      duration: sessionMovie.duration,
-                                      contentRating: sessionMovie.contentRating,
-                                      genres: sessionMovie.genres,
-                                      siteURL: sessionMovie.siteURL,
-                                      trailers: sessionMovie.trailers,
-                                      synopsis: '', // Preencheremos isso depois
-                                      tags: sessionMovie.tags || [],
-                                      completeTags: sessionMovie.completeTags || [],
-                                      urlKey: sessionMovie.urlKey,
-                                      cinemas: {}
-                                  };
-                              }
-
-                              // Adiciona dados do cinema para este filme
-                              if (sessionMovie.rooms) { // Verifica se sessionMovie.rooms existe
-                                  if (!movies[sessionMovie.id].cinemas[theater.name]) {
-                                      movies[sessionMovie.id].cinemas[theater.name] = sessionMovie.rooms.map(room => ({
-                                          name: room.name,
-                                          sessions: room.sessions?.map(session => ({// corrigido o erro aqui
-                                              date: session.date.dayAndMonth,
-                                              time: session.time,
-                                              type: session.types[0]?.name || 'Normal',
-                                          })) || [] // safe call
-                                      }));
-                                  }
-                              }
-                          });
-                      } else {
-                          console.warn(`Dados de sessão não encontrados para o cinema ${theater.name}`);
-                      }
-                  })
-                  .catch(error => console.error(`Erro ao obter sessões para o cinema ${theater.name}:`, error));
+          saveCache(THEATERS_CACHE_KEY, data, THEATERS_CACHE_DATE_KEY);
+          return data;
+        });
+    }
+  
+    // Primeiro, processa o nowPlaying
+    nowPlayingPromise
+      .then(data => {
+        // Processa os dados do nowPlaying
+        let moviesArray = [];
+        if (data.items) {
+          moviesArray = data.items;
+        } else if (Array.isArray(data)) {
+          moviesArray = data;
+        }
+  
+        moviesArray.forEach(nowPlayingMovie => {
+          if (nowPlayingMovie.title) {
+            nowPlayingData[nowPlayingMovie.id] = {
+              id: nowPlayingMovie.id,
+              title: nowPlayingMovie.title,
+              originalTitle: nowPlayingMovie.originalTitle,
+              synopsis: nowPlayingMovie.synopsis || '',
+              imageFeatured: nowPlayingMovie.imageFeatured || '',
+              cast: nowPlayingMovie.cast || '',
+              director: nowPlayingMovie.director || '',
+              distributor: nowPlayingMovie.distributor || '',
+              countryOrigin: nowPlayingMovie.countryOrigin || '',
+              urlKey: nowPlayingMovie.urlKey
+            };
+            console.log(`Filme no nowPlaying: ID=${nowPlayingMovie.id}, Título=${nowPlayingMovie.title}, Sinopse disponível=${!!nowPlayingMovie.synopsis}`);
+          } else {
+            console.warn("Filme sem title no nowPlaying:", nowPlayingMovie);
+          }
+        });
+  
+        return theatersPromise;
+      })
+      .then(theatersData => {
+        theaters = theatersData;
+  
+        // Para cada cinema, busque (ou use cache) as sessões
+        let sessionPromises = theaters.map(theater => {
+          const theaterId = theater.id;
+          const urlSessions = `https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/sessions/city/${cityId}/theater/${theaterId}?partnership=marcotulio`;
+  
+          const sessionsCacheKey = SESSIONS_CACHE_KEY_PREFIX + theaterId;
+          const sessionsCacheDateKey = SESSIONS_CACHE_DATE_KEY_PREFIX + theaterId;
+  
+          let sessionsPromise;
+          if (isCacheValid(sessionsCacheDateKey)) {
+            sessionsPromise = Promise.resolve(getCache(sessionsCacheKey));
+            console.log(`Usando cache das sessões para o cinema ${theater.name}`);
+          } else {
+            sessionsPromise = fetch(urlSessions)
+              .then(response => response.json())
+              .then(sessionData => {
+                console.log(`Sessões do cinema ${theater.name} recebidas:`, sessionData);
+                saveCache(sessionsCacheKey, sessionData, sessionsCacheDateKey);
+                return sessionData;
+              });
+          }
+  
+          return sessionsPromise.then(sessionData => {
+            if (sessionData && sessionData[0] && sessionData[0].movies) {
+              sessionData[0].movies.forEach(sessionMovie => {
+                if (!movies[sessionMovie.id]) {
+                  movies[sessionMovie.id] = {
+                    id: sessionMovie.id,
+                    title: sessionMovie.title,
+                    originalTitle: sessionMovie.originalTitle,
+                    images: sessionMovie.images,
+                    duration: sessionMovie.duration,
+                    contentRating: sessionMovie.contentRating,
+                    genres: sessionMovie.genres,
+                    siteURL: sessionMovie.siteURL,
+                    trailers: sessionMovie.trailers,
+                    synopsis: '', // Será preenchido a seguir
+                    tags: sessionMovie.tags || [],
+                    completeTags: sessionMovie.completeTags || [],
+                    urlKey: sessionMovie.urlKey,
+                    cinemas: {}
+                  };
+                }
+  
+                if (sessionMovie.rooms) {
+                  if (!movies[sessionMovie.id].cinemas[theater.name]) {
+                    movies[sessionMovie.id].cinemas[theater.name] = sessionMovie.rooms.map(room => ({
+                      name: room.name,
+                      sessions: room.sessions?.map(session => ({
+                        date: session.date.dayAndMonth,
+                        time: session.time,
+                        type: session.types[0]?.name || 'Normal'
+                      })) || []
+                    }));
+                  }
+                }
+              });
+            } else {
+              console.warn(`Sessões não encontradas para o cinema ${theater.name}`);
+            }
           });
-
-          return Promise.all(sessionPromises);
+        });
+  
+        return Promise.all(sessionPromises);
       })
       .then(() => {
-        // Após buscar todas as sessões, combina os dados com as informações do "nowplaying"
+        // Agora, para cada filme processado, preenche a sinopse usando nowPlayingData
         for (let movieId in movies) {
-            const movie = movies[movieId];
-            console.log(`Processando filme com movieId: ${movieId}, título: ${movie.title}`);
-
-            // Usar a função getSynopsis para buscar a sinopse, com fallback para o título
-            movie.synopsis = getSynopsis(movie.id, nowPlayingData);
-            console.log(`Sinopse para ${movie.title}: ${movie.synopsis.substring(0, 50)}...`);
+          const movie = movies[movieId];
+          console.log(`Processando filme: ID=${movieId}, título=${movie.title}`);
+          movie.synopsis = getSynopsis(movie.id, nowPlayingData);
+          console.log(`Sinopse para ${movie.title}: ${movie.synopsis.substring(0,50)}...`);
         }
-    
+  
         // Popula os cards pequenos
         const sessionsContainer = document.getElementById('eventContainer');
         for (let movieId in movies) {
           const movieElement = createMovieElement(movieId, movies[movieId]);
           sessionsContainer.appendChild(movieElement);
         }
-    
-        // Popula o carousel usando os mesmos filmes
+  
+        // Popula o carousel com os filmes que possuem imagem horizontal
         const featuredCarouselInner = document.getElementById('featuredCarouselInner');
         const indicators = document.getElementById('carouselIndicators');
         let slideIndex = 0;
-        
+  
         for (let movieId in movies) {
-          // Se o filme não tiver imagem horizontal, ignora-o
           if (!movies[movieId].images || !movies[movieId].images.find(img => img.type === "PosterHorizontal")) {
             continue;
           }
-          
           const slide = createFeaturedMovieSlide(movies[movieId]);
           if (!slide) continue;
-          
-          // Não define nenhum slide como ativo aqui
           featuredCarouselInner.appendChild(slide);
-
-          // Cria o indicador para esse slide
+  
           const li = document.createElement('li');
           li.setAttribute('data-target', '#featuredMovieCarousel');
           li.setAttribute('data-slide-to', slideIndex);
           indicators.appendChild(li);
-
+  
           slideIndex++;
         }
-
-        // Após criar todos os slides, escolhe um aleatoriamente para ser o ativo
+  
         if (slideIndex > 0) {
           const slides = featuredCarouselInner.querySelectorAll('.carousel-item');
           const indicatorItems = indicators.querySelectorAll('li');
@@ -652,22 +690,21 @@
     // Configuração do modal para trailer usando jQuery e Plyr
     $(document).ready(function() {
       var player;
-    
+  
       $('#trailerModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);
         var trailerUrl = 'https:' + button.data('trailer');
-    
+  
         var modal = $(this);
         var trailerIframe = modal.find('#trailer');
         trailerIframe.attr('src', trailerUrl);
-    
+  
         player = Plyr.setup(trailerIframe.get(0));
       });
-    
+  
       $('#trailerModal').on('hide.bs.modal', function (event) {
         var modal = $(this);
         modal.find('#trailer').attr('src', '');
-    
         if (player) {
           player.destroy();
         }
@@ -682,14 +719,12 @@
         const genres = button.data('genres');
         const duration = button.data('duration');
         const synopsis = button.data('synopsis');
-
+  
         $(this).find('#synopsisImage').attr('src', image);
         $(this).find('#synopsisTitle').text(title);
         $(this).find('#synopsisRating').html(`<span class="badge ${getBadgeColor(rating)}">${rating}</span>`);
         $(this).find('#synopsisGenres').text(genres);
         $(this).find('#synopsisDuration').text(duration);
-
-        //Usar .text() é o mais adequado para exibir texto no modal, pois garante a renderização correta e evita problemas de segurança.
         $(this).find('#synopsisText').text(synopsis);
       });
     });
