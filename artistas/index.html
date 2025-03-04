@@ -115,56 +115,35 @@
     <!-- Os cards dos artistas serão inseridos aqui -->
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  
   <script>
-    // Add YouTube Player API script
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    // ========= Funções de Cache =========
 
-    var ytPlayers = [];
-    function onYouTubeIframeAPIReady() {
-      ytPlayers = ['ytplayer1', 'ytplayer2', 'ytplayer3', 'ytplayer4', 'ytplayer5', 'ytplayer6', 'ytplayer7', 'ytplayer8'].map((id) => {
-        return new YT.Player(id, {
-          events: {
-            'onReady': onPlayerReady
-          }
-        });
+    // Retorna a data atual no formato "YYYY-MM-DD"
+    function getTodayDateString() {
+      const now = new Date();
+      return now.toISOString().split('T')[0];
+    }
+
+    // Função genérica para buscar e cachear dados (cache válido por 24h, começando à meia-noite)
+    function getCachedData(cacheKey, cacheDateKey, fetchFn) {
+      if (localStorage.getItem(cacheDateKey) === getTodayDateString()) {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          return Promise.resolve(JSON.parse(cached));
+        }
+      }
+      return fetchFn().then(data => {
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(cacheDateKey, getTodayDateString());
+        return data;
       });
     }
 
-    function onPlayerReady(event) {
-      event.target.mute();
-      if (event.target.getIframe().closest('.carousel-item').classList.contains('active')) {
-        event.target.playVideo();
-      }
-    }
+    // ========= Funções para Spotify =========
 
-    function pauseCurrentPlayer(e) {
-      const currentPlayer = e.target.getElementsByTagName('iframe')[$('.carousel-item.active').index()];
-      if (currentPlayer && currentPlayer.contentWindow && currentPlayer.contentWindow.postMessage) {
-        currentPlayer.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-      }
-    }
-
-    function playNextPlayer(e) {
-      const nextPlayer = e.target.getElementsByTagName('iframe')[$(e.relatedTarget).index()];
-      if (nextPlayer && nextPlayer.contentWindow && nextPlayer.contentWindow.postMessage) {
-        nextPlayer.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-        nextPlayer.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-      }
-    }
-
-    $('#videoCarousel').on('slide.bs.carousel', function (e) {
-      pauseCurrentPlayer(e);
-      playNextPlayer(e);
-    });
-
-    // ==============================
-    // Integração com API do Spotify
-    // ==============================
     const CLIENT_ID = "81fe610cb0784b629af48e2ae0b30fdf";
     const CLIENT_SECRET = "b6cbe5ba48584b458bb334242b912bb5";
     const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
@@ -182,19 +161,19 @@
       return data.access_token;
     }
 
+    async function fetchArtistDetails(artistId, token) {
+      const response = await fetch(`${SPOTIFY_API_BASE}${artistId}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      return response.json();
+    }
+
     async function fetchArtistReleases(artistId, token) {
       const response = await fetch(`${SPOTIFY_API_BASE}${artistId}/albums?include_groups=album,single&limit=50`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await response.json();
       return data.items || [];
-    }
-
-    async function fetchArtistDetails(artistId, token) {
-      const response = await fetch(`${SPOTIFY_API_BASE}${artistId}`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      return response.json();
     }
 
     function isNewRelease(dateString) {
@@ -218,21 +197,39 @@
       }
     }
 
-    // ==============================
-    // Carregar dados do JSON e atualizar cards
-    // ==============================
+    // ========= Funções para Carregar Dados dos Artistas =========
+
+    const ARTISTAS_CACHE_KEY = 'artistasData';
+    const ARTISTAS_CACHE_DATE_KEY = 'artistasDataDate';
+
     document.addEventListener("DOMContentLoaded", async function() {
-      const response = await fetch('data.json');
-      const data = await response.json();
+      let artistasData;
+      // Tenta usar cache para o data.json
+      if (localStorage.getItem(ARTISTAS_CACHE_DATE_KEY) === getTodayDateString()) {
+        artistasData = JSON.parse(localStorage.getItem(ARTISTAS_CACHE_KEY));
+        console.log('Usando cache dos dados de artistas');
+      } else {
+        try {
+          const response = await fetch('data.json');
+          artistasData = await response.json();
+          localStorage.setItem(ARTISTAS_CACHE_KEY, JSON.stringify(artistasData));
+          localStorage.setItem(ARTISTAS_CACHE_DATE_KEY, getTodayDateString());
+          console.log('Dados de artistas buscados e salvos em cache');
+        } catch (error) {
+          console.error('Erro ao buscar data.json:', error);
+          return;
+        }
+      }
+
       const artistCards = document.getElementById('artistCards');
       
-      // Embaralhar a ordem dos artistas
-      data.artistas.sort(() => Math.random() - 0.5);
+      // Embaralha a ordem dos artistas (opcional)
+      artistasData.artistas.sort(() => Math.random() - 0.5);
       
-      // Obter token do Spotify uma vez
+      // Obter token do Spotify (não cacheamos o token, pois ele expira rápido)
       const token = await getSpotifyToken();
 
-      data.artistas.forEach(artista => {
+      artistasData.artistas.forEach(artista => {
         const card = document.createElement('div');
         card.className = 'card artist-card';
         const cardBody = document.createElement('div');
@@ -240,7 +237,6 @@
         
         // Imagem e título do artista
         const cardImage = document.createElement('img');
-        // Imagem padrão do JSON enquanto a capa do Spotify é carregada
         cardImage.src = artista.imagem || 'placeholder-image.png';
         cardImage.alt = artista.nome;
         cardBody.appendChild(cardImage);
@@ -250,7 +246,7 @@
         cardTitle.textContent = artista.nome;
         cardBody.appendChild(cardTitle);
         
-        // Lista de ícones
+        // Lista de ícones dos canais
         const iconList = document.createElement('div');
         iconList.className = 'icon-list';
         iconList.innerHTML = `
@@ -262,16 +258,14 @@
         `;
         cardBody.appendChild(iconList);
         
-        // Container para álbuns e singles
+        // Container para exibir álbuns e singles
         const cardTextContainer = document.createElement('div');
         cardTextContainer.className = 'card-text-container';
-        // Cria dois contêineres: um para Álbuns e outro para Singles
         const albumsList = document.createElement('div');
         albumsList.className = 'albums-list';
         const singlesList = document.createElement('div');
         singlesList.className = 'singles-list';
         
-        // Exibir dados estáticos iniciais, se houver
         if(artista.albuns) {
           albumsList.innerHTML = `<strong>Álbuns:</strong><ul>${artista.albuns.map(album => {
             return `<li><a href="${album.spotify}" target="_blank">${album.nome} (${album.ano})</a></li>`;
@@ -288,46 +282,54 @@
         card.appendChild(cardBody);
         artistCards.appendChild(card);
 
-        // Se o artista tiver link do Spotify, atualizar com dados dinâmicos
-        if(artista.canais.spotify) {
+        // Se o artista tiver link do Spotify, busca dados dinâmicos com cache
+        if (artista.canais.spotify) {
           const artistId = extractSpotifyArtistId(artista.canais.spotify);
-          if(artistId) {
-            // Atualizar o nome do artista com o nome oficial da API
-            fetchArtistDetails(artistId, token).then(artistDetails => {
-              if(artistDetails && artistDetails.name) {
+          if (artistId) {
+            // Atualiza detalhes do artista (cache por 24h)
+            getCachedData(
+              `spotify_details_${artistId}`,
+              `spotify_details_date_${artistId}`,
+              () => fetchArtistDetails(artistId, token)
+            ).then(artistDetails => {
+              if (artistDetails && artistDetails.name) {
                 cardTitle.textContent = artistDetails.name;
               }
             }).catch(err => {
               console.error("Erro ao buscar detalhes do artista para", artista.nome, err);
             });
             
-            fetchArtistReleases(artistId, token).then(releases => {
-              if(releases.length > 0) {
-                // Remover duplicatas (comparando nomes ignorando caixa)
+            // Atualiza lançamentos do artista (cache por 24h)
+            getCachedData(
+              `spotify_releases_${artistId}`,
+              `spotify_releases_date_${artistId}`,
+              () => fetchArtistReleases(artistId, token)
+            ).then(releases => {
+              if (releases.length > 0) {
+                // Remove duplicatas (ignorando caixa)
                 releases = releases.filter((album, index, self) => 
                   self.findIndex(a => a.name.toLowerCase() === album.name.toLowerCase()) === index
                 );
-                // Ordenar lançamentos: mais novo primeiro
+                // Ordena lançamentos: os mais recentes primeiro
                 releases.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
                 
-                // Separar em Álbuns e Singles
                 const albumsData = releases.filter(release => release.album_type === "album");
                 const singlesData = releases.filter(release => release.album_type === "single");
-
-                // Atualiza a imagem do card com uma capa aleatória (preferencialmente de um álbum, se existir)
+  
+                // Atualiza a imagem do card com uma capa aleatória (priorizando álbuns)
                 let selectedRelease = null;
-                if(albumsData.length > 0) {
+                if (albumsData.length > 0) {
                   selectedRelease = albumsData[Math.floor(Math.random() * albumsData.length)];
-                } else if(singlesData.length > 0) {
+                } else if (singlesData.length > 0) {
                   selectedRelease = singlesData[Math.floor(Math.random() * singlesData.length)];
                 }
-                if(selectedRelease && selectedRelease.images && selectedRelease.images.length > 0) {
+                if (selectedRelease && selectedRelease.images && selectedRelease.images.length > 0) {
                   cardImage.src = selectedRelease.images[0].url;
                 }
                 
-                // Montar HTML para Álbuns
+                // Monta HTML para álbuns
                 let albumsHTML = "";
-                if(albumsData.length > 0) {
+                if (albumsData.length > 0) {
                   albumsHTML = `<strong>Álbuns:</strong><ul>` + albumsData.map(release => {
                     const newBadge = isNewRelease(release.release_date) ? '<span class="badge badge-danger">NOVO</span>' : '';
                     const releaseYear = release.release_date ? release.release_date.slice(0,4) : '';
@@ -335,9 +337,9 @@
                   }).join('') + `</ul>`;
                 }
                 
-                // Montar HTML para Singles
+                // Monta HTML para singles
                 let singlesHTML = "";
-                if(singlesData.length > 0) {
+                if (singlesData.length > 0) {
                   singlesHTML = `<strong>Singles:</strong><ul>` + singlesData.map(release => {
                     const newBadge = isNewRelease(release.release_date) ? '<span class="badge badge-danger">NOVO</span>' : '';
                     const releaseYear = release.release_date ? release.release_date.slice(0,4) : '';
@@ -345,7 +347,6 @@
                   }).join('') + `</ul>`;
                 }
                 
-                // Atualiza os contêineres do card com os lançamentos separados
                 albumsList.innerHTML = albumsHTML;
                 singlesList.innerHTML = singlesHTML;
               }
@@ -355,6 +356,11 @@
           }
         }
       });
+    });
+  </script>
+  <script>
+    $(function(){
+      $("#footer-placeholder").load("../footer.html");
     });
   </script>
 </body>
