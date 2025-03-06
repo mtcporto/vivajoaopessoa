@@ -7,9 +7,83 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="styles.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <style>
+    /* Adicionar estes estilos junto com os existentes */
+    .carousel-video {
+        position: relative;
+        width: 100%;
+        max-width: 1116px;
+        margin: 20px auto;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 365px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .carousel-indicators li {
+        background-color: #fff;
+    }
+    .carousel-control-prev,
+    .carousel-control-next {
+        z-index: 10;
+    }
+    .featured-event-card {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    .featured-event-card img {
+        width: 100%;
+        height: 365px;
+        object-fit: cover;
+    }
+    .featured-info {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 50%;
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        color: #fff;
+        z-index: 2;
+    }
+    .featured-info .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.8), transparent);
+        z-index: 1;
+    }
+    .featured-info .content {
+        position: relative;
+        z-index: 2;
+        text-align: left;
+        top: -120px;
+    }
+</style>
 </head>
 <body>
   <div class="header">Shows e Eventos em João Pessoa</div>
+  
+  <!-- Adicionar carousel antes do container principal -->
+  <div id="featuredEventCarousel" class="carousel slide carousel-video" data-ride="carousel" data-interval="10000">
+      <ol class="carousel-indicators" id="carouselIndicators"></ol>
+      <div class="carousel-inner" id="featuredCarouselInner"></div>
+      <a class="carousel-control-prev" href="#featuredEventCarousel" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Anterior</span>
+      </a>
+      <a class="carousel-control-next" href="#featuredEventCarousel" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Próximo</span>
+      </a>
+  </div>
+
   <div class="container">
     <div id="eventos" class="row"></div>
     <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Eventos</button>
@@ -203,6 +277,31 @@ function loadEvents() {
                 futuro: groupedEvents.futuro.length
             });
 
+            // Popula o carousel com eventos destacados
+            const carousel = document.getElementById('featuredCarouselInner');
+            const indicators = document.getElementById('carouselIndicators');
+            carousel.innerHTML = '';
+            indicators.innerHTML = '';
+
+            // Prioriza eventos de hoje e amanhã, depois desta semana
+            let featuredEvents = [
+                ...groupedEvents.hoje,
+                ...groupedEvents.amanha,
+                ...groupedEvents.estaSemana
+            ].slice(0, 5); // Limita a 5 eventos destacados
+
+            featuredEvents.forEach((event, index) => {
+                const slide = createFeaturedEventSlide(event);
+                if (index === 0) slide.classList.add('active');
+                carousel.appendChild(slide);
+
+                const indicator = document.createElement('li');
+                indicator.setAttribute('data-target', '#featuredEventCarousel');
+                indicator.setAttribute('data-slide-to', index.toString());
+                if (index === 0) indicator.classList.add('active');
+                indicators.appendChild(indicator);
+            });
+
             // Renderiza os grupos na ordem correta
             const container = document.getElementById('eventos');
             container.innerHTML = '';
@@ -287,6 +386,30 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Adicionar esta função para criar slides do carousel
+function createFeaturedEventSlide(event) {
+    const slide = document.createElement('div');
+    slide.classList.add('carousel-item');
+
+    // Limpa a data removendo "João Pessoa" se existir
+    const date = event.date.replace('João Pessoa', '').trim();
+
+    slide.innerHTML = `
+        <div class="featured-event-card">
+            <img src="${event.image}" alt="${event.title}">
+            <div class="featured-info">
+                <div class="overlay"></div>
+                <div class="content">
+                    <h2 class="title">${event.title}</h2>
+                    <p class="card-text">${date}</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    return slide;
+}
 
 document.querySelector("#loadMore").addEventListener('click', loadEvents);
 loadEvents();
