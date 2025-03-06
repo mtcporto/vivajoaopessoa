@@ -27,25 +27,266 @@
   <script>
 let eventosLoaded = 0;
 
-function loadEvents() {
-  const eventLoadPromises = [
-    loadSymplaEvents(),
-    loadEventimEvents(),
-    loadBilheteriaDigitalEvents(),
-    loadOutgoEvents(),
-    loadIngressoDigitalEvents(),
-  ];
+// Função para converter string de data para objeto Date
+function parseEventDate(dateStr) {
+    if (!dateStr) return null;
+    dateStr = dateStr.trim().toLowerCase();
+    
+    try {
+        const months = {
+            'janeiro': 0, 'fevereiro': 1, 'março': 2, 'abril': 3,
+            'maio': 4, 'junho': 5, 'julho': 6, 'agosto': 7,
+            'setembro': 8, 'outubro': 9, 'novembro': 10, 'dezembro': 11
+        };
 
-  Promise.all(eventLoadPromises)
-    .then(() => {
-      eventosLoaded += 4; // Increment eventosLoaded after all events are loaded
-      // You can add any post-processing or UI updates here
-      console.log("All events loaded!");
-    })
-    .catch((error) => {
-      console.error("Error loading events:", error);
-    });
+        // Formato Bilheteria Digital: "20 de março"
+        if (dateStr.includes(' de ')) {
+            const parts = dateStr.split(' de ');
+            const day = parseInt(parts[0].replace(/[^\d]/g, ''));
+            const monthStr = parts[1].split(' ')[0]; // Pega só o nome do mês
+            const month = months[monthStr];
+            
+            if (!isNaN(day) && month !== undefined) {
+                const year = new Date().getFullYear();
+                const date = new Date(year, month, day);
+                console.log(`Data parseada de "${dateStr}": ${date.toISOString()}`);
+                return date;
+            }
+        }
+        
+        // Formato DD/MM/YYYY ou DD/MM/YYYY HH:mm
+        const ddmmyyyy = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        if (ddmmyyyy) {
+            const [_, day, month, year] = ddmmyyyy;
+            const date = new Date(year, month - 1, day);
+            console.log(`Data parseada de "${dateStr}": ${date.toISOString()}`);
+            return date;
+        }
+
+        // Se chegou aqui, não conseguiu parsear
+        console.warn(`Formato de data não reconhecido: ${dateStr}`);
+        return null;
+    } catch (error) {
+        console.error(`Erro ao processar data "${dateStr}":`, error);
+        return null;
+    }
 }
+
+// Função para organizar eventos por período
+function organizeEvents(allEvents) {
+    console.log('Organizando eventos...');
+    
+    // Debug: mostra as datas antes da ordenação
+    allEvents.forEach(event => {
+        const parsedDate = parseEventDate(event.date);
+        console.log(`Evento: ${event.title}`);
+        console.log(`Data original: ${event.date}`);
+        console.log(`Data parseada: ${parsedDate?.toISOString() || 'Inválida'}`);
+        console.log('---');
+    });
+
+    // Ordena eventos
+    allEvents.sort((a, b) => {
+        const dateA = parseEventDate(a.date);
+        const dateB = parseEventDate(b.date);
+        
+        if (dateA && dateB) {
+            const result = dateA - dateB;
+            console.log(`Comparando: ${a.title} (${dateA.toISOString()}) com ${b.title} (${dateB.toISOString()}): ${result}`);
+            return result;
+        }
+        
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return 0;
+    });
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const nextWeekEnd = new Date(now);
+    nextWeekEnd.setDate(now.getDate() + 7);
+
+    const nextMonthStart = new Date(now);
+    nextMonthStart.setMonth(now.getMonth() + 1, 1);
+    
+    const nextMonthEnd = new Date(now);
+    nextMonthEnd.setMonth(now.getMonth() + 2, 0);
+
+    const groups = {
+        hoje: [],
+        amanha: [],
+        estaSemana: [],
+        proximoMes: [],
+        futuro: []
+    };
+
+    allEvents.forEach(event => {
+        const eventDate = parseEventDate(event.date);
+        if (!eventDate) {
+            groups.futuro.push(event);
+            return;
+        }
+
+        eventDate.setHours(0, 0, 0, 0);
+
+        if (eventDate.getTime() === now.getTime()) {
+            groups.hoje.push(event);
+        } else if (eventDate.getTime() === tomorrow.getTime()) {
+            groups.amanha.push(event);
+        } else if (eventDate <= nextWeekEnd) {
+            groups.estaSemana.push(event);
+        } else if (eventDate >= nextMonthStart && eventDate <= nextMonthEnd) {
+            groups.proximoMes.push(event);
+        } else {
+            groups.futuro.push(event);
+        }
+    });
+
+    return groups;
+}
+
+// Modificar a função loadEvents para usar a organização
+function loadEvents() {
+    // Limpa o container antes de começar
+    const container = document.getElementById('eventos');
+    container.innerHTML = '';
+    console.log('Container limpo, iniciando carregamento...');
+
+    const eventLoadPromises = [
+        new Promise(resolve => {
+            loadSymplaEvents(events => {
+                console.log('Eventos Sympla carregados:', events.length);
+                resolve(events);
+            });
+        }),
+        new Promise(resolve => {
+            loadEventimEvents(events => {
+                console.log('Eventos Eventim carregados:', events.length);
+                resolve(events);
+            });
+        }),
+        new Promise(resolve => {
+            loadBilheteriaDigitalEvents(events => {
+                console.log('Eventos Bilheteria Digital carregados:', events.length);
+                resolve(events);
+            });
+        }),
+        new Promise(resolve => {
+            loadOutgoEvents(events => {
+                console.log('Eventos Outgo carregados:', events.length);
+                resolve(events);
+            });
+        }),
+        new Promise(resolve => {
+            loadIngressoDigitalEvents(events => {
+                console.log('Eventos Ingresso Digital carregados:', events.length);
+                resolve(events);
+            });
+        }),
+    ];
+
+    Promise.all(eventLoadPromises)
+        .then(results => {
+            const allEvents = results.flat().filter(Boolean);
+            console.log('Total de eventos:', allEvents.length);
+
+            const groupedEvents = organizeEvents(allEvents);
+            console.log('Eventos agrupados:', {
+                hoje: groupedEvents.hoje.length,
+                amanha: groupedEvents.amanha.length,
+                estaSemana: groupedEvents.estaSemana.length,
+                proximoMes: groupedEvents.proximoMes.length,
+                futuro: groupedEvents.futuro.length
+            });
+
+            // Renderiza os grupos na ordem correta
+            const container = document.getElementById('eventos');
+            container.innerHTML = '';
+
+            const grupos = [
+                { key: 'hoje', title: 'Hoje' },
+                { key: 'amanha', title: 'Amanhã' },
+                { key: 'estaSemana', title: 'Esta Semana' },
+                { key: 'proximoMes', title: 'Próximo Mês' },
+                { key: 'futuro', title: 'Eventos Futuros' }
+            ];
+
+            grupos.forEach(({ key, title }) => {
+                const events = groupedEvents[key];
+                if (events && events.length > 0) {
+                    // Adiciona o título do grupo
+                    const groupTitle = document.createElement('div');
+                    groupTitle.className = 'col-12';
+                    groupTitle.innerHTML = `<h3 class="group-title">${title}</h3>`;
+                    container.appendChild(groupTitle);
+
+                    // Adiciona os eventos do grupo
+                    events.forEach(event => {
+                        const eventDiv = createEventCard(event);
+                        container.appendChild(eventDiv);
+                    });
+                }
+            });
+
+            eventosLoaded += allEvents.length;
+            console.log('Renderização completa!');
+        })
+        .catch(error => {
+            console.error("Erro ao carregar eventos:", error);
+        });
+}
+
+// Função para obter a classe do badge baseado na fonte
+function getBadgeClass(source) {
+    const badgeClasses = {
+        'Sympla': 'badge-info',
+        'Eventim': 'badge-success',
+        'Bilheteria Digital': 'badge-warning',
+        'Outgo': 'badge-danger',
+        'Ingresso Digital': 'badge-dark'
+    };
+    return badgeClasses[source] || 'badge-secondary';
+}
+
+// Atualizar a função createEventCard para usar as cores corretas dos badges
+function createEventCard(event) {
+    const div = document.createElement('div');
+    div.className = 'col-md-4 col-sm-6 mb-4';
+    div.innerHTML = `
+        <div class="card">
+            <a href="${event.link}" target="_blank" class="card-link">
+                <img src="${event.image || 'placeholder.jpg'}" class="card-img-top" alt="${event.title}">
+            </a>
+            <div class="card-body">
+                <p class="fonte">
+                    <span class="badge ${getBadgeClass(event.source)}">Fonte: ${event.source}</span>
+                </p>
+                <h5 class="card-title">${event.title}</h5>
+                <p class="card-text">${event.date}</p>
+                <p class="card-text">${event.location || ''}</p>
+            </div>
+        </div>
+    `;
+    return div;
+}
+
+// Estilo para os títulos dos grupos
+const style = document.createElement('style');
+style.textContent = `
+    .group-title {
+        padding: 10px;
+        margin: 20px 0;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        color: #0056b3;
+        font-weight: bold;
+    }
+`;
+document.head.appendChild(style);
 
 document.querySelector("#loadMore").addEventListener('click', loadEvents);
 loadEvents();
