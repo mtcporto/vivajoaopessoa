@@ -6,7 +6,6 @@
     <title>Bares e Restaurantes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -53,50 +52,87 @@
     <!-- Os cards serão inseridos aqui pelo JavaScript -->
 </div>
 
-<!-- Container para o footer -->
-<div id="footer-placeholder"></div>    
-
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-   fetch('data.json') // Ajuste para o caminho correto do arquivo JSON
-        .then(response => response.json())
-        .then(data => {
-            const container = document.querySelector('.container');
-            const row = document.createElement('div');
-            row.className = 'row';
-            data.estabelecimentos.forEach(estabelecimento => {
-                const col = document.createElement('div');
-                col.className = 'col-md-4';
-                const card = document.createElement('div');
-                card.className = 'card';
-                const instagramLink = estabelecimento.instagram ? `https://www.instagram.com/${estabelecimento.instagram}` : '#';
-                const mapLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(estabelecimento.endereco)}`;
-                card.innerHTML = `
-                    <img src="${estabelecimento.foto}" class="card-img-top" alt="${estabelecimento.nome}">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                           ${estabelecimento.nome}
-                        </h5>
-                        <p class="card-text">
-                            <a href="${mapLink}" target="_blank" class="map-icon">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </a>
-                            <a href="${instagramLink}" target="_blank" class="instagram-icon">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                        </p>
-                    </div>
-                `;
-                row.appendChild(col);
-                col.appendChild(card);
-            });
-            container.appendChild(row);
+    // === CONFIGURAÇÃO DO CACHE ===
+    const PLACES_CACHE_KEY = 'baresData';
+    const PLACES_CACHE_DATE_KEY = 'baresDataDate';
+    const PLACES_CACHE_DURATION = 30; // dias
+
+    function isCacheValid(cacheDateKey, durationInDays) {
+        const cachedDate = localStorage.getItem(cacheDateKey);
+        if (!cachedDate) return false;
+        
+        const cachedTime = new Date(cachedDate).getTime();
+        const now = new Date().getTime();
+        const diffDays = Math.floor((now - cachedTime) / (1000 * 60 * 60 * 24));
+        
+        return diffDays < durationInDays;
+    }
+
+    function saveCache(cacheKey, data, cacheDateKey) {
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(cacheDateKey, new Date().toISOString());
+    }
+
+    function getCache(cacheKey) {
+        const data = localStorage.getItem(cacheKey);
+        return data ? JSON.parse(data) : null;
+    }
+
+    function renderEstabelecimentos(data) {
+        const container = document.querySelector('.container');
+        const row = document.createElement('div');
+        row.className = 'row';
+        
+        data.estabelecimentos.forEach(estabelecimento => {
+            const col = document.createElement('div');
+            col.className = 'col-md-4';
+            const card = document.createElement('div');
+            card.className = 'card';
+            const instagramLink = estabelecimento.instagram ? `https://www.instagram.com/${estabelecimento.instagram}` : '#';
+            const mapLink = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(estabelecimento.endereco)}`;
+            card.innerHTML = `
+                <img src="${estabelecimento.foto}" class="card-img-top" alt="${estabelecimento.nome}">
+                <div class="card-body">
+                    <h5 class="card-title">
+                       ${estabelecimento.nome}
+                    </h5>
+                    <p class="card-text">
+                        <a href="${mapLink}" target="_blank" class="map-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </a>
+                        <a href="${instagramLink}" target="_blank" class="instagram-icon">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </p>
+                </div>
+            `;
+            row.appendChild(col);
+            col.appendChild(card);
         });
+        
+        container.appendChild(row);
+    }
+
+    // Carrega os dados com cache
+    if (isCacheValid(PLACES_CACHE_DATE_KEY, PLACES_CACHE_DURATION)) {
+        console.log('Usando cache dos estabelecimentos');
+        const cachedData = getCache(PLACES_CACHE_KEY);
+        if (cachedData) {
+            renderEstabelecimentos(cachedData);
+        }
+    } else {
+        console.log('Buscando dados dos estabelecimentos');
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                saveCache(PLACES_CACHE_KEY, data, PLACES_CACHE_DATE_KEY);
+                renderEstabelecimentos(data);
+            });
+    }
 </script>
-<script>
-  $(function(){
-    $("#footer-placeholder").load("../footer.html");
-  });
-</script>
+
 </body>
 </html>
