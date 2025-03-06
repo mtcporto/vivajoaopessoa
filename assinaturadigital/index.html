@@ -253,6 +253,22 @@
                 telefone: "83 988281973"
             };
 
+            function getValidationUrl() {
+                const hostname = window.location.hostname;
+                const protocol = window.location.protocol;
+                
+                // Se estiver em localhost
+                if (hostname === 'localhost') {
+                    return `${protocol}//${hostname}/assinaturadigital/validar.html`;
+                }
+                
+                // Para ambiente de produção
+                const baseDomain = hostname.split('.').slice(-2).join('.');
+                return `${protocol}//validar.${baseDomain}`;
+            }
+
+            const VALIDATION_URL = getValidationUrl();
+
             // Elementos de progresso
             const progressSteps = [
                 document.getElementById('progressStep1'),
@@ -502,7 +518,7 @@
                     const qrData = JSON.stringify({
                         hash: signatureData.documentHash,
                         timestamp: signatureData.timestamp,
-                        verificationUrl: 'https://validar.iti.gov.br'
+                        verificationUrl: VALIDATION_URL
                     });
 
                     // Continuar com o código existente de geração do PDF
@@ -526,7 +542,7 @@
 
                     // QR Code
                     const qrSize = (signaturePosition.overlayHeight * scaleY); // Use overlay height as reference
-                    const qrCodeCanvas = await generateQRCode('https://validar.iti.gov.br');
+                    const qrCodeCanvas = await generateQRCode(VALIDATION_URL);
                     const qrCodeImageBytes = await fetch(qrCodeCanvas.toDataURL()).then(res => res.arrayBuffer());
                     const qrCodeImageEmbed = await pdfDoc.embedPng(qrCodeImageBytes);
 
@@ -566,7 +582,7 @@
                         color: PDFLib.rgb(0, 0, 0)
                     });
 
-                    page.drawText('Verificação: validar.iti.gov.br', {
+                    page.drawText('Verificação: ' + new URL(VALIDATION_URL).hostname, {
                         x: textX,
                         y: pdfY + textHeight - (spacing * 4),
                         size: fontSize,
@@ -624,7 +640,7 @@
                 const qrContainer = document.getElementById('qrcode');
                 qrContainer.innerHTML = ''; // Limpa o container
                 return new Promise((resolve) => {
-                    QRCode.toCanvas(qrContainer, 'https://validar.iti.gov.br', { 
+                    QRCode.toCanvas(qrContainer, VALIDATION_URL, { 
                         width: 60,
                         height: 60,
                         margin: 0
