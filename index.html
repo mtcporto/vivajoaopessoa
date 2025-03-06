@@ -24,12 +24,13 @@
       padding: 10px;
       text-align: center;
       font-size: 2em;
-      margin-bottom: 5px;
+      /* margin-bottom: 20px; */
     }    
     .card-weather {
       margin-bottom: 20px;
       width: 100%;
       max-width: 100%;
+      margin-top: 5px;
     }
     .badge.bg-orange, .badge-yellow, .bg-warning  {
   background-color: #d6c318;
@@ -87,7 +88,6 @@
     </header>
 
 
-
     <div class="container">
       <div class="row">
         <div class="col-12">
@@ -129,52 +129,39 @@
 
   <!-- Container para o footer -->
   <div id="footer-placeholder"></div>
+
   
     <script>
-    // strings: [
-    //   'Descubra',
-    //   'Explore',
-    //   'Conheça',
-    //   'Experimente',
-    //   'Navegue por',
-    //   'Percorra',
-    //   'Sinta',
-    //   'Desvende',
-    //   'Celebre',
-    //   'Saboreie',
-    //   'Contemple',
-    //   'Curta',
-    //   'Mergulhe em',
-    //   'Aventure-se em',
-    //   'Viva'
-    // ],
-var typed = new Typed('#typed-text', {
-    strings: [
-      '',
-      'Descubra',
-      'Explore',
-      'Conheça',
-      'Sinta',
-      'Desvende',
-      'Celebre',
-      'Saboreie',
-      'Contemple',
-      'Curta',
-      'Viva'
-    ],
-    typeSpeed: 80,
-    backSpeed: 50,
-    loop: false,
-    smartBackspace: true, // Para não apagar a palavra "João Pessoa"
-    preStringTyped: function() {
-      // Garante que a palavra "João Pessoa" esteja sempre presente
-      document.getElementById('typed-text').textContent += ' João Pessoa';
-    }
-  });
+  // === CONFIGURAÇÃO DO CACHE ===
+  const CARDS_CACHE_KEY = 'cardsData';
+  const CARDS_CACHE_DATE_KEY = 'cardsDataDate';
+  const CARDS_CACHE_DURATION = 30; // dias
 
-        // JSON com as informações dos cards
-        const cardsData = [
-        {
+  // Funções de cache
+  function isCacheValid(cacheDateKey, durationInDays) {
+    const cachedDate = localStorage.getItem(cacheDateKey);
+    if (!cachedDate) return false;
+    
+    const cachedTime = new Date(cachedDate).getTime();
+    const now = new Date().getTime();
+    const diffDays = Math.floor((now - cachedTime) / (1000 * 60 * 60 * 24));
+    
+    return diffDays < durationInDays;
+  }
+
+  function saveCache(cacheKey, data, cacheDateKey) {
+    localStorage.setItem(cacheKey, JSON.stringify(data));
+    localStorage.setItem(cacheDateKey, new Date().toISOString());
+  }
+
+  function getCache(cacheKey) {
+    const data = localStorage.getItem(cacheKey);
+    return data ? JSON.parse(data) : null;
+  }
+
+  // Dados dos cards (mantido igual)
+  const cardsData = [
+    {
     "titulo": "Shows e Eventos",
     "texto": "Descubra os melhores shows e eventos da cidade.",
     "link": "/shows/",
@@ -238,38 +225,78 @@ var typed = new Typed('#typed-text', {
   }
 ];
 
-        // Função para criar os cards dinamicamente
-        function createCards() {
-            const container = document.getElementById('card-container');
-            container.innerHTML = '';
+  // Funções de criação e carregamento dos cards
+  function createCards(cardsData) {
+    const container = document.getElementById('card-container');
+    container.innerHTML = '';
 
-            cardsData.forEach(card => {
-                const cardHTML = `
-                    <div class="col-md-4 col-sm-6 mb-4">
-                        <div class="card dark-card">
-                            <img src="${card.imagem}" class="card-img-top" alt="${card.titulo}">
-                            <div class="card-body">
-                                <h5 class="card-title">${card.titulo}</h5>
-                                <p class="card-text">${card.texto}</p>
-                                <a href="${card.link}" class="btn btn-success" target="_blank">Ver mais</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += cardHTML;
-            });
-        }
-
-        // Chama a função para criar os cards ao carregar a página
-        window.onload = createCards;
-    </script>
-   <script src="/clima/weather.js"></script>
-   <script src="/alertas/alertas.js"></script>
-     <!-- Scripts para carregar o footer -->
-  <script>
-    $(function(){
-      $("#footer-placeholder").load("footer.html");
+    cardsData.forEach(card => {
+      const cardHTML = `
+        <div class="col-md-4 col-sm-6 mb-4">
+          <div class="card dark-card">
+            <img src="${card.imagem}" class="card-img-top" alt="${card.titulo}">
+            <div class="card-body">
+              <h5 class="card-title">${card.titulo}</h5>
+              <p class="card-text">${card.texto}</p>
+              <a href="${card.link}" class="btn btn-success" target="_blank">Ver mais</a>
+            </div>
+          </div>
+        </div>
+      `;
+      container.innerHTML += cardHTML;
     });
-  </script>
+  }
+
+  function loadCards() {
+    if (isCacheValid(CARDS_CACHE_DATE_KEY, CARDS_CACHE_DURATION)) {
+      console.log('Usando cache dos cards');
+      const cachedCards = getCache(CARDS_CACHE_KEY);
+      if (cachedCards) {
+        createCards(cachedCards);
+        return;
+      }
+    }
+
+    console.log('Salvando cards no cache');
+    saveCache(CARDS_CACHE_KEY, cardsData, CARDS_CACHE_DATE_KEY);
+    createCards(cardsData);
+  }
+
+  // Inicialização
+  window.onload = function() {
+    loadCards();
+  };
+
+  // Typed.js animation (mantido igual)
+  var typed = new Typed('#typed-text', {
+    strings: [
+      '',
+      'Descubra',
+      'Explore',
+      'Conheça',
+      'Sinta',
+      'Desvende',
+      'Celebre',
+      'Saboreie',
+      'Contemple',
+      'Curta',
+      'Viva'
+    ],
+    typeSpeed: 80,
+    backSpeed: 50,
+    loop: false,
+    smartBackspace: true,
+    preStringTyped: function() {
+      document.getElementById('typed-text').textContent += ' João Pessoa';
+    }
+  });
+
+  // Scripts para carregar o footer
+  $(function(){
+    $("#footer-placeholder").load("footer.html");
+  });
+</script>
+<script src="/clima/weather.js"></script>
+<script src="/alertas/alertas.js"></script>
 </body>
 </html>
