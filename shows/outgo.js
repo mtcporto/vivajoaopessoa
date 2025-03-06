@@ -27,107 +27,60 @@ function parsePortugueseDate(dateStr) {
   return null;
 }
 
-function loadOutgoEvents() {
-  const url = 'https://cors.mosaicoworkers.workers.dev/www.outgo.com.br/eventos/PB';
-  let eventosCount = 0;
+function loadOutgoEvents(callback) {
+    const url = 'https://cors.mosaicoworkers.workers.dev/www.outgo.com.br/eventos/PB';
 
-  fetch(url)
-    .then(response => response.text())
-    .then(html => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const eventosDiv = document.getElementById('eventos');
+    fetch(url)
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const eventos = Array.from(doc.querySelectorAll('card-event'))
+                .map(evento => {
+                    try {
+                        const titleElement = evento.querySelector('.cardEvent-title');
+                        if (!titleElement) return null;
 
-      // Seleciona todos os eventos na página
-      const eventos = doc.querySelectorAll('card-event');
+                        const subtitleElements = evento.querySelectorAll('.cardEvent-subtitle');
+                        if (!subtitleElements || subtitleElements.length < 2) return null;
 
-      eventos.forEach((evento, index) => {
-        if (index >= eventosCount && index < eventosCount + 9) {
-          try {
-            const titleElement = evento.querySelector('.cardEvent-title');
-            if (!titleElement) {
-              console.error('Elemento .cardEvent-title não encontrado', evento);
-              return;
-            }
-            const nomeOriginal = titleElement.textContent.trim();
-            const nome = nomeOriginal
-              .toLowerCase()
-              .replace(/\s/g, '-')
-              .replace(/[áàãâä]/g, 'a')
-              .replace(/[éèêë]/g, 'e')
-              .replace(/[íìîï]/g, 'i')
-              .replace(/[óòõôö]/g, 'o')
-              .replace(/[úùûü]/g, 'u')
-              .replace(/[ç]/g, 'c');
+                        const data = subtitleElements[0]?.querySelector('time')?.textContent.trim() 
+                            || subtitleElements[0]?.textContent.trim();
+                        const local = subtitleElements[1]?.textContent.trim() || '';
 
-            const linkElement = evento.querySelector('.card-link');
-            if (!linkElement) {
-              console.error('Elemento .card-link não encontrado', evento);
-              return;
-            }
-            const href = linkElement.getAttribute('href');
-            const idEvento = href.split('/').pop();
-            const link = `https://www.outgo.com.br/${idEvento}`;
+                        // Filtra eventos que não são de João Pessoa
+                        if (!local || !local.includes('João Pessoa')) return null;
 
-            const imgElement = evento.querySelector('.cardEvent-coverpage');
-            if (!imgElement) {
-              console.error('Elemento .cardEvent-coverpage não encontrado', evento);
-              return;
-            }
-            const foto = imgElement.getAttribute('src');
+                        // Filtra eventos passados
+                        const eventDate = parsePortugueseDate(data);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (eventDate && eventDate < today) return null;
 
-            const subtitleElements = evento.querySelectorAll('.cardEvent-subtitle');
-            let data = '';
-            let local = '';
+                        const link = evento.querySelector('.card-link')?.getAttribute('href');
+                        const image = evento.querySelector('.cardEvent-coverpage')?.getAttribute('src');
 
-            if (subtitleElements.length >= 1) {
-              const timeElement = subtitleElements[0].querySelector('time');
-              data = timeElement ? timeElement.textContent.trim() : subtitleElements[0].textContent.trim();
-            }
-            if (subtitleElements.length >= 2) {
-              local = subtitleElements[1].textContent.trim();
-            }
+                        return {
+                            title: titleElement.textContent.trim(),
+                            link: link ? 'https://www.outgo.com.br' + link : '#',
+                            image: image || 'placeholder.jpg',
+                            date: data || 'Data não informada',
+                            location: local,
+                            source: 'Outgo'
+                        };
+                    } catch (error) {
+                        console.error('Erro ao processar evento Outgo:', error);
+                        return null;
+                    }
+                })
+                .filter(Boolean);
 
-            // Filtra somente eventos de João Pessoa
-            if (!local.includes('João Pessoa')) {
-              return;
-            }
-
-            // Filtra eventos passados
-            const eventDate = parsePortugueseDate(data);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            if (eventDate && eventDate < today) {
-              console.log(`Evento "${nomeOriginal}" ignorado por ser passado.`);
-              return;
-            }
-
-            const eventoDiv = document.createElement('div');
-            eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
-            eventoDiv.innerHTML = `
-              <div class="card">
-                <a href="${link}" target="_blank" class="card-link">
-                  <img src="${foto}" class="card-img-top" alt="${nome}">
-                </a>
-                <div class="card-body">
-                  <p class="fonte">
-                    <span class="badge badge-danger">Fonte: Outgo</span>
-                  </p>                    
-                  <h5 class="card-title">${nomeOriginal}</h5>
-                  <p class="card-text">${data}</p>
-                  <p class="card-text">${local}</p>
-                </div>
-              </div><br>
-            `;
-            eventosDiv.appendChild(eventoDiv);
-          } catch (error) {
-            console.error(`Erro ao processar o evento: ${error}`);
-          }
-        }
-      });
-
-      eventosCount += 50;
-      document.querySelector("#loadMore").style.display = (eventosCount < eventos.length) ? 'block' : 'none';
-    })
-    .catch(console.error);
+            console.log('Eventos Outgo encontrados:', eventos.length);
+            callback(eventos);
+        })
+        .catch(error => {
+            console.error('Erro ao carregar Outgo:', error);
+            callback([]);
+        });
 }
