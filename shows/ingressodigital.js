@@ -1,94 +1,47 @@
-function loadIngressoDigitalEvents() {
-  // URL of the page to scrape
-  const url = 'https://cors.mosaicoworkers.workers.dev/ingressodigital.com/list.php?busca=S&txt_busca=joao+pessoa&txt_busca_m=';
-  let eventosCount = 0;
+function loadIngressoDigitalEvents(callback) {
+    const url = 'https://cors.mosaicoworkers.workers.dev/ingressodigital.com/list.php?busca=S&txt_busca=joao+pessoa&txt_busca_m=';
 
-  function loadEvents() {
     fetch(url)
-      .then(response => response.text())
-      .then(html => {
-        // console.log(html);  // Print raw data
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const eventosDiv = document.getElementById('eventos');
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const eventos = Array.from(doc.querySelectorAll('.item-content'))
+                .map(evento => {
+                    try {
+                        const imgElement = evento.querySelector('.item-content__img');
+                        const localElement = evento.querySelector('.id-location span');
 
-        // Select events from the Ingresso Digital page
-        const eventos = doc.querySelectorAll('.item-content');
+                        if (!localElement?.textContent.includes('João Pessoa, PB')) return null;
 
-        eventos.forEach((evento, index) => {
-          if (index >= eventosCount && index < eventosCount + 9) {
-            try {
-              // Extract the event image
-              const imgElement = evento.querySelector('.item-content__img');
-              let foto = '';
-              if (imgElement) {
-                let style = imgElement.getAttribute('style');
-                let match = style.match(/url\((.*?)\)/i);
-                if (match) {
-                  foto = match[1].replace(/['"]/g, '');
-                }
-              }
+                        const dataElement = evento.querySelector('.d-flex');
+                        let datas = [];
+                        if (dataElement) {
+                            datas = Array.from(dataElement.querySelectorAll('li a'))
+                                .map(item => item.textContent.trim().replace(/\+$/, ''))
+                                .map(text => text.replace(/^(\d{2}\/\d{2})(\d{2}:\d{2})$/, '$1 $2'));
+                        }
 
-              // Extract the event link (remove unnecessary parts)
-              const link = evento.querySelector('a').getAttribute('href').replace('./evento/', 'https://ingressodigital.com/evento/');
+                        return {
+                            title: evento.querySelector('h2 a').textContent.trim(),
+                            link: evento.querySelector('a').getAttribute('href').replace('./evento/', 'https://ingressodigital.com/evento/'),
+                            image: imgElement?.style.backgroundImage.match(/url\((.*?)\)/i)?.[1].replace(/['"]/g, '') || 'placeholder.jpg',
+                            date: datas.join(", "),
+                            location: localElement.textContent,
+                            source: 'Ingresso Digital'
+                        };
+                    } catch (error) {
+                        console.error('Erro ao processar evento Ingresso Digital:', error);
+                        return null;
+                    }
+                })
+                .filter(Boolean);
 
-              // Extract the title of the event
-              const titulo = evento.querySelector('h2 a').textContent.trim();
-
-              // Extract the date(s) of the event
-              const dataElement = evento.querySelector('.d-flex');
-              let data = "";
-              if (dataElement) {
-                const dataItems = dataElement.querySelectorAll('li a');
-                dataItems.forEach((item, index) => {
-                  let itemText = item.textContent.trim();
-                  // Remove the "+" at the end, if any
-                  if (itemText.endsWith('+')) {
-                    itemText = itemText.slice(0, -1);
-                  }
-                  // Insert a space between date and time if missing
-                  itemText = itemText.replace(/^(\d{2}\/\d{2})(\d{2}:\d{2})$/, '$1 $2');
-                  data += itemText + (index < dataItems.length - 1 ? ", " : "");
-                });
-                // Remove the last comma, if any
-                if (data.endsWith(', ')) {
-                  data = data.slice(0, -2);
-                }
-              }
-
-              // Check if the event is in João Pessoa
-              const localElement = evento.querySelector('.id-location span');
-              if (localElement && localElement.textContent.includes('João Pessoa, PB')) {
-                // Create the event card element
-                const eventoDiv = document.createElement('div');
-                eventoDiv.className = 'col-md-4 col-sm-6 mb-4';
-                eventoDiv.innerHTML = `
-                  <div class="card">
-                    <a href="${link}" target="_blank" class="card-link">
-                      <img src="${foto}" class="card-img-top" alt="${titulo}">
-                    </a>
-                    <div class="card-body">
-                      <p class="fonte">
-                        <span class="badge badge-dark">Fonte: Ingresso Digital</span>
-                      </p>
-                      <h5 class="card-title">${titulo}</h5>
-                      <p class="card-text">${data}</p>
-                      <p class="card-text">${localElement.textContent}</p>
-                    </div>
-                  </div><br>
-                `;
-                eventosDiv.appendChild(eventoDiv);
-              }
-            } catch (error) {
-              console.error(`Erro ao processar o evento: ${error}`);
-            }
-          }
+            callback(eventos);
+        })
+        .catch(error => {
+            console.error('Erro ao carregar Ingresso Digital:', error);
+            callback([]);
         });
-
-        eventosCount += 9;
-      })
-      .catch(console.error);
-  }
-
-  loadEvents();
 }
