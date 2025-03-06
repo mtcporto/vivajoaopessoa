@@ -248,6 +248,10 @@
     const SESSIONS_CACHE_KEY_PREFIX = 'sessionsData_';
     const SESSIONS_CACHE_DATE_KEY_PREFIX = 'sessionsDataDate_';
 
+    // Adicionando novas constantes de cache para o endpoint "soon"
+    const SOON_CACHE_KEY = 'soonData';
+    const SOON_CACHE_DATE_KEY = 'soonDataDate';
+
     // Retorna a data atual no formato "YYYY-MM-DD"
     function getTodayDateString() {
       const now = new Date();
@@ -490,23 +494,36 @@
     }
   
     // Função para buscar a sinopse do filme a partir do cache nowPlaying (usando o id)
-    function getSynopsis(movieId, nowPlayingData) {
-      if (nowPlayingData[movieId] && nowPlayingData[movieId].synopsis && nowPlayingData[movieId].synopsis.trim() !== '') {
-        console.log(`Sinopse encontrada para o filme com ID: ${movieId}`);
+    function getSynopsis(movieId, nowPlayingData, soonData) {
+      console.log(`Buscando sinopse para filme ID: ${movieId}`);
+      
+      // Primeiro tenta no nowPlaying
+      if (nowPlayingData[movieId] && nowPlayingData[movieId].synopsis && nowPlayingData[movieId].synopsis.trim()) {
+        console.log(`Sinopse encontrada em nowPlaying: ${nowPlayingData[movieId].synopsis.substring(0,50)}...`);
         return nowPlayingData[movieId].synopsis;
-      } else {
-        console.warn(`Nenhuma sinopse encontrada para o filme com ID: ${movieId}`);
-        return 'Sinopse não disponível.';
       }
+      
+      // Depois tenta no soon
+      if (soonData[movieId] && soonData[movieId].synopsis && soonData[movieId].synopsis.trim()) {
+        console.log(`Sinopse encontrada em soon: ${soonData[movieId].synopsis.substring(0,50)}...`);
+        return soonData[movieId].synopsis;
+      }
+    
+      console.warn(`Nenhuma sinopse encontrada para ID: ${movieId}`);
+      console.log('nowPlayingData para este ID:', nowPlayingData[movieId]);
+      console.log('soonData para este ID:', soonData[movieId]);
+      return 'Sinopse não disponível.';
     }
   
     // ==== Fluxo de carregamento dos dados com cache ====
     const cityId = 32;
     const urlNowPlaying = `https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/templates/nowplaying/${cityId}?partnership=marcotulio`;
+    const urlSoon = `https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/templates/soon/${cityId}?partnership=marcotulio`;
     const urlTheaters = `https://cors.mosaicoworkers.workers.dev/api-content.ingresso.com/v0/theaters/city/${cityId}?partnership=marcotulio`;
   
     let movies = {};
     let nowPlayingData = {};
+    let soonData = {};
     let theaters = [];
   
     // --- Fetch e cache do nowPlaying ---
@@ -520,6 +537,21 @@
         .then(data => {
           console.log("Dados de nowPlaying recebidos:", data);
           saveCache(NOW_PLAYING_CACHE_KEY, data, NOW_PLAYING_CACHE_DATE_KEY);
+          return data;
+        });
+    }
+  
+    // Fetch e cache do soon
+    let soonPromise;
+    if (isCacheValid(SOON_CACHE_DATE_KEY)) {
+      soonPromise = Promise.resolve(getCache(SOON_CACHE_KEY));
+      console.log('Usando cache do soon');
+    } else {
+      soonPromise = fetch(urlSoon)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Dados do soon recebidos:", data);
+          saveCache(SOON_CACHE_KEY, data, SOON_CACHE_DATE_KEY);
           return data;
         });
     }
@@ -539,37 +571,48 @@
         });
     }
   
-    // Primeiro, processa o nowPlaying
-    nowPlayingPromise
-      .then(data => {
-        // Processa os dados do nowPlaying
+    // Modifique o fluxo de promessas para incluir o soon
+    Promise.all([nowPlayingPromise, soonPromise])
+      .then(([nowPlayingItems, soonItems]) => {
+        console.log('Dados brutos do soon:', soonItems); // Debug
+    
+        // Processa nowPlaying
         let moviesArray = [];
-        if (data.items) {
-          moviesArray = data.items;
-        } else if (Array.isArray(data)) {
-          moviesArray = data;
+        if (nowPlayingItems.items) {
+          moviesArray = nowPlayingItems.items;
+        } else if (Array.isArray(nowPlayingItems)) {
+          moviesArray = nowPlayingItems;
         }
-  
-        moviesArray.forEach(nowPlayingMovie => {
-          if (nowPlayingMovie.title) {
-            nowPlayingData[nowPlayingMovie.id] = {
-              id: nowPlayingMovie.id,
-              title: nowPlayingMovie.title,
-              originalTitle: nowPlayingMovie.originalTitle,
-              synopsis: nowPlayingMovie.synopsis || '',
-              imageFeatured: nowPlayingMovie.imageFeatured || '',
-              cast: nowPlayingMovie.cast || '',
-              director: nowPlayingMovie.director || '',
-              distributor: nowPlayingMovie.distributor || '',
-              countryOrigin: nowPlayingMovie.countryOrigin || '',
-              urlKey: nowPlayingMovie.urlKey
-            };
-            console.log(`Filme no nowPlaying: ID=${nowPlayingMovie.id}, Título=${nowPlayingMovie.title}, Sinopse disponível=${!!nowPlayingMovie.synopsis}`);
-          } else {
-            console.warn("Filme sem title no nowPlaying:", nowPlayingMovie);
+    
+        moviesArray.forEach(movie => {
+          if (movie.title) {
+            nowPlayingData[movie.id] = movie; // Armazena o objeto completo
           }
         });
-  
+    
+        // Processa soon
+        let soonArray = [];
+        if (soonItems.items) {
+          soonArray = soonItems.items;
+        } else if (Array.isArray(soonItems)) {
+          soonArray = soonItems;
+        }
+    
+        console.log('Array do soon:', soonArray); // Debug
+    
+        soonArray.forEach(movie => {
+          if (movie.title) {
+            // Armazena o objeto completo no soonData
+            soonData[movie.id] = movie;
+            
+            // Se o filme não existe no nowPlaying ou não tem sinopse, adiciona do soon
+            if (!nowPlayingData[movie.id] || !nowPlayingData[movie.id].synopsis) {
+              console.log(`Adicionando/atualizando dados do soon para o filme ${movie.title} (ID: ${movie.id})`);
+              nowPlayingData[movie.id] = movie;
+            }
+          }
+        });
+    
         return theatersPromise;
       })
       .then(theatersData => {
@@ -645,7 +688,7 @@
         for (let movieId in movies) {
           const movie = movies[movieId];
           console.log(`Processando filme: ID=${movieId}, título=${movie.title}`);
-          movie.synopsis = getSynopsis(movie.id, nowPlayingData);
+          movie.synopsis = getSynopsis(movie.id, nowPlayingData, soonData);
           console.log(`Sinopse para ${movie.title}: ${movie.synopsis.substring(0,50)}...`);
         }
   
