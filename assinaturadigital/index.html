@@ -215,7 +215,7 @@
                             <div style="font-weight: bold;">Marco Tulio Cicero de Mesquita Porto</div>
                             <div>CPF: 930.929.624-00</div>
                             <div id="signatureDateTime"></div>
-                            <div><small class="text-muted">Verificação: validar.iti.gov.br</small></div>
+                            <div><small class="text-muted">Verificação: <span id="validationDomain"></span></small></div>
                         </div>
                     </div>
                     <div id="resizeHandle"></div>
@@ -240,7 +240,7 @@
                     <p><strong>Nome:</strong> Marco Tulio Cicero de Mesquita Porto</p>
                     <p><strong>CPF:</strong> 930.929.624-00</p>
                     <p><strong>Data e Hora:</strong> <span id="finalSignatureDateTime"></span></p>
-                    <p><strong>Verificação:</strong> <a href="https://validar.iti.gov.br" target="_blank">validar.iti.gov.br</a></p>
+                    <p><strong>Verificação:</strong> <span id="finalValidationDomain"></span></p>
                 </div>
                 <button id="downloadPdfBtn" class="btn btn-success">
                     <i class="bi bi-download"></i> Baixar Documento Assinado
@@ -276,6 +276,12 @@
             }
 
             const VALIDATION_URL = getValidationUrl();
+            
+            // Atualize o domínio de validação na interface
+            document.getElementById('validationDomain').textContent = 
+                `${window.location.hostname}/assinaturadigital/validar`;
+            document.getElementById('finalValidationDomain').textContent = 
+                `${window.location.hostname}/assinaturadigital/validar`;
 
             // Elementos de progresso
             const progressSteps = [
@@ -522,13 +528,12 @@
                     // Gerar assinatura digital
                     const signatureData = await signPDF(originalPdfBytes);
                     
-                    // Criar QR code com dados da assinatura
-                    const qrData = JSON.stringify({
-                        hash: signatureData.documentHash,
-                        timestamp: signatureData.timestamp,
-                        verificationUrl: VALIDATION_URL
-                    });
-
+                    // Criar QR code com ID do documento
+                    const validationUrl = `${window.location.origin}/assinaturadigital/validar?id=${encodeURIComponent(signatureData.documentId)}`;
+                    
+                    // Atualizar preview do QR code
+                    const qrCodeCanvas = await generateQRCode(validationUrl);
+                    
                     // Continuar com o código existente de geração do PDF
                     const pdfDoc = await PDFLib.PDFDocument.load(originalPdfBytes);
                     const pages = pdfDoc.getPages();
@@ -550,7 +555,6 @@
 
                     // QR Code
                     const qrSize = (signaturePosition.overlayHeight * scaleY); // Use overlay height as reference
-                    const qrCodeCanvas = await generateQRCode(VALIDATION_URL);
                     const qrCodeImageBytes = await fetch(qrCodeCanvas.toDataURL()).then(res => res.arrayBuffer());
                     const qrCodeImageEmbed = await pdfDoc.embedPng(qrCodeImageBytes);
 
@@ -590,7 +594,7 @@
                         color: PDFLib.rgb(0, 0, 0)
                     });
 
-                    page.drawText('Verificação: ' + new URL(VALIDATION_URL).hostname, {
+                    page.drawText('Verificação: ' + `${window.location.hostname}/assinaturadigital/validar`, {
                         x: textX,
                         y: pdfY + textHeight - (spacing * 4),
                         size: fontSize,
@@ -697,12 +701,14 @@
                 sig.updateString(pdfHashB64);
                 
                 const signature = sig.sign();
+                const documentId = pdfHashB64.replace(/[/+=]/g, ''); // Clean Base64 for URL
                 
                 return {
                     signature: signature,
                     publicKey: keyPair.publicKey,
                     timestamp: new Date().toISOString(),
-                    documentHash: pdfHashB64
+                    documentHash: pdfHashB64,
+                    documentId: documentId
                 };
             } catch (error) {
                 console.error('Erro na assinatura:', error);
@@ -750,6 +756,28 @@
                 console.error('Erro na verificação:', error);
                 return false;
             }
+        }
+
+        async function generateQRCode(documentHash) {
+            const baseUrl = window.location.origin; // pega o domínio atual
+            const validationUrl = `${baseUrl}/assinaturadigital/validar?id=${encodeURIComponent(documentHash)}`;
+            
+            // Gerar QR Code com a URL completa
+            const qr = new QRCode(document.getElementById("qrcode"), {
+                text: validationUrl,
+                width: 128,
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Adicionar link clicável abaixo do QR Code
+            const linkElement = document.createElement('a');
+            linkElement.href = validationUrl;
+            linkElement.textContent = 'Link para validação';
+            linkElement.className = 'mt-2 d-block';
+            document.getElementById("qrcode").appendChild(linkElement);
         }
     </script>
 </body>
