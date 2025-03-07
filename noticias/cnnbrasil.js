@@ -48,67 +48,55 @@ async function getFeaturedImage(articleURL) {
   }
 }
 
-
-
-// Função para carregar notícias da CNN Brasil
-async function loadCNNBrasilNews() {
+function loadCNNBrasilNews(callback) {
   const url = 'https://cors.mosaicoworkers.workers.dev/www.cnnbrasil.com.br/feed/';
-  let newsCount = 0;
+  const MAX_NEWS = 25;
+  
+  fetch(url)
+      .then(response => response.text())
+      .then(async data => {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(data, 'text/xml');
+          const items = xmlDoc.querySelectorAll('item');
+          
+          const newsPromises = Array.from(items)
+              .slice(0, MAX_NEWS)  // Limita a 25 notícias
+              .map(async item => {
+                  try {
+                      const title = item.querySelector('title')?.textContent || '';
+                      const link = item.querySelector('link')?.textContent || '#';
+                      const pubDate = new Date(item.querySelector('pubDate')?.textContent || new Date());
+                      
+                      // Busca imagem e retorna null se não encontrar
+                      const image = await getFeaturedImage(link);
+                      if (!image || image.includes('placehold.co')) {
+                          return null;
+                      }
 
-  async function loadNews() {
-    try {
-      const response = await fetch(url);
-      const data = await response.text();
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(data, 'text/xml');
-      const items = xmlDoc.querySelectorAll('item');
-  
-      for (let i = newsCount; i < Math.min(newsCount + 30, items.length); i++) {
-        const item = items[i];
-        const title = item.querySelector('title').textContent;
-        const link = item.querySelector('link').textContent;
-        const pubDate = new Date(item.querySelector('pubDate').textContent).toLocaleString('pt-BR', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        });
-  
-        // Busca a imagem principal da página do artigo
-        const imgURL = await getFeaturedImage(link);
-  
-        const html = `
-          <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-              <img src="${imgURL}" class="bd-placeholder-img card-img-top" width="100%" height="225">
-              <div class="card-body">
-                <p class="fonte">
-                  <span class="badge badge-dark">Fonte: CNN Brasil</span>
-                </p>                      
-                <h5 class="card-title">${title}</h5>
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="btn-group">
-                    <a href="${link}" target="_blank" class="btn btn-sm btn-outline-secondary">Ver Notícia</a>
-                  </div>
-                  <small class="text-muted">${pubDate}</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-  
-        document.querySelector("#newsCards").innerHTML += html;
-      }
-  
-      newsCount += 30;
-      document.querySelector("#loadMore").style.display = (newsCount < items.length) ? 'block' : 'none';
-    } catch (error) {
-      console.error('Erro ao carregar notícias:', error);
-    }
-  }
-  
-  document.querySelector("#loadMore").addEventListener('click', loadNews);
-  loadNews();
+                      return {
+                          title,
+                          link,
+                          date: pubDate.toLocaleString('pt-BR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                          }),
+                          image,
+                          source: 'CNN Brasil'
+                      };
+                  } catch (error) {
+                      console.error('Erro ao processar notícia CNN:', error);
+                      return null;
+                  }
+              });
+
+          const news = (await Promise.all(newsPromises)).filter(Boolean);
+          callback(news);
+      })
+      .catch(error => {
+          console.error('Erro ao carregar notícias CNN:', error);
+          callback([]);
+      });
 }
