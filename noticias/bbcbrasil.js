@@ -1,68 +1,86 @@
-function loadBBCBrasilNews() {
-  const url = 'https://cors.mosaicoworkers.workers.dev/feeds.bbci.co.uk/portuguese/rss.xml';
-  let newsCount = 0;
-
-  function loadNews() {
+function loadBBCBrasilNews(callback) {
+    const url = 'https://cors.mosaicoworkers.workers.dev/feeds.bbci.co.uk/portuguese/rss.xml';
+    const MAX_NEWS = 25;
+    
     fetch(url)
-      .then(response => response.text())
-      .then(data => {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data, 'text/xml');
-        const items = xmlDoc.querySelectorAll('item');
-
-        items.forEach((item, index) => {
-          if (index >= newsCount && index < newsCount + 30) {
-            const title = item.querySelector('title').textContent;
-            // Se o título for "CLIQUE PARA SE INSCREVER", pula esse item
-            if (title.trim().toUpperCase() === "CLIQUE PARA SE INSCREVER") {
-              return; // pular este item
-            }
+        .then(response => response.text())
+        .then(data => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data, 'text/xml');
+            const items = xmlDoc.querySelectorAll('item');
             
-            const link = item.querySelector('link').textContent;
-            const pubDate = new Date(item.querySelector('pubDate').textContent).toLocaleString('pt-BR', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false
-            });
+            console.log('BBC: Itens encontrados:', items.length);
+            
+            const news = Array.from(items)
+                .map(item => {
+                    try {
+                        const title = item.querySelector('title')?.textContent || '';
+                        const link = item.querySelector('link')?.textContent || '#';
+                        
+                        // Nova estratégia para encontrar imagens
+                        let image = null;
+                        
+                        // 1. Tenta encontrar no namespace media
+                        const mediaContent = item.querySelector('media\\:content, content');
+                        if (mediaContent) {
+                            image = mediaContent.getAttribute('url');
+                        }
 
-            let imgURL = "https://placehold.co/300x200?text=Sem+Imagem";
-            const imgElement = item.querySelector("*[url]");
-            if (imgElement) {
-              imgURL = imgElement.getAttribute('url');
-            }
+                        // 2. Tenta encontrar no namespace media:thumbnail
+                        if (!image) {
+                            const mediaThumbnail = item.querySelector('media\\:thumbnail, thumbnail');
+                            if (mediaThumbnail) {
+                                image = mediaThumbnail.getAttribute('url');
+                            }
+                        }
 
-            const html = `
-              <div class="col-md-4">
-                <div class="card mb-4 shadow-sm">
-                  <img src="${imgURL}" class="bd-placeholder-img card-img-top" width="100%" height="225">
-                  <div class="card-body">
-                    <p class="fonte">
-                      <span class="badge badge-success">Fonte: BBC Brasil</span>
-                    </p>                           
-                    <h5 class="card-title">${title}</h5>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="btn-group">
-                        <a href="${link}" target="_blank" class="btn btn-sm btn-outline-secondary">Ver Notícia</a>
-                      </div>
-                      <small class="text-muted">${pubDate}</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            `;
-            document.querySelector("#newsCards").innerHTML += html;
-          }
+                        // 3. Tenta encontrar na descrição
+                        if (!image) {
+                            const description = item.querySelector('description')?.textContent || '';
+                            const imgMatch = description.match(/src="([^"]+)"/);
+                            if (imgMatch) {
+                                image = imgMatch[1];
+                            }
+                        }
+
+                        // Se não encontrou imagem, tenta uma última estratégia
+                        if (!image) {
+                            const content = item.querySelector('content\\:encoded')?.textContent || '';
+                            const imgMatch = content.match(/src="([^"]+)"/);
+                            if (imgMatch) {
+                                image = imgMatch[1];
+                            }
+                        }
+
+                        // Se ainda não tem imagem, pula
+                        if (!image) {
+                            console.log('BBC: Notícia sem imagem:', title);
+                            return null;
+                        }
+
+                        const pubDate = new Date(item.querySelector('pubDate')?.textContent || new Date());
+                        
+                        return {
+                            title,
+                            link,
+                            date: pubDate.toLocaleString('pt-BR'),
+                            image,
+                            source: 'BBC Brasil'
+                        };
+                    } catch (error) {
+                        console.error('BBC: Erro ao processar notícia:', error);
+                        return null;
+                    }
+                })
+                .filter(Boolean)
+                .slice(0, MAX_NEWS); // Limita a 25 notícias após filtrar as que têm imagem
+
+            console.log('BBC: Notícias processadas com imagem:', news.length);
+            callback(news);
+        })
+        .catch(error => {
+            console.error('Erro ao carregar notícias BBC:', error);
+            callback([]);
         });
-        newsCount += 30;
-        document.querySelector("#loadMore").style.display = (newsCount < items.length) ? 'block' : 'none';
-      })
-      .catch(error => console.error('Erro:', error));
-  }
-
-  document.querySelector("#loadMore").addEventListener('click', loadNews);
-  loadNews();
 }
 
