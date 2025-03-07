@@ -1,74 +1,63 @@
 // noticiasaominuto.js
-function loadNoticiasAoMinutoNews() {
+function loadNoticiasAoMinutoNews(callback) {
     const url = 'https://cors.mosaicoworkers.workers.dev/www.noticiasaominuto.com.br/rss/brasil';
-    let newsCount = 0;
-
-    function loadNews() {
-      fetch(url)
+    const MAX_NEWS = 25;
+    
+    fetch(url)
         .then(response => response.text())
         .then(str => {
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(str, "text/xml");
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(str, "text/xml");
+            const items = xmlDoc.querySelectorAll('item');
+            
+            const news = Array.from(items)
+                .slice(0, MAX_NEWS)
+                .map(item => {
+                    try {
+                        const title = item.querySelector("title")?.textContent;
+                        const link = item.querySelector("link")?.textContent;
+                        const pubDate = new Date(item.querySelector("pubDate")?.textContent || new Date());
 
-          xmlDoc.querySelectorAll('item').forEach((item, index) => {
-            if (index >= newsCount && index < newsCount + 30) {
-              const titleElement = item.querySelector("title");
-              const title = titleElement ? titleElement.textContent : '';
+                        // Procura imagem no enclosure
+                        let image = "https://placehold.co/300x200?text=Sem+Imagem";
+                        const imgElement = item.querySelector("enclosure");
+                        if (imgElement && imgElement.getAttribute('url')) {
+                            image = imgElement.getAttribute('url');
+                        }
 
-              const linkElement = item.querySelector("link");
-              const link = linkElement ? linkElement.textContent : '';
+                        return {
+                            title,
+                            link,
+                            image,
+                            date: pubDate.toLocaleString('pt-BR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            }),
+                            source: 'Notícias ao Minuto'
+                        };
+                    } catch (err) {
+                        console.error('NAM: Erro ao processar item:', err);
+                        return null;
+                    }
+                })
+                .filter(Boolean);
 
-              let imgURL = "https://placehold.co/300x200?text=Sem+Imagem";
-              const imgElement = item.querySelector("enclosure");
-              if (imgElement) {
-                imgURL = imgElement.getAttribute('url');
-              }
-
-              // Formating the publication date
-              const pubDateElement = item.querySelector("pubDate");
-              let pubDate = pubDateElement ? new Date(pubDateElement.textContent) : new Date();
-
-              const options = {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-              };
-              pubDate = pubDate.toLocaleString('pt-BR', options);
-
-              const html = `
-                <div class="col-md-4">
-                  <div class="card mb-4 shadow-sm">
-                    <img src="${imgURL}" class="bd-placeholder-img card-img-top" width="100%" height="225">
-                    <div class="card-body">
-                    <p class="fonte">
-                    <span class="badge badge-info">Fonte: Notícias ao Minuto</span>
-                    </p>                            
-                    <h5 class="card-title">${title}</h5>
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group">
-                          <a href="${link}" target="_blank" class="btn btn-sm btn-outline-secondary">Ver Notícia</a>
-                        </div>
-                        <small class="text-muted">${pubDate}</small>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              `;
-              document.querySelector("#newsCards").innerHTML += html;
-            }
-          });
-          newsCount += 30;
-          if (newsCount < xmlDoc.querySelectorAll('item').length) {
-            document.querySelector("#loadMore").style.display = 'block';
-          } else {
-            document.querySelector("#loadMore").style.display = 'none';
-          }
+            console.log('NAM: Notícias processadas:', news.length);
+            callback(news);
         })
-        .catch(error => console.error('Erro:', error));
-    }
+        .catch(error => {
+            console.error('NAM: Erro ao carregar feed:', error);
+            callback([]);
+        });
+}
 
-    document.querySelector("#loadMore").addEventListener('click', loadNews);
-    loadNews();  }
+// Função auxiliar para decodificar entidades HTML
+function decodeEntities(text) {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
+}
