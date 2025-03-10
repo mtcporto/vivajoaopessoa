@@ -239,7 +239,7 @@ function setWeatherCardBackground() {
     if (currentHour >= 5 && currentHour < 16) {
       weatherCard.style.setProperty('background', 'linear-gradient(to bottom left, #023a58, #48cae4)', 'important');
     } else if (currentHour >= 16 && currentHour < 18) {
-      weatherCard.style.setProperty('background', 'linear-gradient(to bottom left, #a40027, #f88510)', 'important');
+      weatherCard.style.setProperty('background', 'linear-gradient(to left bottom, #177BAD, #FF6C00)', 'important');
     } else {
       weatherCard.style.setProperty('background', 'linear-gradient(to bottom left, #000000, #024163)', 'important');
     }
@@ -251,6 +251,3 @@ document.addEventListener('DOMContentLoaded', function() {
   setWeatherCardBackground();
   // reloadStylesheets(); 
 });
-
-
-
