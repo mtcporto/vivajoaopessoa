@@ -108,36 +108,59 @@ function parseEventDate(dateStr) {
     
     try {
         const months = {
-            'janeiro': 0, 'fevereiro': 1, 'março': 2, 'abril': 3,
+            'janeiro': 0, 'fevereiro': 1, 'março': 2, 'abril': 3, 'mar': 2,
             'maio': 4, 'junho': 5, 'julho': 6, 'agosto': 7,
             'setembro': 8, 'outubro': 9, 'novembro': 10, 'dezembro': 11
         };
 
-        // Formato Bilheteria Digital: "20 de março"
+        // Formato Sympla: "DD de MMM às HH:mm"
+        const symplaFormat1 = dateStr.match(/(\d{1,2})\s+de\s+([a-zç]+)\s+(?:às\s+)?(\d{1,2}:\d{2})?/i);
+        if (symplaFormat1) {
+            const day = parseInt(symplaFormat1[1]);
+            const monthStr = symplaFormat1[2].toLowerCase();
+            const month = months[monthStr];
+            if (!isNaN(day) && month !== undefined) {
+                const year = new Date().getFullYear();
+                const date = new Date(year, month, day);
+                return date;
+            }
+        }
+
+        // Formato Sympla: "DD de MMM a DD de MMM"
+        const symplaFormat2 = dateStr.match(/(\d{1,2})\s+de\s+([a-zç]+)\s+a\s+(\d{1,2})\s+de\s+([a-zç]+)/i);
+        if (symplaFormat2) {
+            const startDay = parseInt(symplaFormat2[1]);
+            const startMonthStr = symplaFormat2[2].toLowerCase();
+            const startMonth = months[startMonthStr];
+            // Use a data inicial para eventos com intervalo
+            if (!isNaN(startDay) && startMonth !== undefined) {
+                const year = new Date().getFullYear();
+                const date = new Date(year, startMonth, startDay);
+                return date;
+            }
+        }
+
+        // Formatos existentes...
         if (dateStr.includes(' de ')) {
             const parts = dateStr.split(' de ');
             const day = parseInt(parts[0].replace(/[^\d]/g, ''));
-            const monthStr = parts[1].split(' ')[0]; // Pega só o nome do mês
+            const monthStr = parts[1].split(' ')[0];
             const month = months[monthStr];
             
             if (!isNaN(day) && month !== undefined) {
                 const year = new Date().getFullYear();
                 const date = new Date(year, month, day);
-                console.log(`Data parseada de "${dateStr}": ${date.toISOString()}`);
                 return date;
             }
         }
         
-        // Formato DD/MM/YYYY ou DD/MM/YYYY HH:mm
         const ddmmyyyy = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
         if (ddmmyyyy) {
             const [_, day, month, year] = ddmmyyyy;
             const date = new Date(year, month - 1, day);
-            console.log(`Data parseada de "${dateStr}": ${date.toISOString()}`);
             return date;
         }
 
-        // Se chegou aqui, não conseguiu parsear
         console.warn(`Formato de data não reconhecido: ${dateStr}`);
         return null;
     } catch (error) {
