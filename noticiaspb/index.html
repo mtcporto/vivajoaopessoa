@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notícias</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Estilos do carousel igual ao do cinema */
+    .carousel-video {
+      position: relative;
+      width: 100%;
+      max-width: 1116px;
+      margin: 20px auto;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 365px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .carousel-indicators li {
+      background-color: #fff;
+    }
+    .carousel-control-prev,
+    .carousel-control-next {
+      z-index: 10;
+    }
+    .featured-news-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .featured-news-card img {
+      width: 100%;
+      height: 365px;
+      object-fit: cover;
+    }
+    .featured-info {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      color: #fff;
+      z-index: 2;
+    }
+    .featured-info .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.8), transparent);
+      z-index: 1;
+    }
+    .featured-info .content {
+      position: relative;
+      z-index: 2;
+      text-align: left;
+      top: -54px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Notícias</h1>
+  </div>
+
+  <!-- Carousel para notícias em destaque -->
+  <div id="featuredNewsCarousel" class="carousel slide carousel-video" data-ride="carousel">
+    <ol class="carousel-indicators" id="carouselIndicators"></ol>
+    <div class="carousel-inner" id="featuredCarouselInner"></div>
+    <a class="carousel-control-prev" href="#featuredNewsCarousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </a>
+    <a class="carousel-control-next" href="#featuredNewsCarousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </a>
+  </div>
+
+  <!-- Container existente para as notícias -->
+  <div class="container py-5">
+    <div class="row" id="newsCards"></div>
+    <button id="loadMore" class="btn btn-primary" style="display: none; margin: 0 auto;">Mais Notícias</button>
+  </div>
+
+  <!-- Scripts na ordem correta -->
+  <!-- Primeiro os utilitários -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <!-- Depois os scripts de fontes de notícias individuais -->
+  <script src="g1.js"></script>
+  <script src="clickpb.js"></script>
+  <script src="wscom.js"></script>
+  <!-- <script src="portalcorreio.js"></script> -->
+
+  <!-- E por último o script principal que faz o carregamento -->
+  <script>
+    let newsLoaded = 0;
+    
+    // Helper para definir a cor do badge por fonte
+    function getBadgeColorClass(source) {
+        switch(source) {
+            case 'G1': return 'badge-danger';  // vermelho
+            case 'ClickPB': return 'badge-warning';  // amarelo
+            case 'WSCOM': return 'badge-primary';  // azul
+            case 'Portal Correio': return 'badge-info';  // azul claro
+            default: return 'badge-secondary';
+        }
+    }
+
+    // Função para criar slide do carousel (atualizada)
+    function createFeaturedNewsSlide(news) {
+        const slide = document.createElement('div');
+        slide.classList.add('carousel-item');
+
+        slide.innerHTML = `
+            <div class="featured-news-card">
+                <img src="${news.image}" alt="${news.title}">
+                <div class="featured-info">
+                    <div class="overlay"></div>
+                    <div class="content">
+                        <h2 class="title">${news.title}</h2>
+                        <p class="card-text">
+                            ${news.date}<br>
+                            <span class="badge ${getBadgeColorClass(news.source)}">
+                                ${news.source}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return slide;
+    }
+
+    function loadNews() {
+        console.log('Iniciando carregamento de notícias...');
+        const newsContainer = document.getElementById('newsCards');
+        newsContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border" role="status"></div></div>';
+        
+        // Array com todas as promessas (sem Portal Correio)
+        const promises = [
+            new Promise(resolve => loadG1News(resolve)),
+            new Promise(resolve => loadClickPBNews(resolve)),
+            new Promise(resolve => loadWSCOMNews(resolve))
+        ];
+
+        // Carrega o carousel assim que as duas primeiras fontes estiverem prontas
+        Promise.race([
+            Promise.all(promises.slice(0, 2)),
+            new Promise(resolve => setTimeout(() => resolve([]), 3000)) // Timeout de 3s
+        ]).then(([firstResults]) => {
+            if (firstResults && firstResults.length > 0) {
+                const initialNews = firstResults.flat().filter(Boolean);
+                updateCarousel(initialNews);
+            }
+        });
+
+        // Processa cada fonte assim que estiver disponível
+        let processedNews = [];
+        promises.forEach((promise, index) => {
+            promise.then(news => {
+                if (news && news.length > 0) {
+                    processedNews = [...processedNews, ...news];
+                    // Atualiza a exibição a cada nova fonte
+                    displayNews(processedNews.sort((a, b) => new Date(b.date) - new Date(a.date)));
+                }
+            });
+        });
+
+        // Quando todas estiverem prontas, faz a atualização final
+        Promise.all(promises)
+            .then(results => {
+                const allNews = results
+                    .filter(Array.isArray)
+                    .flat()
+                    .filter(Boolean);
+
+                processedNews = allNews;
+                updateCarousel(allNews);
+                displayNews(allNews.sort((a, b) => new Date(b.date) - new Date(a.date)));
+            })
+            .catch(error => {
+                console.error('Erro ao carregar notícias:', error);
+            });
+    }
+
+    // Função auxiliar para atualizar o carousel
+    function updateCarousel(news) {
+        const carousel = document.getElementById('featuredCarouselInner');
+        const indicators = document.getElementById('carouselIndicators');
+        
+        // Ordena por data
+        news.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Helper para verificar qualidade da imagem
+        const isHighQualityImage = (url) => {
+            return url.includes('800x') || // WSCOM
+                   url.includes('1024x') || // ClickPB
+                   url.includes('640x') || // G1
+                   url.includes('900x'); // Dimensões maiores
+        };
+
+        // Helper para verificar se é notícia de João Pessoa
+        const isJoaoPessoaNews = (title) => {
+            const keywords = ['joão pessoa', 'capital', 'pmjp', 'prefeitura', 'cabedelo', 
+                             'região metropolitana'];
+            return keywords.some(keyword => 
+                title.toLowerCase().includes(keyword));
+        };
+
+        // Primeiro, tenta pegar notícias de João Pessoa com imagens de alta qualidade
+        const priorityNews = news.filter(item => 
+            isJoaoPessoaNews(item.title) && 
+            isHighQualityImage(item.image));
+
+        // Depois, completa com outras notícias de alta qualidade
+        const highQualityNews = news.filter(item => 
+            isHighQualityImage(item.image) && 
+            !priorityNews.includes(item));
+
+        // Por fim, usa as notícias restantes
+        const otherNews = news.filter(item => 
+            !priorityNews.includes(item) && 
+            !highQualityNews.includes(item));
+
+        // Combina as listas mantendo a prioridade
+        const orderedNews = [...priorityNews, ...highQualityNews, ...otherNews];
+
+        // Pega as 5 notícias mais recentes (uma de cada fonte, se possível)
+        const featuredNews = [];
+        const usedSources = new Set();
+        
+        // Tenta pegar uma de cada fonte, mantendo a prioridade estabelecida
+        orderedNews.forEach(item => {
+            if (!usedSources.has(item.source) && 
+                item.image && 
+                !item.image.includes('placeholder') &&
+                !item.image.includes('placehold.co') && 
+                featuredNews.length < 5) {
+                featuredNews.push(item);
+                usedSources.add(item.source);
+            }
+        });
+
+        // Se não conseguiu 5 notícias, completa com as mais recentes da lista priorizada
+        if (featuredNews.length < 5) {
+            orderedNews.forEach(item => {
+                if (featuredNews.length < 5 && 
+                    item.image && 
+                    !item.image.includes('placeholder') && 
+                    !item.image.includes('placehold.co') && 
+                    !featuredNews.includes(item)) {
+                    featuredNews.push(item);
+                }
+            });
+        }
+
+        // Atualiza o carousel
+        carousel.innerHTML = '';
+        indicators.innerHTML = '';
+        
+        featuredNews.forEach((item, index) => {
+            const slide = createFeaturedNewsSlide(item);
+            if (index === 0) slide.classList.add('active');
+            carousel.appendChild(slide);
+
+            const indicator = document.createElement('li');
+            indicator.setAttribute('data-target', '#featuredNewsCarousel');
+            indicator.setAttribute('data-slide-to', index.toString());
+            if (index === 0) indicator.classList.add('active');
+            indicators.appendChild(indicator);
+        });
+
+        // Reinicializa o carousel
+        $('#featuredNewsCarousel').carousel({
+            interval: 5000,
+            pause: 'hover'
+        });
+
+        // Debug
+        console.log('Notícias no carousel:', featuredNews.map(n => n.source));
+    }
+
+    function displayNews(news) {
+        const container = document.getElementById('newsCards');
+        container.innerHTML = '';
+        
+        const fragment = document.createDocumentFragment();
+        
+        news.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'col-md-4';
+            div.innerHTML = `
+                <div class="card mb-4 shadow-sm">
+                    <img src="${item.image}" loading="lazy" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="${item.title}">
+                    <div class="card-body">
+                        <p class="fonte">
+                            <span class="badge ${getBadgeColorClass(item.source)}">
+                                Fonte: ${item.source}
+                            </span>
+                        </p>
+                        <h5 class="card-title">${item.title}</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <a href="${item.link}" target="_blank" class="btn btn-sm btn-outline-secondary">Ver Notícia</a>
+                            </div>
+                            <small class="text-muted">${item.date}</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            fragment.appendChild(div);
+        });
+        
+        container.appendChild(fragment);
+    }
+
+    document.querySelector("#loadMore").addEventListener('click', loadNews);
+    loadNews();
+  </script>
+</body>
+</html>
