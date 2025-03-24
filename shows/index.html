@@ -101,72 +101,106 @@
   <script>
 let eventosLoaded = 0;
 
-// Função para converter string de data para objeto Date
 function parseEventDate(dateStr) {
     if (!dateStr) return null;
     dateStr = dateStr.trim().toLowerCase();
+    // Colapsa múltiplos espaços em um único espaço
+    dateStr = dateStr.replace(/\s+/g, ' ');
     
-    try {
-        const months = {
-            'janeiro': 0, 'fevereiro': 1, 'março': 2, 'abril': 3, 'mar': 2,
-            'maio': 4, 'junho': 5, 'julho': 6, 'agosto': 7,
-            'setembro': 8, 'outubro': 9, 'novembro': 10, 'dezembro': 11
-        };
+    // Dicionário de meses completos e abreviados
+    const months = {
+        'janeiro': 0, 'jan': 0,
+        'fevereiro': 1, 'fev': 1,
+        'março': 2, 'mar': 2,
+        'abril': 3, 'abr': 3,
+        'maio': 4, 'mai': 4,
+        'junho': 5, 'jun': 5,
+        'julho': 6, 'jul': 6,
+        'agosto': 7, 'ago': 7,
+        'setembro': 8, 'set': 8,
+        'outubro': 9, 'out': 9,
+        'novembro': 10, 'nov': 10,
+        'dezembro': 11, 'dez': 11
+    };
 
-        // Formato Sympla: "DD de MMM às HH:mm"
-        const symplaFormat1 = dateStr.match(/(\d{1,2})\s+de\s+([a-zç]+)\s+(?:às\s+)?(\d{1,2}:\d{2})?/i);
-        if (symplaFormat1) {
-            const day = parseInt(symplaFormat1[1]);
-            const monthStr = symplaFormat1[2].toLowerCase();
-            const month = months[monthStr];
-            if (!isNaN(day) && month !== undefined) {
-                const year = new Date().getFullYear();
-                const date = new Date(year, month, day);
-                return date;
-            }
-        }
-
-        // Formato Sympla: "DD de MMM a DD de MMM"
-        const symplaFormat2 = dateStr.match(/(\d{1,2})\s+de\s+([a-zç]+)\s+a\s+(\d{1,2})\s+de\s+([a-zç]+)/i);
-        if (symplaFormat2) {
-            const startDay = parseInt(symplaFormat2[1]);
-            const startMonthStr = symplaFormat2[2].toLowerCase();
-            const startMonth = months[startMonthStr];
-            // Use a data inicial para eventos com intervalo
-            if (!isNaN(startDay) && startMonth !== undefined) {
-                const year = new Date().getFullYear();
-                const date = new Date(year, startMonth, startDay);
-                return date;
-            }
-        }
-
-        // Formatos existentes...
-        if (dateStr.includes(' de ')) {
-            const parts = dateStr.split(' de ');
-            const day = parseInt(parts[0].replace(/[^\d]/g, ''));
-            const monthStr = parts[1].split(' ')[0];
-            const month = months[monthStr];
-            
-            if (!isNaN(day) && month !== undefined) {
-                const year = new Date().getFullYear();
-                const date = new Date(year, month, day);
-                return date;
-            }
-        }
-        
-        const ddmmyyyy = dateStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-        if (ddmmyyyy) {
-            const [_, day, month, year] = ddmmyyyy;
-            const date = new Date(year, month - 1, day);
+    // Formato Sympla: "DD de MMM às HH:mm"
+    const symplaFormat1 = dateStr.match(/(\d{1,2})\s+de\s+([a-zç]+)(?:\s+às\s+(\d{1,2}:\d{2}))?/i);
+    if (symplaFormat1) {
+        const day = parseInt(symplaFormat1[1]);
+        const monthStr = symplaFormat1[2].toLowerCase();
+        const month = months[monthStr];
+        if (!isNaN(day) && month !== undefined) {
+            const year = new Date().getFullYear();
+            const date = new Date(year, month, day);
             return date;
         }
-
-        console.warn(`Formato de data não reconhecido: ${dateStr}`);
-        return null;
-    } catch (error) {
-        console.error(`Erro ao processar data "${dateStr}":`, error);
-        return null;
     }
+
+    // Formato Sympla: "DD de MMM a DD de MMM"
+    const symplaFormat2 = dateStr.match(/(\d{1,2})\s+de\s+([a-zç]+)\s+a\s+(\d{1,2})\s+de\s+([a-zç]+)/i);
+    if (symplaFormat2) {
+        const startDay = parseInt(symplaFormat2[1]);
+        const startMonthStr = symplaFormat2[2].toLowerCase();
+        const startMonth = months[startMonthStr];
+        if (!isNaN(startDay) && startMonth !== undefined) {
+            const year = new Date().getFullYear();
+            const date = new Date(year, startMonth, startDay);
+            return date;
+        }
+    }
+
+    // Formato DD/MM HH:mm
+    const ddmmyyhhmm = dateStr.match(/(\d{2})\/(\d{2})\s+(\d{2}:\d{2})/);
+    if (ddmmyyhhmm) {
+        const day = parseInt(ddmmyyhhmm[1]);
+        const month = parseInt(ddmmyyhhmm[2]) - 1;
+        const year = new Date().getFullYear();
+        const [ , , , time] = ddmmyyhhmm;
+        const [hours, minutes] = time.split(':').map(Number);
+        if (!isNaN(day) && !isNaN(month)) {
+            const date = new Date(year, month, day, hours, minutes);
+            return date;
+        }
+    }
+
+    // Formato DD/MM
+    const ddmmyy = dateStr.match(/(\d{2})\/(\d{2})/);
+    if (ddmmyy) {
+        const [ , day, month] = ddmmyy;
+        const year = new Date().getFullYear();
+        const date = new Date(year, parseInt(month) - 1, parseInt(day));
+        return date;
+    }
+
+    // Formato "Sexta, 28 de mar às 21:00"
+    const dayMonthTime = dateStr.match(/(?:segunda|terça|quarta|quinta|sexta|sábado|domingo),\s*(\d{1,2})\s+de\s+([a-zç]+)\s+às\s+(\d{1,2}:\d{2})/i);
+    if (dayMonthTime) {
+        const day = parseInt(dayMonthTime[1], 10);
+        const monthStr = dayMonthTime[2].toLowerCase();
+        const month = months[monthStr];
+        const [ , , , time] = dayMonthTime;
+        const [hours, minutes] = time.split(':').map(Number);
+        if (!isNaN(day) && month !== undefined) {
+            const year = new Date().getFullYear();
+            const date = new Date(year, month, day, hours, minutes);
+            return date;
+        }
+    }
+
+    if (dateStr.includes(' de ')) {
+        const parts = dateStr.split(' de ');
+        const day = parseInt(parts[0].replace(/[^\d]/g, ''));
+        const monthStr = parts[1].split(' ')[0];
+        const month = months[monthStr];
+        if (!isNaN(day) && month !== undefined) {
+            const year = new Date().getFullYear();
+            const date = new Date(year, month, day);
+            return date;
+        }
+    }
+
+    console.warn(`Formato de data não reconhecido: ${dateStr}`);
+    return null;
 }
 
 // Função para organizar eventos por período
