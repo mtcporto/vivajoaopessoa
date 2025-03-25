@@ -141,7 +141,7 @@
     }
 
     function loadNews() {
-        console.log('Iniciando carregamento de notícias...');
+        // console.log('Iniciando carregamento de notícias...');
         const newsContainer = document.getElementById('newsCards');
         newsContainer.innerHTML = '<div class="col-12 text-center"><div class="spinner-border" role="status"></div></div>';
         
@@ -285,7 +285,7 @@
         });
 
         // Debug
-        console.log('Notícias no carousel:', featuredNews.map(n => n.source));
+        // console.log('Notícias no carousel:', featuredNews.map(n => n.source));
     }
 
     function displayNews(news) {
