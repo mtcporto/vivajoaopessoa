@@ -210,8 +210,7 @@
 
         // Helper para verificar se é notícia de João Pessoa
         const isJoaoPessoaNews = (title) => {
-            const keywords = ['joão pessoa', 'capital', 'pmjp', 'prefeitura', 'cabedelo', 
-                             'região metropolitana'];
+            const keywords = ['joão pessoa', 'capital', 'pmjp'];
             return keywords.some(keyword => 
                 title.toLowerCase().includes(keyword));
         };
