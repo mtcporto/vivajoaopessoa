@@ -4,10 +4,19 @@ function loadSymplaEvents(callback) {
     fetch(url)
         .then(response => response.text())
         .then(html => {
+            // Remove tags de preload, scripts e styles que contenham "/_next/static/"
+            html = html.replace(/<link[^>]+rel=["']preload["'][^>]*\/_next\/static\/[^>]*>/gi, '');
+            html = html.replace(/<link[^>]+\/_next\/static\/[^>]*>/gi, '');
+            html = html.replace(/<script[^>]+src=["'][^"']*\/_next\/static\/[^"']*["'][^>]*><\/script>/gi, '');
+            html = html.replace(/<style[^>]*>[\s\S]*?\/_next\/static\/[\s\S]*?<\/style>/gi, '');
+            // Remove explicit URLs que apontam para os assets pré-carregados
+            html = html.replace(/https:\/\/cors\.mosaicoworkers\.workers\.dev\/_next\/static\//g, '');
+
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
+            const eventos = doc.querySelectorAll('a.sympla-card');
             
-            const eventos = Array.from(doc.querySelectorAll('a.sympla-card'))
+            const eventosArray = Array.from(eventos)
                 .map(evento => {
                     try {
                         return {
@@ -25,11 +34,11 @@ function loadSymplaEvents(callback) {
                 })
                 .filter(evento => evento && evento.location.includes('João Pessoa'));
 
-            callback(eventos);
+            callback(eventosArray);
         })
         .catch(error => {
             console.error('Erro ao carregar Sympla:', error);
-            callback([]);
+            callback([]); // Em caso de erro, retorna array vazio via callback
         });
 }
 

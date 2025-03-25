@@ -97,17 +97,15 @@
   <script src="bilheteriadigital.js"></script>
   <script src="outgo.js"></script>
   <script src="ingressodigital.js"></script>
+  <script src="shotgun.js"></script>
 
   <script>
 let eventosLoaded = 0;
 
 function parseEventDate(dateStr) {
     if (!dateStr) return null;
-    dateStr = dateStr.trim().toLowerCase();
-    // Colapsa múltiplos espaços em um único espaço
-    dateStr = dateStr.replace(/\s+/g, ' ');
-    
-    // Dicionário de meses completos e abreviados
+    dateStr = dateStr.trim().toLowerCase().replace(/\s+/g, ' ');
+
     const months = {
         'janeiro': 0, 'jan': 0,
         'fevereiro': 1, 'fev': 1,
@@ -123,97 +121,49 @@ function parseEventDate(dateStr) {
         'dezembro': 11, 'dez': 11
     };
 
-    // Formato Sympla: "DD de MMM às HH:mm"
-    const symplaFormat1 = dateStr.match(/(\d{1,2})\s+de\s+([a-zç]+)(?:\s+às\s+(\d{1,2}:\d{2}))?/i);
-    if (symplaFormat1) {
-        const day = parseInt(symplaFormat1[1]);
-        const monthStr = symplaFormat1[2].toLowerCase();
-        const month = months[monthStr];
-        if (!isNaN(day) && month !== undefined) {
-            const year = new Date().getFullYear();
-            const date = new Date(year, month, day);
-            return date;
-        }
+    let match;
+    // Tenta o formato "8 de fevereiro"
+    match = dateStr.match(/(\d{1,2})\s+de\s+([\wÀ-ÖØ-öø-ÿ]+)/i);
+    if (match) {
+        let day = parseInt(match[1], 10);
+        let monthName = match[2].toLowerCase();
+        let month = months[monthName];
+        if (month === undefined) return null;
+        let year = new Date().getFullYear();
+        return new Date(year, month, day);
     }
-
-    // Formato Sympla: "DD de MMM a DD de MMM"
-    const symplaFormat2 = dateStr.match(/(\d{1,2})\s+de\s+([a-zç]+)\s+a\s+(\d{1,2})\s+de\s+([a-zç]+)/i);
-    if (symplaFormat2) {
-        const startDay = parseInt(symplaFormat2[1]);
-        const startMonthStr = symplaFormat2[2].toLowerCase();
-        const startMonth = months[startMonthStr];
-        if (!isNaN(startDay) && startMonth !== undefined) {
-            const year = new Date().getFullYear();
-            const date = new Date(year, startMonth, startDay);
-            return date;
-        }
+    // Tenta o formato "24/03/2025, 20:00"
+    match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{2}:\d{2})/);
+    if (match) {
+        let day = parseInt(match[1], 10);
+        let monthNum = parseInt(match[2], 10) - 1;
+        let year = parseInt(match[3], 10);
+        let [hours, minutes] = match[4].split(':').map(Number);
+        return new Date(year, monthNum, day, hours, minutes);
     }
-
-    // Formato DD/MM HH:mm
-    const ddmmyyhhmm = dateStr.match(/(\d{2})\/(\d{2})\s+(\d{2}:\d{2})/);
-    if (ddmmyyhhmm) {
-        const day = parseInt(ddmmyyhhmm[1]);
-        const month = parseInt(ddmmyyhhmm[2]) - 1;
-        const year = new Date().getFullYear();
-        const [ , , , time] = ddmmyyhhmm;
-        const [hours, minutes] = time.split(':').map(Number);
-        if (!isNaN(day) && !isNaN(month)) {
-            const date = new Date(year, month, day, hours, minutes);
-            return date;
-        }
+    // Tenta o formato "04/04 21:00" (sem ano)
+    match = dateStr.match(/(\d{1,2})\/(\d{1,2})\s+(\d{2}:\d{2})/);
+    if (match) {
+        let day = parseInt(match[1], 10);
+        let monthNum = parseInt(match[2], 10) - 1;
+        let year = new Date().getFullYear();
+        let [hours, minutes] = match[3].split(':').map(Number);
+        return new Date(year, monthNum, day, hours, minutes);
     }
-
-    // Formato DD/MM
-    const ddmmyy = dateStr.match(/(\d{2})\/(\d{2})/);
-    if (ddmmyy) {
-        const [ , day, month] = ddmmyy;
-        const year = new Date().getFullYear();
-        const date = new Date(year, parseInt(month) - 1, parseInt(day));
-        return date;
-    }
-
-    // Formato "Sexta, 28 de mar às 21:00"
-    const dayMonthTime = dateStr.match(/(?:segunda|terça|quarta|quinta|sexta|sábado|domingo),\s*(\d{1,2})\s+de\s+([a-zç]+)\s+às\s+(\d{1,2}:\d{2})/i);
-    if (dayMonthTime) {
-        const day = parseInt(dayMonthTime[1], 10);
-        const monthStr = dayMonthTime[2].toLowerCase();
-        const month = months[monthStr];
-        const [ , , , time] = dayMonthTime;
-        const [hours, minutes] = time.split(':').map(Number);
-        if (!isNaN(day) && month !== undefined) {
-            const year = new Date().getFullYear();
-            const date = new Date(year, month, day, hours, minutes);
-            return date;
-        }
-    }
-
-    if (dateStr.includes(' de ')) {
-        const parts = dateStr.split(' de ');
-        const day = parseInt(parts[0].replace(/[^\d]/g, ''));
-        const monthStr = parts[1].split(' ')[0];
-        const month = months[monthStr];
-        if (!isNaN(day) && month !== undefined) {
-            const year = new Date().getFullYear();
-            const date = new Date(year, month, day);
-            return date;
-        }
-    }
-
-    console.warn(`Formato de data não reconhecido: ${dateStr}`);
     return null;
 }
 
 // Função para organizar eventos por período
 function organizeEvents(allEvents) {
-    console.log('Organizando eventos...');
+    // console.log('Organizando eventos...');
     
     // Debug: mostra as datas antes da ordenação
     allEvents.forEach(event => {
         const parsedDate = parseEventDate(event.date);
-        console.log(`Evento: ${event.title}`);
-        console.log(`Data original: ${event.date}`);
-        console.log(`Data parseada: ${parsedDate?.toISOString() || 'Inválida'}`);
-        console.log('---');
+        // console.log(`Evento: ${event.title}`);
+        // console.log(`Data original: ${event.date}`);
+        // console.log(`Data parseada: ${parsedDate?.toISOString() || 'Inválida'}`);
+        // console.log('---');
     });
 
     // Ordena eventos
@@ -223,7 +173,7 @@ function organizeEvents(allEvents) {
         
         if (dateA && dateB) {
             const result = dateA - dateB;
-            console.log(`Comparando: ${a.title} (${dateA.toISOString()}) com ${b.title} (${dateB.toISOString()}): ${result}`);
+            // console.log(`Comparando: ${a.title} (${dateA.toISOString()}) com ${b.title} (${dateB.toISOString()}): ${result}`);
             return result;
         }
         
@@ -285,36 +235,43 @@ function loadEvents() {
     // Limpa o container antes de começar
     const container = document.getElementById('eventos');
     container.innerHTML = '';
-    console.log('Container limpo, iniciando carregamento...');
+    // console.log('Container limpo, iniciando carregamento...');
 
     const eventLoadPromises = [
         new Promise(resolve => {
             loadSymplaEvents(events => {
-                console.log('Eventos Sympla carregados:', events.length);
+                // console.log('Eventos Sympla carregados:', events.length);
                 resolve(events);
             });
         }),
         new Promise(resolve => {
             loadEventimEvents(events => {
-                console.log('Eventos Eventim carregados:', events.length);
+                // console.log('Eventos Eventim carregados:', events.length);
                 resolve(events);
             });
         }),
         new Promise(resolve => {
             loadBilheteriaDigitalEvents(events => {
-                console.log('Eventos Bilheteria Digital carregados:', events.length);
+                // console.log('Eventos Bilheteria Digital carregados:', events.length);
                 resolve(events);
             });
         }),
         new Promise(resolve => {
             loadOutgoEvents(events => {
-                console.log('Eventos Outgo carregados:', events.length);
+                // console.log('Eventos Outgo carregados:', events.length);
                 resolve(events);
             });
         }),
         new Promise(resolve => {
             loadIngressoDigitalEvents(events => {
-                console.log('Eventos Ingresso Digital carregados:', events.length);
+                // console.log('Eventos Ingresso Digital carregados:', events.length);
+                resolve(events);
+            });
+        }),
+        // Nova promise para eventos do Shotgun
+        new Promise(resolve => {
+            loadShotgunEvents(events => {
+                // console.log('Eventos Shotgun carregados:', events.length);
                 resolve(events);
             });
         }),
@@ -322,17 +279,24 @@ function loadEvents() {
 
     Promise.all(eventLoadPromises)
         .then(results => {
-            const allEvents = results.flat().filter(Boolean);
-            console.log('Total de eventos:', allEvents.length);
+            let allEvents = results.flat().filter(Boolean);
+            // Filtra para manter somente eventos com título, data e local válidos
+            allEvents = allEvents.filter(e =>
+                e.title && !e.title.toLowerCase().includes("não informado") &&
+                e.date && !e.date.toLowerCase().includes("não informada") &&
+                e.location && !e.location.toLowerCase().includes("não informado")
+            );
+            // console.log('Total de eventos válidos:', allEvents.length);
 
             const groupedEvents = organizeEvents(allEvents);
-            console.log('Eventos agrupados:', {
-                hoje: groupedEvents.hoje.length,
-                amanha: groupedEvents.amanha.length,
-                estaSemana: groupedEvents.estaSemana.length,
-                proximoMes: groupedEvents.proximoMes.length,
+            // console.log('Eventos agrupados:', 
+            {
+                hoje: groupedEvents.hoje.length;
+                amanha: groupedEvents.amanha.length;
+                estaSemana: groupedEvents.estaSemana.length;
+                proximoMes: groupedEvents.proximoMes.length;
                 futuro: groupedEvents.futuro.length
-            });
+            };
 
             // Popula o carousel com eventos destacados
             const carousel = document.getElementById('featuredCarouselInner');
@@ -389,7 +353,7 @@ function loadEvents() {
             });
 
             eventosLoaded += allEvents.length;
-            console.log('Renderização completa!');
+            // console.log('Renderização completa!');
         })
         .catch(error => {
             console.error("Erro ao carregar eventos:", error);
@@ -411,6 +375,10 @@ function getBadgeClass(source) {
 // Atualizar a função createEventCard para usar as cores corretas dos badges
 function createEventCard(event) {
     const div = document.createElement('div');
+    let parsedDate = parseEventDate(event.date);
+    let formattedDate = parsedDate 
+        ? parsedDate.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+        : event.date;
     div.className = 'col-md-4 col-sm-6 mb-4';
     div.innerHTML = `
         <div class="card">
@@ -422,8 +390,8 @@ function createEventCard(event) {
                     <span class="badge ${getBadgeClass(event.source)}">Fonte: ${event.source}</span>
                 </p>
                 <h5 class="card-title">${event.title}</h5>
-                <p class="card-text">${event.date}</p>
-                <p class="card-text">${event.location || ''}</p>
+                <p class="card-text">${formattedDate}</p>
+                <p class="card-text">${event.location}</p>
             </div>
         </div>
     `;

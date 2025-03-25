@@ -58,13 +58,13 @@ fetch(url)
                     // Filtra eventos passados
                     const eventDate = parsePortugueseDate(data);
                     if (!eventDate) {
-                        console.log("Event Date is null for event:", titleElement.textContent.trim(), "with data string:", data);
+                        // console.log("Event Date is null for event:", titleElement.textContent.trim(), "with data string:", data);
                         return null;
                     }
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     if (eventDate < today) return null;
-                    console.log("eventDate: ", eventDate);
+                    // console.log("eventDate: ", eventDate);
                     const link = evento.querySelector('.card-link')?.getAttribute('href');
                     const image = evento.querySelector('.cardEvent-coverpage')?.getAttribute('src');
 
@@ -83,7 +83,7 @@ fetch(url)
             })
             .filter(Boolean);
 
-        console.log('Eventos Outgo encontrados:', eventos.length);
+        // console.log('Eventos Outgo encontrados:', eventos.length);
         callback(eventos);
     })
     .catch(error => {
