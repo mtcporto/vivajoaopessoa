@@ -79,12 +79,15 @@
 
     .card-img-overlay {
       position: absolute;
-      bottom: 0;
+      bottom: 0; /* Posiciona na parte inferior */
       left: 0;
       right: 0;
       background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.4), transparent);
       color: white;
-      padding: 15px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end; /* Alinha o conteúdo na parte inferior */
     }
 
     .card-img-container img {
@@ -193,6 +196,25 @@
       width: 20px;
       text-align: center;
     }
+
+    /* Estilo para o ícone de estacionamento customizado */
+    .icon-estacionamento {
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        font-style: normal;
+    }
+
+    /* Estilo para os itens do modal */
+    .facility-icon-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 5px 0;
+    }
+
+    .facility-icon-label .facility-icon {
+      margin-right: 10px;
+    }
   </style>
 </head>
 <body>
@@ -275,7 +297,7 @@
         acessibilidade: '<i class="fas fa-wheelchair"></i>',
         pet_friendly: '<i class="fas fa-paw"></i>',
         espaco_kids: '<i class="fas fa-child"></i>',
-        estacionamento: '<i class="fas fa-parking"></i>',
+        estacionamento: '<span class="icon-estacionamento">E</span>',
         wifi: '<i class="fas fa-wifi"></i>'
       };
 
@@ -350,12 +372,19 @@
               <h6 class="mb-3 mt-4"><strong>Recursos</strong></h6>
               <div class="facility-icons mb-3">
                 ${Object.entries(estabelecimento.recursos_e_facilidades)
-                  .map(([key, value]) => `
-                    <span class="facility-icon ${value ? 'active' : 'inactive'}">
-                      <i class="fas fa-${getFacilityIcon(key)}"></i>
-                      <small class="ms-1">${key.replace('_', ' ')}</small>
-                    </span>
-                  `).join('')}
+                  .map(([key, value]) => {
+                    const icon = key === 'estacionamento' ? 
+                      '<span class="icon-estacionamento">E</span>' : 
+                      `<i class="fas fa-${getFacilityIcon(key)}"></i>`;
+                    return `
+                      <div class="facility-icon-label">
+                        <span class="facility-icon ${value ? 'active' : 'inactive'}">
+                          ${icon}
+                        </span>
+                        <span>${key.replace('_', ' ')}</span>
+                      </div>
+                    `;
+                  }).join('')}
               </div>
 
               <h6 class="mb-3"><strong>Ambiente e Público</strong></h6>
