@@ -1,0 +1,1287 @@
+{
+    "estabelecimentos": [
+      {
+        "categoria": "restaurante",
+        "nome": "Nau Frutos do Mar",
+        "endereco": {
+          "rua": "Rua Lupercio Branco",
+          "numero": 130,
+          "bairro": "Manaíra",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58038-110"
+        },
+        "contato": {
+          "telefone": "(83) 3031-8000",
+          "email": "contato@naufrutosdomar.com.br",
+          "website": "http://www.naufrutosdomar.com.br",
+          "redes_sociais": {
+            "instagram": "nau.joaopessoa",
+            "facebook": "naufrutosdomar"
+          }
+        },
+        "horario_funcionamento": {
+          "segunda_a_sexta": "12:00 - 15:00, 18:00 - 23:00",
+          "sabado": "12:00 - 23:30",
+          "domingo": "12:00 - 22:00"
+        },
+        "tipo_cozinha": [
+          "frutos do mar",
+          "brasileira"
+        ],
+        "servicos_oferecidos": [
+          "entrega",
+          "retirada",
+          "refeições no local",
+          "reservas"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": true,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "sofisticado",
+          "indicado_para": [
+            "encontros românticos",
+            "reuniões de negócios",
+            "famílias"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Camarão na Moranga",
+            "Peixe ao Molho de Maracujá"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "vegetariano",
+            "sem glúten"
+          ]
+        },
+        "foto": "imagens/nau.jpg"
+      },
+      {
+        "categoria": "bar",
+        "nome": "Empório Café",
+        "endereco": {
+          "rua": "Rua Coração de Jesus",
+          "numero": 145,
+          "bairro": "Tambaú",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58039-070"
+        },
+        "contato": {
+          "telefone": "(83) 3247-2604",
+          "email": "contato@emporiocafe.com.br",
+          "website": "http://www.emporiocafe.com.br",
+          "redes_sociais": {
+            "instagram": "emporiocafe",
+            "facebook": "emporiocafejp"
+          }
+        },
+        "horario_funcionamento": {
+          "segunda_a_quinta": "18:00 - 02:00",
+          "sexta_a_sabado": "18:00 - 04:00",
+          "domingo": "18:00 - 00:00"
+        },
+        "tipo_cozinha": [
+          "bar",
+          "cafeteria"
+        ],
+        "servicos_oferecidos": [
+          "refeições no local",
+          "reservas"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": true,
+          "espaco_kids": false,
+          "estacionamento": false,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": false,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": false
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "casual",
+          "indicado_para": [
+            "encontros com amigos",
+            "happy hour"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Cervejas artesanais",
+            "Sanduíches gourmet"
+          ],
+          "faixa_preco": "econômico",
+          "opcoes_especiais": [
+            "vegano"
+          ]
+        },
+        "foto": "imagens/emporiocafe.jpg"
+      },
+      {
+        "categoria": "restaurantes",
+        "nome": "Mangai",
+        "endereco": {
+          "rua": "Av. Gen. Edson Ramalho",
+          "numero": 696,
+          "bairro": "Manaíra",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58038-100"
+        },
+        "contato": {
+          "telefone": "(83) 3247-4411",
+          "email": "contato@mangai.com.br",
+          "website": "http://www.mangai.com.br",
+          "redes_sociais": {
+            "instagram": "mangairestaurantes",
+            "facebook": "mangairestaurante"
+          }
+        },
+        "horario_funcionamento": {
+          "segunda_a_sabado": "11:30 - 22:00",
+          "domingo": "11:30 - 16:00"
+        },
+        "tipo_cozinha": [
+          "regional",
+          "nordestina",
+          "brasileira"
+        ],
+        "servicos_oferecidos": [
+          "buffet",
+          "refeições no local",
+          "estacionamento",
+          "eventos"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": true,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "familiar",
+          "indicado_para": [
+            "famílias",
+            "grupos",
+            "turistas"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Buchada de Bode",
+            "Baião de Dois",
+            "Carne de Sol na Nata"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "pratos veganos",
+            "sem glúten"
+          ]
+        },
+        "foto": "imagens/mangai.jpg"
+      },
+      {
+        "categoria": "restaurantes",
+        "nome": "Gulliver Mar",
+        "endereco": {
+          "rua": "Av. Cabo Branco",
+          "numero": 5160,
+          "bairro": "Cabo Branco",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58045-010"
+        },
+        "contato": {
+          "telefone": "(83) 3226-4004",
+          "email": "contato@gullivermar.com.br",
+          "website": "http://www.gullivermar.com.br",
+          "redes_sociais": {
+            "instagram": "restaurantegullivermar"
+          }
+        },
+        "horario_funcionamento": {
+          "segunda_a_domingo": "11:00 - 23:00"
+        },
+        "tipo_cozinha": [
+          "frutos do mar",
+          "contemporânea"
+        ],
+        "servicos_oferecidos": [
+          "refeições no local",
+          "delivery",
+          "reservas",
+          "música ao vivo"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": true,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "sofisticado",
+          "indicado_para": [
+            "jantares românticos",
+            "eventos especiais",
+            "turistas"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Lagosta Grelhada",
+            "Paella de Frutos do Mar",
+            "Peixe ao Molho de Camarão"
+          ],
+          "faixa_preco": "alto",
+          "opcoes_especiais": [
+            "frutos do mar frescos",
+            "vinhos importados"
+          ]
+        },
+        "foto": "imagens/gullivermar.jpg"
+      },
+      {
+        "categoria": "restaurante",
+        "nome": "Gulliver Restaurante",
+        "endereco": {
+          "rua": "Av. Olinda",
+          "numero": 590,
+          "bairro": "Tambaú",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58039-121"
+        },
+        "contato": {
+          "telefone": "(83) 3226-3838",
+          "email": "contato@restaurantegulliver.com.br",
+          "website": "http://www.restaurantegulliver.com.br",
+          "redes_sociais": {
+            "instagram": "restaurantegulliver"
+          }
+        },
+        "horario_funcionamento": {
+          "segunda_a_domingo": "11:30 - 23:00"
+        },
+        "tipo_cozinha": [
+          "contemporânea",
+          "internacional"
+        ],
+        "servicos_oferecidos": [
+          "refeições no local",
+          "delivery",
+          "reservas"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": true,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "sofisticado",
+          "indicado_para": [
+            "famílias",
+            "executivos",
+            "ocasiões especiais"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Filé à Parmegiana",
+            "Risoto de Camarão",
+            "Massas Artesanais"
+          ],
+          "faixa_preco": "alto",
+          "opcoes_especiais": [
+            "menu executivo",
+            "carta de vinhos"
+          ]
+        },
+        "foto": "imagens/gulliver.jpg"
+      },
+      {
+        "categoria": "restaurante",
+        "nome": "Ippon",
+        "endereco": {
+          "rua": "Av. Profa. Maria Sales",
+          "numero": 314,
+          "bairro": "Tambaú",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58039-130"
+        },
+        "contato": {
+          "telefone": "(83) 3226-1342",
+          "email": "contato@ipponjp.com.br",
+          "website": "http://www.ipponjp.com.br",
+          "redes_sociais": {
+            "instagram": "ipponrestaurante"
+          }
+        },
+        "horario_funcionamento": {
+          "terca_a_domingo": "11:30 - 15:00, 18:00 - 23:00",
+          "segunda": "Fechado"
+        },
+        "tipo_cozinha": [
+          "japonesa",
+          "contemporânea"
+        ],
+        "servicos_oferecidos": [
+          "delivery",
+          "refeições no local",
+          "reservas"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "moderno",
+          "indicado_para": [
+            "jantares românticos",
+            "encontros de negócios",
+            "amantes da culinária japonesa"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Combinados de Sushi",
+            "Sashimi Especial",
+            "Pratos Quentes Japoneses"
+          ],
+          "faixa_preco": "alto",
+          "opcoes_especiais": [
+            "menu executivo",
+            "opções vegetarianas"
+          ]
+        },
+        "foto": "imagens/ippon.jpg"
+      },
+      {
+        "categoria": "restaurante",
+        "nome": "Bar do Cuscuz",
+        "endereco": {
+          "rua": "Av. Cabo Branco",
+          "numero": 3056,
+          "bairro": "Cabo Branco",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58045-010"
+        },
+        "contato": {
+          "telefone": "(83) 3226-1144",
+          "email": "contato@bardocuscuz.com.br",
+          "website": "http://www.bardocuscuz.com.br",
+          "redes_sociais": {
+            "instagram": "bardocuscuzjp"
+          }
+        },
+        "horario_funcionamento": {
+          "segunda_a_domingo": "06:00 - 12:00"
+        },
+        "tipo_cozinha": [
+          "regional",
+          "café da manhã"
+        ],
+        "servicos_oferecidos": [
+          "café da manhã",
+          "refeições no local"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "tradicional",
+          "indicado_para": [
+            "café da manhã",
+            "turistas",
+            "famílias"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Cuscuz Recheado",
+            "Tapioca Especial",
+            "Café Regional"
+          ],
+          "faixa_preco": "econômico",
+          "opcoes_especiais": [
+            "pratos regionais",
+            "opções vegetarianas"
+          ]
+        },
+        "foto": "imagens/bdc.jpg"
+      },
+      {
+        "categoria": "restaurante",
+        "nome": "Tramonto Wine Bar",
+        "endereco": {
+          "rua": "Rua Franca Filho",
+          "numero": 508,
+          "bairro": "Manaíra",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58038-150"
+        },
+        "contato": {
+          "telefone": "(83) 3023-5858",
+          "email": "contato@tramonto.com.br",
+          "website": "http://www.tramonto.com.br",
+          "redes_sociais": {
+            "instagram": "tramontowinebar"
+          }
+        },
+        "horario_funcionamento": {
+          "terca_a_sabado": "18:00 - 00:00",
+          "domingo_e_segunda": "Fechado"
+        },
+        "tipo_cozinha": [
+          "italiana",
+          "wine bar",
+          "mediterrânea"
+        ],
+        "servicos_oferecidos": [
+          "jantar",
+          "degustação de vinhos",
+          "eventos privados"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "sofisticado",
+          "indicado_para": [
+            "encontros românticos",
+            "amantes de vinho",
+            "ocasiões especiais"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Tábua de Frios",
+            "Massas Artesanais",
+            "Vinhos Selecionados"
+          ],
+          "faixa_preco": "alto",
+          "opcoes_especiais": [
+            "carta de vinhos premium",
+            "menu degustação"
+          ]
+        },
+        "foto": "imagens/tramonto.jpg"
+      },
+      {
+        "categoria": "restaurante",
+        "nome": "Famiglia Muccini",
+        "endereco": {
+          "rua": "Rua Nossa Senhora dos Navegantes",
+          "numero": 140,
+          "bairro": "Tambaú",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58039-110"
+        },
+        "contato": {
+          "telefone": "(83) 3226-7816",
+          "email": "contato@famigliamuccini.com.br",
+          "website": "http://www.famigliamuccini.com.br",
+          "redes_sociais": {
+            "instagram": "famigliamuccini"
+          }
+        },
+        "horario_funcionamento": {
+          "terca_a_domingo": "11:30 - 15:00, 18:00 - 23:00",
+          "segunda": "Fechado"
+        },
+        "tipo_cozinha": [
+          "italiana",
+          "pizzaria"
+        ],
+        "servicos_oferecidos": [
+          "delivery",
+          "refeições no local",
+          "reservas",
+          "eventos"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": true,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "familiar",
+          "indicado_para": [
+            "famílias",
+            "grupos",
+            "casais"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Pizzas Artesanais",
+            "Massas Caseiras",
+            "Risotos"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "vinhos italianos",
+            "sobremesas caseiras"
+          ]
+        },
+        "foto": "imagens/familiamuccini.jpg"
+      },
+      {
+        "categoria": "restaurante",
+        "nome": "Fascino Medieval",
+        "endereco": {
+          "rua": "Av. Guarabira",
+          "numero": 1242,
+          "bairro": "Manaíra",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58038-140"
+        },
+        "contato": {
+          "telefone": "(83) 3506-8585",
+          "email": "contato@fascinomedieval.com.br",
+          "website": "http://www.fascinomedieval.com.br",
+          "redes_sociais": {
+            "instagram": "fascinomedieval"
+          }
+        },
+        "horario_funcionamento": {
+          "quinta_a_sabado": "19:00 - 23:00",
+          "domingo": "12:00 - 16:00",
+          "segunda_a_quarta": "Fechado"
+        },
+        "tipo_cozinha": [
+          "medieval",
+          "internacional",
+          "temática"
+        ],
+        "servicos_oferecidos": [
+          "jantar temático",
+          "shows medievais",
+          "eventos especiais"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": true,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "temático",
+          "indicado_para": [
+            "famílias",
+            "grupos",
+            "eventos especiais"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Banquete Medieval",
+            "Costela no Fogo",
+            "Hidromel Artesanal"
+          ],
+          "faixa_preco": "alto",
+          "opcoes_especiais": [
+            "menu temático",
+            "bebidas medievais"
+          ]
+        },
+        "foto": "imagens/fasciniomedieval.jpg"
+      },
+      {
+        "categoria": "restaurante",
+        "nome": "The W Restaurante",
+        "endereco": {
+          "rua": "Av João Maurício",
+          "numero": 451,
+          "bairro": "Manaíra",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58038-000"
+        },
+        "contato": {
+          "telefone": "(83) 3226-9777",
+          "email": "contato@thewrestaurante.com.br",
+          "website": "http://www.thewrestaurante.com.br",
+          "redes_sociais": {
+            "instagram": "thewrestaurante"
+          }
+        },
+        "horario_funcionamento": {
+          "segunda_a_sabado": "12:00 - 23:00",
+          "domingo": "12:00 - 17:00"
+        },
+        "tipo_cozinha": [
+          "contemporânea",
+          "internacional"
+        ],
+        "servicos_oferecidos": [
+          "almoço",
+          "jantar",
+          "eventos"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": true,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "elegante",
+          "indicado_para": [
+            "executivos",
+            "casais",
+            "ocasiões especiais"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Filé Wellington",
+            "Risoto de Camarão",
+            "Salmão Grelhado"
+          ],
+          "faixa_preco": "alto",
+          "opcoes_especiais": [
+            "menu executivo",
+            "carta de vinhos"
+          ]
+        },
+        "foto": "imagens/thew.jpg"
+      },
+      {
+        "categoria": "bar",
+        "nome": "General Store",
+        "endereco": {
+          "rua": "Gen. Osorio",
+          "numero": 152,
+          "bairro": "Centro",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58010-780"
+        },
+        "contato": {
+          "telefone": "(83) 3506-8181",
+          "email": "contato@generalstorejp.com.br",
+          "website": "http://www.generalstorejp.com.br",
+          "redes_sociais": {
+            "instagram": "generalstorejp"
+          }
+        },
+        "horario_funcionamento": {
+          "terca_a_sabado": "17:00 - 00:00",
+          "domingo_e_segunda": "Fechado"
+        },
+        "tipo_cozinha": [
+          "pub",
+          "petiscos"
+        ],
+        "servicos_oferecidos": [
+          "happy hour",
+          "música ao vivo",
+          "cervejas artesanais"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": true,
+          "espaco_kids": false,
+          "estacionamento": false,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "descontraído",
+          "indicado_para": [
+            "jovens",
+            "after office",
+            "encontros com amigos"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Hambúrgueres Artesanais",
+            "Petiscos",
+            "Cervejas Especiais"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "cervejas artesanais",
+            "drinks autorais"
+          ]
+        },
+        "foto": "imagens/generalstore.jpg"
+      },
+      {
+        "categoria": "bar",
+        "nome": "Vila do Porto",
+        "endereco": {
+          "rua": "R. Padre Antônio Pereira",
+          "numero": 350,
+          "bairro": "Varadouro",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58010-010"
+        },
+        "contato": {
+          "telefone": "(83) 3506-8282",
+          "email": "contato@viladoporto.com.br",
+          "website": "http://www.viladoporto.com.br",
+          "redes_sociais": {
+            "instagram": "vila_do_porto"
+          }
+        },
+        "horario_funcionamento": {
+          "quarta_a_sabado": "18:00 - 02:00",
+          "domingo": "16:00 - 22:00",
+          "segunda_e_terca": "Fechado"
+        },
+        "tipo_cozinha": [
+          "boteco",
+          "petiscos",
+          "regional"
+        ],
+        "servicos_oferecidos": [
+          "música ao vivo",
+          "petiscos",
+          "drinks"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "histórico",
+          "indicado_para": [
+            "happy hour",
+            "turistas",
+            "amantes de música"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Petiscos Regionais",
+            "Drinks Autorais",
+            "Tábuas de Frios"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "pratos típicos",
+            "drinks especiais"
+          ]
+        },
+        "foto": "imagens/viladoporto.jpg"
+      },
+      {
+        "categoria": "bar",
+        "nome": "Manga Rosa",
+        "endereco": {
+          "rua": "Av. Campos Sales",
+          "numero": 153,
+          "bairro": "Bessa",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58037-800"
+        },
+        "contato": {
+          "telefone": "(83) 3506-8383",
+          "email": "contato@mangarosabar.com.br",
+          "website": "http://www.mangarosabar.com.br",
+          "redes_sociais": {
+            "instagram": "mangarosabarjp"
+          }
+        },
+        "horario_funcionamento": {
+          "terca_a_sabado": "16:00 - 02:00",
+          "domingo": "16:00 - 00:00",
+          "segunda": "Fechado"
+        },
+        "tipo_cozinha": [
+          "brasileira",
+          "contemporânea"
+        ],
+        "servicos_oferecidos": [
+          "happy hour",
+          "música ao vivo",
+          "drinks especiais"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": true,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "descontraído",
+          "indicado_para": [
+            "jovens",
+            "casais",
+            "grupos de amigos"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Petiscos Gourmet",
+            "Drinks Tropicais",
+            "Tábuas"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "drinks autorais",
+            "petiscos veganos"
+          ]
+        },
+        "foto": "imagens/mangarosa.jpg"
+      },
+      {
+        "categoria": "bar",
+        "nome": "Dona Branca",
+        "endereco": {
+          "rua": "Av. Gov. Argemiro de Figueiredo",
+          "numero": 1223,
+          "bairro": "Jardim Oceania",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58037-030"
+        },
+        "contato": {
+          "telefone": "(83) 3506-8484",
+          "email": "contato@donabranca.com.br",
+          "website": "http://www.donabranca.com.br",
+          "redes_sociais": {
+            "instagram": "donabrancajpoficial"
+          }
+        },
+        "horario_funcionamento": {
+          "terca_a_sabado": "17:00 - 01:00",
+          "domingo": "17:00 - 23:00",
+          "segunda": "Fechado"
+        },
+        "tipo_cozinha": [
+          "bar",
+          "petiscos",
+          "drinks"
+        ],
+        "servicos_oferecidos": [
+          "happy hour",
+          "música ambiente",
+          "drinks especiais"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": true,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "sofisticado casual",
+          "indicado_para": [
+            "happy hour",
+            "encontros",
+            "grupos"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Drinks Autorais",
+            "Petiscos Finos",
+            "Tábuas Gourmet"
+          ],
+          "faixa_preco": "alto",
+          "opcoes_especiais": [
+            "carta de drinks",
+            "menu vegetariano"
+          ]
+        },
+        "foto": "imagens/donabranca.jpg"
+      },
+      {
+        "categoria": "bar",
+        "nome": "Atol Music Bar",
+        "endereco": {
+          "rua": "Rua Coração de Jesus",
+          "numero": 138,
+          "bairro": "Tambaú",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58039-070"
+        },
+        "contato": {
+          "telefone": "(83) 3506-8585",
+          "email": "contato@atolmusicbar.com.br",
+          "website": "http://www.atolmusicbar.com.br",
+          "redes_sociais": {
+            "instagram": "atolmusicbar"
+          }
+        },
+        "horario_funcionamento": {
+          "quarta_a_sabado": "19:00 - 03:00",
+          "domingo": "19:00 - 00:00",
+          "segunda_e_terca": "Fechado"
+        },
+        "tipo_cozinha": [
+          "bar",
+          "petiscos"
+        ],
+        "servicos_oferecidos": [
+          "música ao vivo",
+          "shows",
+          "drinks"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "musical",
+          "indicado_para": [
+            "amantes de música",
+            "vida noturna",
+            "shows"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Petiscos",
+            "Drinks Clássicos",
+            "Cervejas"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "programação musical",
+            "drinks especiais"
+          ]
+        },
+        "foto": "imagens/atol.jpg"
+      },
+      {
+        "categoria": "bar",
+        "nome": "Priscylla's Hall",
+        "endereco": {
+          "rua": "Av. Monte Castelo",
+          "numero": 73,
+          "bairro": "Bancários",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58027-495"
+        },
+        "contato": {
+          "telefone": "(83) 3506-8686",
+          "email": "contato@priscyllashall.com.br",
+          "website": "http://www.priscyllashall.com.br",
+          "redes_sociais": {
+            "instagram": "priscyllashall"
+          }
+        },
+        "horario_funcionamento": {
+          "quinta_a_sabado": "22:00 - 05:00",
+          "domingo_a_quarta": "Fechado"
+        },
+        "tipo_cozinha": [
+          "bar",
+          "drinks"
+        ],
+        "servicos_oferecidos": [
+          "balada",
+          "shows",
+          "eventos"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "balada",
+          "indicado_para": [
+            "festas",
+            "shows",
+            "vida noturna"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Drinks",
+            "Combos",
+            "Energéticos"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "área vip",
+            "festas temáticas"
+          ]
+        },
+        "foto": "imagens/ph.jpg"
+      },
+      {
+        "categoria": "bar",
+        "nome": "Realidade Alternativa",
+        "endereco": {
+          "rua": "R. Hilda Coutinho Lucena",
+          "numero": 82,
+          "bairro": "Miramar",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58043-110"
+        },
+        "contato": {
+          "telefone": "(83) 3506-8787",
+          "email": "contato@realidadealternativa.com.br",
+          "website": "http://www.realidadealternativa.com.br",
+          "redes_sociais": {
+            "instagram": "realidade_alternativa"
+          }
+        },
+        "horario_funcionamento": {
+          "quarta_a_sabado": "18:00 - 02:00",
+          "domingo_a_terca": "Fechado"
+        },
+        "tipo_cozinha": [
+          "pub",
+          "alternativo"
+        ],
+        "servicos_oferecidos": [
+          "shows",
+          "drinks",
+          "petiscos"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "alternativo",
+          "indicado_para": [
+            "rock",
+            "música alternativa",
+            "público jovem"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Cervejas Artesanais",
+            "Drinks Alternativos",
+            "Petiscos"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "shows ao vivo",
+            "drinks temáticos"
+          ]
+        },
+        "foto": "imagens/realidadealternativa.jpg"
+      },
+      {
+        "categoria": "bar",
+        "nome": "Loca Como Tu Madre",
+        "endereco": {
+          "rua": "R. Joaquim Avundano",
+          "numero": 62,
+          "bairro": "Miramar",
+          "cidade": "João Pessoa",
+          "estado": "Paraíba",
+          "cep": "58043-020"
+        },
+        "contato": {
+          "telefone": "(83) 3506-8888",
+          "email": "contato@locacomotumadre.com.br",
+          "website": "http://www.locacomotumadre.com.br",
+          "redes_sociais": {
+            "instagram": "locacomotumadrejpa"
+          }
+        },
+        "horario_funcionamento": {
+          "terca_a_sabado": "18:00 - 02:00",
+          "domingo_e_segunda": "Fechado"
+        },
+        "tipo_cozinha": [
+          "mexicana",
+          "tex-mex"
+        ],
+        "servicos_oferecidos": [
+          "jantar",
+          "drinks",
+          "música ao vivo"
+        ],
+        "recursos_e_facilidades": {
+          "acessibilidade": true,
+          "pet_friendly": false,
+          "espaco_kids": false,
+          "estacionamento": true,
+          "wifi": true
+        },
+        "praticas_ecologicas": {
+          "descarte_residuos": true,
+          "uso_produtos_locais": true,
+          "economia_energia": true,
+          "reciclagem": true
+        },
+        "ambiente_e_publico_alvo": {
+          "atmosfera": "descontraído",
+          "indicado_para": [
+            "happy hour",
+            "grupos",
+            "amantes de comida mexicana"
+          ]
+        },
+        "cardapio_e_precos": {
+          "descricao_pratos": [
+            "Nachos",
+            "Tacos",
+            "Margaritas"
+          ],
+          "faixa_preco": "moderado",
+          "opcoes_especiais": [
+            "comida mexicana",
+            "tequilas especiais"
+          ]
+        },
+        "foto": "imagens/locacomotumadre.jpg"
+      }
+    ]
+}
