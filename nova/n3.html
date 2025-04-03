@@ -3,619 +3,799 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova Chat Multimodal</title>
+    <title>Nova Chat Multimodal Melhorado (com Contexto e PDF)</title>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Showdown -->
     <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
+    <!-- Prism CSS (Tomorrow Theme) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-html.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    
+    <!-- Prism JS Core + Autoloader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+    <!-- Configure Prism Autoloader -->
+    <script>
+        // Garante que o Prism não tente iniciar antes do DOM estar pronto se carregado com defer
+        document.addEventListener('DOMContentLoaded', (event) => {
+            if (window.Prism) {
+                 Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
+            }
+        });
+    </script>
+
     <style>
-        /* Estilos existentes */
+        :root {
+            --bg-color: #242d35;
+            --container-bg: #242d35;
+            --input-bg: #364b55;
+            --user-msg-bg: #3a4046;
+            --bot-msg-bg: #364b55;
+            --text-color: white;
+            --border-color: #364b55;
+            --icon-color: #6c757d;
+            --icon-hover-color: #007bff;
+            --code-header-bg: #f8f9fa;
+            --code-header-text: #6c757d;
+            --code-block-border: #e9ecef;
+            --remove-file-hover: #ff0000;
+            --pdf-icon-color: #dc3545; /* Vermelho para PDF */
+        }
+
         body {
-    background-color: #242d35;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
-
-.chat-container {
-    width: 100%;
-    max-width: 768px;
-    min-height: 96vh;
-    background: #242d35;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-output {
-    flex-grow: 1;
-    padding: 10px;
-    background-color: #242d35;
-    box-sizing: border-box;
-    margin-bottom: 150px; /* Espaço reservado para o input-container */
-}
-
-.input-container {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        max-width: 768px;
-        height: 120px;
-        padding: 10px;
-        border-top: 1px solid #364b55;
-        background-color: #364b55;
-        gap: 10px;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        box-sizing: border-box;
-        border-radius: 15px;
-    }
-
-    .message-input-container {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .message-input-wrapper {
-        flex-grow: 1;
-        position: relative;
-    }
-
-    #user-input {
-        width: 100%;
-        resize: none;
-        min-height: 40px;
-        max-height: 80px;
-        padding-right: 40px;
-    }
-
-    .attachment-button {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: #6c757d;
-        cursor: pointer;
-        padding: 5px;
-    }
-
-    .attachment-button:hover {
-        color: #007bff;
-    }
-
-    #file-input {
-        display: none;
-    }
-
-    .file-preview {
-        margin-top: 10px;
-    }
-
-/* Estilos para mensagens */
-.message {
-    margin-bottom: 10px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    max-width: 80%;
-}
-
-.message:last-child {
-    margin-bottom: 20px;
-}
-        .message.user {
-            text-align: right;
-            margin-left: auto;
-            background-color: #3a4046;
-            color: white;
-            margin-bottom: 30px;
-
-        }
-        .message.bot {
-    position: relative;
-    padding-right: 30px; /* Espaço para o ícone de cópia */
-    text-align: justify;
-    max-width: 100%;
-    background-color: #364b55;
-    color: white;
-
-}
-
-.message.bot .copy-icon {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    cursor: pointer;
-    color: #6c757d;
-    transition: color 0.2s;
-}
-
-.message.bot .copy-icon:hover {
-    color: #007bff;
-}
-        .message .copy-icon:hover {
-            color: #15ff00;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            color: var(--text-color);
         }
 
-        .input-container input[type="text"] {
+        .chat-container {
+            width: 100%;
+            max-width: 768px;
+            min-height: 96vh;
+            background: var(--container-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-output {
             flex-grow: 1;
+            padding: 10px;
+            background-color: var(--container-bg);
+            box-sizing: border-box;
+            margin-bottom: 150px; /* Espaço reservado para o input-container */
+            overflow-y: auto; /* Permitir scroll interno se necessário */
         }
-        .input-container button {
-            flex-shrink: 0;
+
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 768px;
+            min-height: 120px;
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            gap: 10px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            border-radius: 15px 15px 0 0;
         }
-/* Estilos para os blocos de código */
-.code-block {
-    margin: 1em 0;
-    overflow: hidden;
-}
 
-.code-block .code-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 16px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-}
-
-.code-block .code-language {
-    color: #6c757d;
-    font-size: 0.875rem;
-    font-family: ui-monospace, monospace;
-}
-
-.code-block .copy-button {
-    border: none;
-    background: transparent;
-    color: #6c757d;
-    cursor: pointer;
-    padding: 4px;
-    transition: color 0.2s;
-}
-
-.code-block .copy-button:hover {
-    color: #007bff;
-}
-
-.code-block pre {
-    margin: 0;
-    overflow-x: auto;
-}
-
-.code-block code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 0.9em;
-    line-height: 1.5;
-}
-
-.copy-button {
-    border: none;
-    background: transparent;
-    color: #666;
-    font-size: 0.9em;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    transition: color 0.2s;
-}
-
-.copy-button:hover {
-    color: #007bff;
-}
-        .copy-button:active {
-            background-color: #004085;
+        #file-preview-area {
+             order: 1;
+             display: flex;
+             justify-content: flex-start;
+             padding-bottom: 5px;
+             min-height: 60px;
+             align-items: center; /* Centraliza verticalmente o preview */
         }
-        /* Novos estilos para upload */
-        .file-upload-container {
+
+        .message-input-row {
+            order: 2;
             display: flex;
             gap: 10px;
-            align-items: center;
+            align-items: flex-end;
         }
 
-        .uploaded-file img.file-preview {
-    width: 56px;
-    height: 56px;
-    object-fit: cover;
-    border-radius: 4px;
-}
+        .message-input-wrapper {
+            flex-grow: 1;
+            position: relative;
+        }
 
-.uploaded-file {
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    padding: 5px;
-    background-color: #2c3e50;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    width: 90px;
-}
+        #user-input {
+            width: 100%;
+            resize: none;
+            min-height: 40px;
+            max-height: 120px; /* Aumentar um pouco mais */
+            padding: 10px;
+            padding-right: 45px;
+            border-radius: 8px;
+            line-height: 1.5;
+            overflow-y: auto;
+        }
 
-.remove-file {
-    position: relative;
-    color: #ffffff;
-    cursor: pointer;
-    font-size: 16px;
-}
+        .attachment-button {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            background: none;
+            border: none;
+            color: var(--icon-color);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.2em;
+        }
+
+        .attachment-button:hover {
+            color: var(--icon-hover-color);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Estilos para pré-visualização do arquivo */
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Aumentar gap */
+            padding: 5px 8px; /* Ajustar padding */
+            background-color: #2c3e50;
+            border-radius: 4px;
+            max-width: 200px; /* Aumentar um pouco a largura máxima */
+        }
+
+        .uploaded-file img.file-preview-img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 4px;
+            flex-shrink: 0; /* Evita que a imagem encolha */
+        }
+
+        .file-preview-icon {
+            width: 40px; /* Tamanho do ícone */
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em; /* Tamanho do ícone font-awesome */
+            color: var(--pdf-icon-color); /* Cor específica para PDF */
+            flex-shrink: 0;
+        }
+
+         .uploaded-file span.file-preview-name {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.85em; /* Aumentar um pouco */
+            color: var(--text-color);
+            line-height: 1.2; /* Melhorar leitura */
+        }
+
+        .remove-file-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.1em;
+            padding: 0 3px;
+            flex-shrink: 0; /* Evita que o botão encolha */
+        }
+
+        .remove-file-btn:hover {
+            color: var(--remove-file-hover);
+        }
+
+        /* Estilos para mensagens */
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 12px;
+            max-width: 90%;
+            word-wrap: break-word;
+            position: relative;
+            line-height: 1.6; /* Melhorar legibilidade */
+        }
+        .message:last-child {
+             margin-bottom: 5px; /* Reduzir margem da última mensagem */
+        }
+
+        .message.user {
+            margin-left: auto;
+            background-color: var(--user-msg-bg);
+            color: var(--text-color);
+            text-align: left;
+        }
+
+        .message.bot {
+            margin-right: auto;
+            background-color: var(--bot-msg-bg);
+            color: var(--text-color);
+            text-align: left; /* Mudar para left para consistência */
+            padding-right: 35px;
+        }
+
+        .message.system {
+            text-align: center;
+            font-size: 0.9em;
+            color: #aaa;
+            font-style: italic;
+            max-width: 100%;
+            background: none;
+        }
+
+        .message.bot .copy-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: var(--icon-color);
+            transition: color 0.2s ease-in-out;
+            font-size: 0.9em;
+        }
+
+        .message.bot .copy-icon:hover {
+            color: var(--icon-hover-color);
+        }
+        .message.bot .copy-icon .fa-check {
+             color: lightgreen;
+        }
 
 
-.remove-file:hover {
-    color: #ff0000; /* Cor vermelha ao passar o mouse */
-}
+        /* Estilos para conteúdo da mensagem do usuário (texto + imagem) */
+        .user-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
 
-.file-preview {
-    position: relative; /* Necessário para posicionar elementos filhos absolutamente */
-}
+        .user-content img {
+            max-width: 100%;
+            height: auto;
+            max-height: 350px; /* Aumentar um pouco */
+            object-fit: contain;
+            margin-top: 10px;
+            border-radius: 8px;
+            cursor: pointer; /* Indicar que pode ser clicável (para zoom futuro?) */
+        }
+
+        /* Estilos para os blocos de código */
+        .message.bot pre[class*="language-"] {
+            margin: 1em 0 !important;
+            border-radius: 6px;
+            border: 1px solid var(--code-block-border);
+            position: relative; /* Para posicionar o botão de cópia */
+            background-color: #2d2d2d; /* Fundo escuro padrão do Prism Tomorrow */
+        }
+
+         /* Ajuste padding dentro do pre para dar espaço ao botão */
+         .message.bot pre[class*="language-"] {
+            padding: 1em 1em 1em 1em;
+        }
+        .message.bot pre[class*="language-"] code {
+            padding-right: 50px; /* Espaço à direita para botão não sobrepor scrollbar ou texto */
+        }
 
 
+        .message.bot code[class*="language-"] {
+            font-size: 0.9em;
+            line-height: 1.5;
+            color: #ccc; /* Cor base do texto no Prism Tomorrow */
+        }
 
+        .code-block-wrapper { /* Não mais necessário se o botão for dentro do <pre> */
+           /* position: relative; */
+           /* margin: 1em 0; */
+        }
 
-/* Ajuste na ordem de exibição do container */
-.input-container {
-    display: flex;
-    flex-direction: column-reverse; /* Inverte a ordem dos elementos */
-}
+        .copy-code-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(74, 85, 97, 0.7); /* Fundo semi-transparente */
+            border: none;
+            color: #ccc;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            opacity: 0.6; /* Começa mais transparente */
+            transition: opacity 0.2s, color 0.2s, background-color 0.2s;
+            z-index: 1; /* Garante que fique acima do código */
+        }
 
-.message-input-container {
-    margin-top: auto; /* Empurra para o final do container */
-}
+         .message.bot pre[class*="language-"]:hover .copy-code-btn {
+             opacity: 1; /* Fica opaco no hover do <pre> */
+         }
+
+        .copy-code-btn:hover {
+            color: #fff;
+            background-color: rgba(74, 85, 97, 1); /* Fica mais opaco no hover do botão */
+        }
+
+        .copy-code-btn .fa-check {
+             color: lightgreen;
+        }
+
+         /* Estilo para estado de 'digitando' */
+        .message.bot.typing {
+             padding: 10px 15px;
+             display: inline-block; /* Para não ocupar largura total */
+             border-radius: 12px;
+             background-color: var(--bot-msg-bg);
+        }
+        .typing-indicator {
+            display: inline-block;
+            margin-left: 5px;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin: 0 1px;
+            background-color: var(--icon-color);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: typing 1s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.15s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes typing {
+            0%, 100% { opacity: 0.4; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-3px); }
+        }
+
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <div id="chat-output" class="chat-output"></div>
+        <div id="chat-output" class="chat-output">
+             <!-- Mensagens serão adicionadas aqui -->
+        </div>
         <div class="input-container">
-            <div class="message-input-container">
+             <div id="file-preview-area">
+                 <!-- Preview do arquivo aparece aqui -->
+             </div>
+            <div class="message-input-row">
                 <div class="message-input-wrapper">
-                    <textarea id="user-input" class="form-control" 
-                        placeholder="Digite sua mensagem..."></textarea>
-                    <button class="attachment-button" onclick="document.getElementById('file-input').click()" title="Anexar arquivos">
+                    <textarea id="user-input" class="form-control" placeholder="Digite sua mensagem... (Shift+Enter para nova linha)"></textarea>
+                    <button id="attachment-button" class="attachment-button" title="Anexar arquivos">
                         <i class="fa-solid fa-paperclip"></i>
                     </button>
+                    <input type="file" id="file-input" accept="image/*,application/pdf" aria-label="Anexar arquivo">
                 </div>
             </div>
-            <input type="file" id="file-input" accept="image/*,application/pdf">
-            <div id="file-preview"></div>
         </div>
     </div>
 
     <script>
-        const apiKey = "AIzaSyAQR7qRaUJ6wpEq_RrGSUzodbkmVbz7Gdk";
-        const modelUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=" + apiKey;
+        // --- IIFE para encapsular o código ---
+        (function() {
+            // --- Constantes e Variáveis ---
+            // !!! IMPORTANTE: Mova esta chave para um Backend! Nunca exponha no Frontend!
+            const API_KEY = "AIzaSyAQR7qRaUJ6wpEq_RrGSUzodbkmVbz7Gdk"; // Substitua pela sua chave REAL (mantenha seguro!)
 
-        const chatOutput = document.getElementById('chat-output');
-        const userInput = document.getElementById('user-input');
-        const sendButton = document.getElementById('send-button');
-        const fileInput = document.getElementById('file-input');
-        const filePreview = document.getElementById('file-preview');
+            // Modelo multimodal que processa texto, imagens e PDFs (via inlineData)
+            // Use 'gemini-1.5-flash-latest' ou 'gemini-1.5-pro-latest' ou o experimental se preferir
+            const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${API_KEY}`;
 
-        let currentFile = null;
+            const MAX_HISTORY_TURNS = 10; // Manter os últimos N pares (user/model) de turnos no histórico
 
-        fileInput.addEventListener('change', handleFileSelect);
-        
-        userInput.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault(); // Previne o comportamento padrão do "Enter"
-                handleSendMessage(); // Função que envia a mensagem
-             }
-             if (event.key === 'Enter' && event.shiftKey) {
-                 event.preventDefault(); // Previne o comportamento padrão do "Enter"
-                 userInput.value += '\n'; // Adiciona uma nova linha no textarea
-                }
-           
-        });
-       
+            const chatOutput = document.getElementById('chat-output');
+            const userInput = document.getElementById('user-input');
+            const fileInput = document.getElementById('file-input');
+            const filePreviewArea = document.getElementById('file-preview-area');
+            const attachmentButton = document.getElementById('attachment-button');
 
-function removerArquivo() {
-    console.log('Arquivo removido');
-    // Adicione aqui a lógica para remover o arquivo
-}
+            const markdownConverter = new showdown.Converter({
+                tables: true,
+                ghCodeBlocks: true, // Habilita blocos de código estilo GitHub (```lang ...)
+                tasklists: true,
+                strikethrough: true,
+                simplifiedAutoLink: true,
+                openLinksInNewWindow: true
+            });
 
-// Modifique a função handleFileSelect
-function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+            let currentFile = null;
+            let isWaitingForBot = false;
+            let conversationHistory = []; // Armazena o histórico: {role: 'user'|'model', parts: [{...}]}
 
-    currentFile = file;
-    filePreview.innerHTML = '';
+            // --- Funções Auxiliares ---
 
-    const fileDisplay = document.createElement('div');
-    fileDisplay.className = 'uploaded-file';
-
-    if (file.type.startsWith('image/')) {
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
-        img.className = 'file-preview';
-        fileDisplay.appendChild(img);
-    } else {
-        const fileName = document.createElement('span');
-        fileName.textContent = file.name;
-        fileDisplay.appendChild(fileName);
-    }
-
-    // Criação do botão de remover com ícone do Font Awesome
-    const removeButton = document.createElement('i');
-    removeButton.className = 'fa-solid fa-circle-xmark remove-file';
-    removeButton.onclick = () => {
-        filePreview.innerHTML = '';
-        fileInput.value = '';
-        currentFile = null;
-    };
-    fileDisplay.appendChild(removeButton);
-
-    filePreview.appendChild(fileDisplay);
-}
-
-        async function handleSendMessage() {
-        const userMessage = userInput.value.trim();
-        if (!userMessage && !currentFile) return;
-
-        // Adiciona mensagem do usuário com imagem se houver
-        if (currentFile && currentFile.type.startsWith('image/')) {
-            const imageUrl = URL.createObjectURL(currentFile);
-            addMessage(userMessage, 'user', imageUrl);
-        } else {
-            addMessage(userMessage, 'user');
-        }
-        
-        userInput.value = '';
-
-        try {
-            let requestBody = {
-                contents: [{
-                    parts: []
-                }]
-            };
-
-            if (userMessage) {
-                requestBody.contents[0].parts.push({ text: userMessage });
-            }
-
-            if (currentFile) {
-                const base64Data = await fileToBase64(currentFile);
-                requestBody.contents[0].parts.push({
-                    inlineData: {
-                        mimeType: currentFile.type,
-                        data: base64Data
-                    }
+            function fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        const base64String = reader.result.split(',')[1];
+                        resolve(base64String);
+                    };
+                    reader.onerror = error => reject(error);
                 });
             }
 
-            const response = await fetch(modelUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            });
+            function scrollToBottom() {
+                 requestAnimationFrame(() => {
+                    chatOutput.scrollTop = chatOutput.scrollHeight;
+                 });
+            }
 
-            if (!response.ok) throw new Error('Failed to fetch the response from the API');
+            function copyToClipboard(textToCopy, feedbackElement) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalIconClass = feedbackElement.className;
+                    feedbackElement.className = 'fa-solid fa-check';
+                    feedbackElement.parentElement.title = 'Copiado!'; // Atualiza tooltip do botão
+                    setTimeout(() => {
+                        feedbackElement.className = originalIconClass;
+                        feedbackElement.parentElement.title = 'Copiar código'; // Restaura tooltip
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Erro ao copiar:', err);
+                     feedbackElement.parentElement.title = 'Erro ao copiar';
+                     setTimeout(() => { feedbackElement.parentElement.title = 'Copiar código'; }, 2000);
+                });
+            }
 
-            const data = await response.json();
-            const botResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
-            addMessage(botResponse, 'bot');
-
-            // Limpar arquivo após envio
-            filePreview.innerHTML = '';
-            fileInput.value = '';
-            currentFile = null;
-        } catch (error) {
-            console.error('Error:', error);
-            addMessage('Erro ao obter resposta. Tente novamente.', 'bot');
-        }
-    }
-
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    const base64String = reader.result.split(',')[1];
-                    resolve(base64String);
-                };
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        function addMessage(message, sender, imageUrl = null) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-    chatOutput.appendChild(messageDiv);
-
-    if (sender === 'user') {
-        // Container para organizar texto e imagem
-        const contentDiv = document.createElement('div');
-        contentDiv.style.display = 'flex';
-        contentDiv.style.flexDirection = 'column';
-        contentDiv.style.alignItems = 'flex-end'; // Alinha à direita para mensagens do usuário
-        
-        // Adiciona o texto se houver
-        if (message) {
-            const textDiv = document.createElement('div');
-            textDiv.textContent = message;
-            contentDiv.appendChild(textDiv);
-        }
-        
-        // Adiciona a imagem se houver
-        if (imageUrl) {
-            const img = document.createElement('img');
-            img.src = imageUrl;
-            //img.style.width = '380px';
-            img.style.height = '250px';
-            img.style.objectFit = 'contain';
-            img.style.marginTop = '10px';
-            img.style.borderRadius = '8px';
-            contentDiv.appendChild(img);
-        }
-        
-        messageDiv.appendChild(contentDiv);
-    } else {
-        // Processa mensagem do bot
-    messageDiv.style.position = 'relative'; // Make .message.bot relative
-        const converter = new showdown.Converter({
-            tables: true,
-            ghCodeBlocks: true,
-            tasklists: true
-        });
-        
-        // Analisar a mensagem para identificar diferentes seções
-        const sections = [];
-        let currentSection = '';
-        let inCode = false;
-        let codeLanguage = '';
-        let hasCodeBlock = false;
-        
-        // Primeira passagem: identificar estrutura
-        for (let i = 0; i < message.length; i++) {
-            if (message.substring(i, i + 3) === '```') {
-                hasCodeBlock = true;  // Marca que encontrou um bloco de código
-                if (!inCode) {
-                    if (currentSection) {
-                        sections.push({ type: 'text', content: currentSection });
-                        currentSection = '';
-                    }
-                    let langEnd = message.indexOf('\n', i + 3);
-                    if (langEnd > -1) {
-                        codeLanguage = message.substring(i + 3, langEnd).trim();
-                        i = langEnd;
-                    }
-                    inCode = true;
-                } else {
-                    sections.push({ type: 'code', language: codeLanguage, content: currentSection });
-                    currentSection = '';
-                    inCode = false;
-                    codeLanguage = '';
-                    i += 2;
+            /** Adiciona uma mensagem ao chat UI */
+            function addMessage(messageText, sender, imageUrl = null) {
+                // Remove indicador de "digitando" antes de adicionar nova mensagem (bot ou user)
+                const typingIndicator = chatOutput.querySelector('.message.bot.typing');
+                if (typingIndicator) {
+                    typingIndicator.remove();
                 }
-            } else {
-                currentSection += message[i];
+
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+
+                if (sender === 'user') {
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'user-content';
+
+                    if (messageText) {
+                        const textDiv = document.createElement('div');
+                        textDiv.textContent = messageText; // Mostrar texto puro do usuário
+                        contentDiv.appendChild(textDiv);
+                    }
+
+                    if (imageUrl) {
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.alt = "Imagem anexada pelo usuário";
+                        // img.onclick = () => window.open(imageUrl, '_blank'); // Opcional: Abrir imagem em nova aba
+                        contentDiv.appendChild(img);
+                    }
+                    messageDiv.appendChild(contentDiv);
+
+                } else if (sender === 'bot') {
+                    let htmlContent = markdownConverter.makeHtml(messageText);
+                    messageDiv.innerHTML = htmlContent;
+
+                    // Processar blocos de código APÓS conversão do Markdown
+                    messageDiv.querySelectorAll('pre code').forEach(codeBlock => {
+                        const preElement = codeBlock.parentElement;
+
+                        // Adiciona botão de cópia dentro do <pre>
+                        const copyCodeBtn = document.createElement('button');
+                        copyCodeBtn.className = 'copy-code-btn';
+                        copyCodeBtn.title = 'Copiar código';
+                        copyCodeBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+                        copyCodeBtn.type = 'button'; // Boa prática
+                        copyCodeBtn.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Evita disparar outros eventos
+                            copyToClipboard(codeBlock.innerText, copyCodeBtn.querySelector('i'));
+                        });
+                        preElement.appendChild(copyCodeBtn); // Adiciona botão ao <pre>
+
+                        // Aplica Prism highlighting
+                         // A classe 'language-xyz' deve ter sido adicionada pelo Showdown (ghCodeBlocks)
+                         // Se não tiver classe, o Prism tentará adivinhar
+                         if (!codeBlock.className.includes('language-')) {
+                              preElement.classList.add('language-none'); // Ou outra linguagem padrão
+                         }
+                         Prism.highlightElement(codeBlock);
+
+                    });
+
+                    // Adiciona botão de cópia para a mensagem inteira (se tiver texto fora dos blocos de código)
+                    const hasTextContent = messageDiv.textContent.trim().replace(/Copiar código/gi, '').trim().length > 0;
+                     if (hasTextContent) {
+                        const copyIcon = document.createElement('i');
+                        copyIcon.className = 'fa-regular fa-copy copy-icon';
+                        copyIcon.title = 'Copiar mensagem';
+                         copyIcon.style.cursor = 'pointer'; // Indica clicável
+                        copyIcon.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            // Copia o texto visível, tentando excluir o texto dos botões
+                            let textToCopy = '';
+                            messageDiv.childNodes.forEach(node => {
+                                if (node.nodeType === Node.TEXT_NODE) {
+                                    textToCopy += node.textContent;
+                                } else if (node.nodeType === Node.ELEMENT_NODE && !node.querySelector('.copy-code-btn')) {
+                                    // Inclui texto de elementos que não sejam botões de cópia de código
+                                    textToCopy += node.innerText || node.textContent;
+                                }
+                            });
+                             copyToClipboard(textToCopy.trim(), copyIcon); // Usa a mesma função
+                        });
+                         messageDiv.appendChild(copyIcon);
+                     }
+
+                } else if (sender === 'system') {
+                     messageDiv.textContent = messageText;
+                }
+
+                chatOutput.appendChild(messageDiv);
+                scrollToBottom(); // Rola após adicionar qualquer mensagem
             }
-        }
-        if (currentSection) {
-            sections.push({ type: inCode ? 'code' : 'text', language: codeLanguage, content: currentSection });
-        }
 
-        // Criar estrutura HTML inicial
-        let structureHtml = '';
-        sections.forEach((section, idx) => {
-            if (section.type === 'text') {
-                structureHtml += `<div class="text-section-${idx}"></div>`;
-            } else {
-                structureHtml += `
-                    <div class="code-block rounded-md border border-gray-200 bg-gray-50 dark:bg-gray-900">
-                        <div class="code-header">
-                            <span class="code-language">${section.language}</span>
-                            <button class="copy-button" onclick="copyCode(this)" title="Copiar código">
-                                <i class="fa-regular fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="p-4">
-                            <pre><code class="language-${section.language} code-section-${idx}"></code></pre>
-                        </div>
-                    </div>`;
+             /** Adiciona indicador de digitação */
+             function showTypingIndicator() {
+                 // Remover indicador antigo se existir
+                 const oldIndicator = chatOutput.querySelector('.message.bot.typing');
+                 if (oldIndicator) oldIndicator.remove();
+
+                 const typingDiv = document.createElement('div');
+                 typingDiv.className = 'message bot typing';
+                 typingDiv.innerHTML = `
+                     <div class="typing-indicator">
+                         <span></span><span></span><span></span>
+                     </div>
+                 `;
+                 chatOutput.appendChild(typingDiv);
+                 scrollToBottom();
+             }
+
+            /** Lida com a seleção de arquivo */
+            function handleFileSelect(event) {
+                const file = event.target.files[0];
+                filePreviewArea.innerHTML = '';
+                currentFile = null;
+
+                if (!file) return;
+
+                const allowedMimeTypes = [
+                    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+                    'application/pdf' // PDF permitido
+                ];
+                const maxSizeMB = 15; // Limite um pouco maior para PDFs
+
+                if (!allowedMimeTypes.includes(file.type)) {
+                     addMessage(`Tipo de arquivo não suportado: ${file.type}. Use JPG, PNG, GIF, WebP ou PDF.`, 'system');
+                     fileInput.value = '';
+                     return;
+                }
+
+                if (file.size > maxSizeMB * 1024 * 1024) {
+                    addMessage(`Arquivo muito grande (${(file.size / 1024 / 1024).toFixed(1)}MB). Limite: ${maxSizeMB}MB.`, 'system');
+                    fileInput.value = '';
+                    return;
+                }
+
+                currentFile = file; // Armazena o arquivo válido
+
+                const fileDisplay = document.createElement('div');
+                fileDisplay.className = 'uploaded-file';
+
+                // Preview (Imagem ou Ícone PDF)
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.className = 'file-preview-img';
+                    img.onload = () => URL.revokeObjectURL(img.src); // Libera memória
+                    fileDisplay.appendChild(img);
+                } else if (file.type === 'application/pdf') {
+                    const pdfIcon = document.createElement('i');
+                    pdfIcon.className = 'fa-solid fa-file-pdf file-preview-icon';
+                    fileDisplay.appendChild(pdfIcon);
+                     console.warn("Aviso: Enviar PDFs grandes como inlineData pode consumir muitos tokens ou falhar. A API de Arquivos do Google é mais robusta para isso.");
+                }
+
+                // Nome do arquivo
+                 const fileName = document.createElement('span');
+                 fileName.className = 'file-preview-name';
+                 fileName.textContent = file.name;
+                 fileDisplay.appendChild(fileName);
+
+                // Botão de remover
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-file-btn';
+                removeButton.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                removeButton.title = 'Remover anexo';
+                removeButton.type = 'button';
+                removeButton.addEventListener('click', () => {
+                    filePreviewArea.innerHTML = '';
+                    fileInput.value = '';
+                    currentFile = null;
+                });
+                fileDisplay.appendChild(removeButton);
+
+                filePreviewArea.appendChild(fileDisplay);
             }
-        });
-        messageDiv.innerHTML = structureHtml;
 
-        // Adicionar o ícone de cópia apenas se não houver blocos de código
-        if (!hasCodeBlock) {
-            const copyIcon = document.createElement('i');
-            copyIcon.className = 'fa-regular fa-copy copy-icon';
-            copyIcon.title = 'Copiar mensagem';
-            copyIcon.onclick = () => copyMessageContent(messageDiv, copyIcon);
-            messageDiv.appendChild(copyIcon);
-        }
+            /** Envia mensagem, gerencia histórico e chama a API */
+            async function handleSendMessage() {
+                if (isWaitingForBot) return;
 
-        // Fazer streaming do conteúdo
-        let currentSectionIndex = 0;
-        let currentChar = 0;
-        
-        const interval = setInterval(() => {
-            if (currentSectionIndex < sections.length) {
-                const section = sections[currentSectionIndex];
-                if (currentChar < section.content.length) {
-                    const selector = section.type === 'text' ? 
-                        `.text-section-${currentSectionIndex}` : 
-                        `.code-section-${currentSectionIndex}`;
-                    
-                    const element = messageDiv.querySelector(selector);
-                    if (section.type === 'text') {
-                        const textContent = section.content.substring(0, currentChar + 1);
-                        element.innerHTML = converter.makeHtml(textContent);
+                const userMessageText = userInput.value.trim();
+                let fileToSend = currentFile; // Guarda referência antes de limpar
+
+                if (!userMessageText && !fileToSend) return; // Não envia se ambos estiverem vazios
+
+                isWaitingForBot = true;
+                let userImageObjectURL = null;
+                let currentTurnParts = []; // Partes para a mensagem atual do usuário
+
+                // Limpa UI primeiro para feedback rápido
+                userInput.value = '';
+                userInput.style.height = 'auto';
+                filePreviewArea.innerHTML = '';
+                currentFile = null; // Limpa estado global do arquivo
+                fileInput.value = ''; // Garante limpeza do input
+
+                // Prepara as partes da mensagem atual
+                if (userMessageText) {
+                    currentTurnParts.push({ text: userMessageText });
+                }
+
+                let fileDataPart = null; // Para guardar dados do arquivo para request/histórico
+                if (fileToSend) {
+                    try {
+                        const base64Data = await fileToBase64(fileToSend);
+                        fileDataPart = {
+                            inlineData: { mimeType: fileToSend.type, data: base64Data }
+                        };
+                        currentTurnParts.push(fileDataPart);
+
+                        if (fileToSend.type.startsWith('image/')) {
+                             userImageObjectURL = URL.createObjectURL(fileToSend); // Para UI
+                        }
+                        // Aviso sobre PDF já está em handleFileSelect
+                    } catch (error) {
+                         console.error("Erro ao converter arquivo para Base64:", error);
+                         addMessage("Erro ao processar o arquivo anexo. Não foi enviado.", 'system');
+                         isWaitingForBot = false;
+                         if(userImageObjectURL) URL.revokeObjectURL(userImageObjectURL); // Limpa URL se foi criada
+                         return; // Não continuar se o arquivo falhar
+                    }
+                }
+
+                // Adiciona mensagem do usuário à UI AGORA
+                addMessage(userMessageText, 'user', userImageObjectURL); // Passa a URL da imagem se houver
+
+                // Mostrar indicador de "digitando"
+                showTypingIndicator();
+
+                try {
+                    const currentTurn = { role: 'user', parts: currentTurnParts };
+
+                    // --- Construir corpo da requisição com histórico ---
+                    const requestBody = {
+                        contents: [...conversationHistory, currentTurn], // Histórico + Mensagem atual
+                        generationConfig: {
+                             // temperature: 0.7, // Ajuste conforme necessário
+                             // maxOutputTokens: 2048,
+                        },
+                         safetySettings: [ // Configurações de segurança padrão/recomendadas
+                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+                         ]
+                    };
+
+                    // --- Chamada à API ---
+                    // !!! ESTA CHAMADA DEVE SER FEITA NO SEU BACKEND EM PRODUÇÃO !!!
+                    const response = await fetch(MODEL_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    // Tratamento da resposta
+                    let botResponseText = 'Desculpe, ocorreu um erro ao obter a resposta.'; // Mensagem de erro padrão
+                    let modelResponseParts = [{ text: botResponseText }]; // Padrão para histórico
+
+                    if (!response.ok) {
+                         const errorData = await response.json().catch(() => ({ error: { message: "Erro desconhecido na resposta da API." } }));
+                         console.error("Erro da API:", response.status, response.statusText, errorData);
+                         botResponseText = `Erro ${response.status}: ${errorData.error?.message || response.statusText}`;
+                         addMessage(botResponseText, 'system'); // Mostrar erro como system message
                     } else {
-                        element.textContent = section.content.substring(0, currentChar + 1);
-                        Prism.highlightElement(element);
+                         const data = await response.json();
+
+                         if (data.candidates && data.candidates.length > 0 && data.candidates[0].content?.parts) {
+                             // Sucesso - Pega o texto da primeira parte (pode haver mais partes no futuro)
+                             botResponseText = data.candidates[0].content.parts.map(part => part.text || '').join(''); // Junta partes de texto se houver mais de uma
+                             modelResponseParts = data.candidates[0].content.parts; // Guarda as partes para o histórico
+                             addMessage(botResponseText, 'bot'); // Adiciona resposta à UI
+
+                             // --- Atualiza histórico APÓS sucesso ---
+                             conversationHistory.push(currentTurn); // Adiciona pergunta do usuário
+                             conversationHistory.push({ role: 'model', parts: modelResponseParts }); // Adiciona resposta do modelo
+
+                         } else if (data.promptFeedback && data.promptFeedback.blockReason) {
+                             // Conteúdo bloqueado
+                             botResponseText = `Sua mensagem foi bloqueada (${data.promptFeedback.blockReason}).`;
+                             if(data.promptFeedback.safetyRatings) {
+                                 botResponseText += ` Detalhes: ${data.promptFeedback.safetyRatings.filter(r => r.probability !== 'NEGLIGIBLE').map(r => `${r.category.replace('HARM_CATEGORY_', '')} (${r.probability})`).join(', ')}`;
+                             }
+                             modelResponseParts = [{ text: "[Conteúdo bloqueado]" }]; // Representação no histórico
+                             addMessage(botResponseText, 'system'); // Mostrar bloqueio como system message
+                              // Adiciona ao histórico mesmo se bloqueado, para contexto, mas com texto indicativo
+                             conversationHistory.push(currentTurn);
+                             conversationHistory.push({ role: 'model', parts: modelResponseParts });
+
+                         } else {
+                             // Resposta inesperada
+                             console.warn("Estrutura da resposta inesperada:", data);
+                             botResponseText = 'Recebi uma resposta inesperada da API.';
+                             modelResponseParts = [{ text: botResponseText }];
+                             addMessage(botResponseText, 'system');
+                              // Adiciona ao histórico para não quebrar a sequência
+                             conversationHistory.push(currentTurn);
+                             conversationHistory.push({ role: 'model', parts: modelResponseParts });
+                         }
                     }
-                    currentChar++;
-                } else {
-                    currentSectionIndex++;
-                    currentChar = 0;
+
+                     // --- Limitar tamanho do histórico ---
+                     const turnsToKeep = MAX_HISTORY_TURNS * 2; // *2 porque cada turno tem user + model
+                     if (conversationHistory.length > turnsToKeep) {
+                         conversationHistory = conversationHistory.slice(-turnsToKeep);
+                         console.log("Histórico truncado para os últimos", MAX_HISTORY_TURNS, "turnos.");
+                     }
+
+                } catch (error) {
+                    console.error('Erro crítico ao enviar/processar mensagem:', error);
+                    addMessage(`Erro inesperado: ${error.message}. Verifique o console.`, 'system');
+                    // Remover indicador de typing em caso de erro crítico
+                    const typingIndicator = chatOutput.querySelector('.message.bot.typing');
+                    if (typingIndicator) typingIndicator.remove();
+                } finally {
+                    isWaitingForBot = false; // Libera para novo envio
+                    if (userImageObjectURL) {
+                        URL.revokeObjectURL(userImageObjectURL); // Limpa URL temporária da imagem do usuário
+                    }
                 }
-                window.scrollTo({
-    top: document.body.scrollHeight,
-    behavior: 'smooth'
-});            } else {
-                clearInterval(interval);
             }
-        }, 30);
-    }
 
-    window.scrollTo({
-    top: document.body.scrollHeight,
-    behavior: 'smooth'
-});
+            // --- Event Listeners ---
 
-}
+            attachmentButton.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
 
+            userInput.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    handleSendMessage();
+                }
+            });
 
+            userInput.addEventListener('input', () => {
+                userInput.style.height = 'auto';
+                userInput.style.height = (userInput.scrollHeight) + 'px';
+            });
 
+            // --- Inicialização ---
+            addMessage("Olá! Como posso ajudar você hoje?", 'bot'); // Mensagem inicial (não entra no histórico ainda)
 
-function copyMessageContent(messageDiv, copyIcon) {
-    // Remove o ícone de cópia temporariamente para copiar apenas o conteúdo
-    copyIcon.remove();
-    const text = messageDiv.innerText;
-    copyIcon.className = 'fa-solid fa-check copy-icon';
-    messageDiv.appendChild(copyIcon);
-
-    navigator.clipboard.writeText(text).then(() => {
-        setTimeout(() => {
-            copyIcon.className = 'fa-regular fa-copy copy-icon';
-        }, 2000);
-    }).catch(err => console.error('Erro ao copiar conteúdo:', err));
-}
-
-// Função atualizada para copiar o código
-function copyCode(button) {
-    const codeBlock = button.closest('.code-block').querySelector('code');
-    const codeText = codeBlock.textContent;
-    
-    navigator.clipboard.writeText(codeText).then(() => {
-        const icon = button.querySelector('i');
-        icon.className = 'fa-solid fa-check';
-        setTimeout(() => {
-            icon.className = 'fa-regular fa-copy';
-        }, 2000);
-    });
-}
-
+        })(); // --- Fim do IIFE ---
     </script>
 </body>
 </html>
