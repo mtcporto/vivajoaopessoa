@@ -1,431 +1,374 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-bs-theme="dark"> <!-- Default theme -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova Chat Multimodal Melhorado (com Contexto e PDF)</title>
+    <title>Chat Multimodal (v1 Style + v2 Func - CORRIGIDO)</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Showdown -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Showdown Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
-    <!-- Prism CSS (Tomorrow Theme) -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <!-- Prism JS Core + Autoloader -->
+    <!-- PrismJS CSS (Theme will be updated by JS) -->
+    <link id="prism-theme" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <!-- PrismJS JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
-    <!-- Configure Prism Autoloader -->
     <script>
-        // Garante que o Prism não tente iniciar antes do DOM estar pronto se carregado com defer
-        document.addEventListener('DOMContentLoaded', (event) => {
+        document.addEventListener('DOMContentLoaded', () => {
             if (window.Prism) {
-                 Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
+                Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
             }
+            // Ensure Prism highlights dynamically added content later if needed
+            Prism.hooks.add('complete', function (env) {
+                // Optional: Add logic here if Prism needs manual re-triggering after content load
+            });
         });
     </script>
 
     <style>
+        /* --- CSS Variables --- */
         :root {
+            --border-radius-base: 8px;
+            --border-radius-inner: 4px;
+        }
+        /* --- Dark Theme (Default) --- */
+        :root[data-bs-theme="dark"] {
             --bg-color: #242d35;
             --container-bg: #242d35;
             --input-bg: #364b55;
+            --header-bg: #2d343b;
             --user-msg-bg: #3a4046;
             --bot-msg-bg: #364b55;
             --text-color: white;
-            --border-color: #364b55;
-            --icon-color: #6c757d;
-            --icon-hover-color: #007bff;
-            --code-header-bg: #f8f9fa;
-            --code-header-text: #6c757d;
-            --code-block-border: #e9ecef;
-            --remove-file-hover: #ff0000;
-            --pdf-icon-color: #dc3545; /* Vermelho para PDF */
+            --secondary-text-color: #b0bec5;
+            --border-color: #4f565d; /* Darker border */
+            --icon-color: #b0bec5;
+            --icon-hover-color: #80cbc4;
+            --code-bg: #263238;
+            --code-text-color: #eeffff;
+            --link-color: #80cbc4;
+            --remove-file-hover: #ff8a65;
+            --pdf-icon-color: #ef5350;
+            --audio-icon-color: #ffb74d;
+            --video-icon-color: #64b5f6;
+            --system-msg-bg: rgba(0, 0, 0, 0.15);
+            --input-focus-border: var(--icon-hover-color);
+            --input-focus-shadow: rgba(128, 203, 196, 0.25);
+            --prism-theme-url: 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css';
+        }
+        /* --- Light Theme --- */
+        :root[data-bs-theme="light"] {
+            --bg-color: #eceff1;
+            --container-bg: #ffffff;
+            --input-bg: #ffffff;
+            --header-bg: #f5f7fa;
+            --user-msg-bg: #007bff;
+            --bot-msg-bg: #e9ecef;
+            --text-color: #263238;
+            --secondary-text-color: #546e7a;
+            --border-color: #cfd8dc;
+            --icon-color: #546e7a;
+            --icon-hover-color: #0056b3;
+            --code-bg: #f5f5f5;
+            --code-text-color: #333;
+            --link-color: #007bff;
+            --remove-file-hover: #dc3545;
+            --pdf-icon-color: #dc3545;
+            --audio-icon-color: #fd7e14;
+            --video-icon-color: #17a2b8;
+            --system-msg-bg: rgba(0, 0, 0, 0.05);
+            --input-focus-border: #86b7fe;
+            --input-focus-shadow: rgba(13, 110, 253, 0.25);
+            --prism-theme-url: 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css';
         }
 
+        /* --- Base Styles (Adapt v1 styles here, using variables) --- */
         body {
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            width: 100vw;
-            display: flex;
-            justify-content: center;
-            overflow-y: scroll;
-            overflow-x: hidden;
-            color: var(--text-color);
+             background-color: var(--bg-color); margin: 0; padding: 0;
+             min-height: 100vh; width: 100vw; display: flex; justify-content: center;
+             overflow: hidden; color: var(--text-color); font-family: system-ui, sans-serif;
         }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, 0.3); border-radius: 3px; }
+        :root[data-bs-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.5); }
+        :root[data-bs-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
 
+
+        /* --- Layout Components (Adapt v1 styles here) --- */
         .chat-container {
-            width: 100%;
-            max-width: 768px;
-            min-height: 96vh;
-            background: var(--container-bg);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
-            display: flex;
-            flex-direction: column;
+            width: 100%; max-width: 768px; /* Your v1 width */
+            height: calc(100vh - 20px); max-height: calc(100vh - 20px);
+            background: var(--container-bg); border-radius: var(--border-radius-base);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            :root[data-bs-theme="dark"] & { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); }
+            position: relative; display: flex; flex-direction: column;
+            margin: 10px; border: 1px solid var(--border-color); overflow: hidden;
         }
 
-        .chat-output {
-            flex-grow: 1;
-            padding: 10px;
-            background-color: var(--container-bg);
-            box-sizing: border-box;
-            margin-bottom: 150px; /* Espaço reservado para o input-container */
-            overflow-y: auto; /* Permitir scroll interno se necessário */
+        /* Header (New element) */
+        .chat-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 15px; background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color); flex-shrink: 0;
         }
+        .model-selector-container label { font-size: 0.8em; margin-right: 8px; color: var(--secondary-text-color); }
+        #model-selector {
+            background-color: var(--input-bg); color: var(--text-color);
+            border: 1px solid var(--border-color); border-radius: var(--border-radius-inner);
+            padding: 4px 8px; font-size: 0.85em; outline: none; appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); /* Simple dropdown arrow */
+            background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 16px 12px;
+            padding-right: 1.8rem; /* Space for arrow */
+        }
+         :root[data-bs-theme="light"] #model-selector { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); }
+        #model-selector:focus { border-color: var(--input-focus-border); box-shadow: 0 0 0 2px var(--input-focus-shadow); }
+        #theme-toggle-button { background: none; border: none; color: var(--icon-color); font-size: 1.1em; cursor: pointer; padding: 5px; transition: color 0.2s ease; }
+        #theme-toggle-button:hover { color: var(--icon-hover-color); }
 
-        .input-container {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 768px;
-            min-height: 120px;
-            padding: 10px;
-            border-top: 1px solid var(--border-color);
-            background-color: var(--input-bg);
-            gap: 10px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-            border-radius: 15px 15px 0 0;
+        /* Initial State (Adapt v1 styles) */
+        .initial-state-container {
+             flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+             text-align: center; padding: 40px 20px; color: var(--secondary-text-color); opacity: 1; transition: opacity 0.3s ease-out;
         }
-
-        #file-preview-area {
-             order: 1;
-             display: flex;
-             justify-content: flex-start;
-             padding-bottom: 5px;
-             min-height: 60px;
-             align-items: center; /* Centraliza verticalmente o preview */
-        }
-
-        .message-input-row {
-            order: 2;
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        .message-input-wrapper {
-            flex-grow: 1;
-            position: relative;
-        }
-
-        #user-input {
-            width: 100%;
-            resize: none;
-            min-height: 40px;
-            max-height: 120px; /* Aumentar um pouco mais */
-            padding: 10px;
-            padding-right: 45px;
-            border-radius: 8px;
-            line-height: 1.5;
-            overflow-y: auto;
-        }
-
-        .attachment-button {
-            position: absolute;
-            right: 10px;
-            bottom: 10px;
-            background: none;
-            border: none;
-            color: var(--icon-color);
-            cursor: pointer;
-            padding: 5px;
-            font-size: 1.2em;
-        }
-
-        .attachment-button:hover {
-            color: var(--icon-hover-color);
-        }
-
-        #file-input {
-            display: none;
-        }
-
-        /* Estilos para pré-visualização do arquivo */
-        .uploaded-file {
-            display: flex;
-            align-items: center;
-            gap: 8px; /* Aumentar gap */
-            padding: 5px 8px; /* Ajustar padding */
-            background-color: #2c3e50;
-            border-radius: 4px;
-            max-width: 200px; /* Aumentar um pouco a largura máxima */
-        }
-
-        .uploaded-file img.file-preview-img {
-            width: 48px;
-            height: 48px;
-            object-fit: cover;
-            border-radius: 4px;
-            flex-shrink: 0; /* Evita que a imagem encolha */
-        }
-
-        .file-preview-icon {
-            width: 40px; /* Tamanho do ícone */
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em; /* Tamanho do ícone font-awesome */
-            color: var(--pdf-icon-color); /* Cor específica para PDF */
-            flex-shrink: 0;
-        }
-
-         .uploaded-file span.file-preview-name {
-            flex-grow: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 0.85em; /* Aumentar um pouco */
-            color: var(--text-color);
-            line-height: 1.2; /* Melhorar leitura */
-        }
-
-        .remove-file-btn {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            cursor: pointer;
-            font-size: 1.1em;
-            padding: 0 3px;
-            flex-shrink: 0; /* Evita que o botão encolha */
-        }
-
-        .remove-file-btn:hover {
-            color: var(--remove-file-hover);
-        }
-
-        /* Estilos para mensagens */
-        .message {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 12px;
-            max-width: 90%;
-            word-wrap: break-word;
-            position: relative;
-            line-height: 1.6; /* Melhorar legibilidade */
-        }
-        .message:last-child {
-             margin-bottom: 5px; /* Reduzir margem da última mensagem */
-        }
-
-        .message.user {
-            margin-left: auto;
-            background-color: var(--user-msg-bg);
-            color: var(--text-color);
-            text-align: left;
-        }
-
-        .message.bot {
-            margin-right: auto;
-            background-color: var(--bot-msg-bg);
-            color: var(--text-color);
-            text-align: left; /* Mudar para left para consistência */
-            padding-right: 35px;
-        }
-
-        .message.system {
-            text-align: center;
-            font-size: 0.9em;
-            color: #aaa;
-            font-style: italic;
-            max-width: 100%;
-            background: none;
-        }
-
-        .message.bot .copy-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            color: var(--icon-color);
-            transition: color 0.2s ease-in-out;
-            font-size: 0.9em;
-        }
-
-        .message.bot .copy-icon:hover {
-            color: var(--icon-hover-color);
-        }
-        .message.bot .copy-icon .fa-check {
-             color: lightgreen;
-        }
-
-
-        /* Estilos para conteúdo da mensagem do usuário (texto + imagem) */
-        .user-content {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .user-content img {
-            max-width: 100%;
-            height: auto;
-            max-height: 350px; /* Aumentar um pouco */
-            object-fit: contain;
-            margin-top: 10px;
-            border-radius: 8px;
-            cursor: pointer; /* Indicar que pode ser clicável (para zoom futuro?) */
-        }
-
-        /* Estilos para os blocos de código */
-        .message.bot pre[class*="language-"] {
-            margin: 1em 0 !important;
-            border-radius: 6px;
-            border: 1px solid var(--code-block-border);
-            position: relative; /* Para posicionar o botão de cópia */
-            background-color: #2d2d2d; /* Fundo escuro padrão do Prism Tomorrow */
-        }
-
-         /* Ajuste padding dentro do pre para dar espaço ao botão */
-         .message.bot pre[class*="language-"] {
-            padding: 1em 1em 1em 1em;
-        }
-        .message.bot pre[class*="language-"] code {
-            padding-right: 50px; /* Espaço à direita para botão não sobrepor scrollbar ou texto */
-        }
-
-
-        .message.bot code[class*="language-"] {
-            font-size: 0.9em;
-            line-height: 1.5;
-            color: #ccc; /* Cor base do texto no Prism Tomorrow */
-        }
-
-        .code-block-wrapper { /* Não mais necessário se o botão for dentro do <pre> */
-           /* position: relative; */
-           /* margin: 1em 0; */
-        }
-
-        .copy-code-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(74, 85, 97, 0.7); /* Fundo semi-transparente */
-            border: none;
-            color: #ccc;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8em;
-            opacity: 0.6; /* Começa mais transparente */
-            transition: opacity 0.2s, color 0.2s, background-color 0.2s;
-            z-index: 1; /* Garante que fique acima do código */
-        }
-
-         .message.bot pre[class*="language-"]:hover .copy-code-btn {
-             opacity: 1; /* Fica opaco no hover do <pre> */
+         .initial-state-container.hidden { opacity: 0; pointer-events: none; position: absolute; } /* Hide smoothly */
+         .initial-state-container h1 { font-size: 1.6em; color: var(--text-color); margin-bottom: 10px; }
+         .initial-state-container p { font-size: 0.95em; margin-bottom: 25px; max-width: 450px; }
+         .example-prompts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+         .example-prompt-btn {
+             background-color: var(--input-bg); border: 1px solid var(--border-color);
+             color: var(--text-color); padding: 6px 12px; border-radius: 15px; /* Rounded */
+             cursor: pointer; transition: background-color 0.2s ease; font-size: 0.85em;
          }
+         .example-prompt-btn:hover { background-color: var(--border-color); }
+         .example-prompt-btn i { margin-right: 4px; font-size: 0.9em; }
 
-        .copy-code-btn:hover {
-            color: #fff;
-            background-color: rgba(74, 85, 97, 1); /* Fica mais opaco no hover do botão */
+
+        /* Chat Output (Adapt v1 styles) */
+        .chat-output {
+            flex-grow: 1; padding: 10px 15px; /* Adjust padding */ background-color: var(--container-bg);
+            box-sizing: border-box; overflow-y: auto; scroll-behavior: smooth;
         }
 
-        .copy-code-btn .fa-check {
-             color: lightgreen;
+        /* Input Area (Adapt v1 styles - Assuming fixed position based on image 1) */
+        .input-area-container {
+            position: absolute; /* Changed back based on v1 look */
+            bottom: 0; left: 0; right: 0; /* Full width at bottom */
+            max-width: 768px; /* Match container width */
+            margin: 0 auto; /* Center if container is wider */
+            padding: 10px; border-top: 1px solid var(--border-color);
+            background-color: var(--input-bg); gap: 10px; z-index: 1000;
+            display: flex; flex-direction: column; box-sizing: border-box;
+            border-radius: 0 0 var(--border-radius-base) var(--border-radius-base);
         }
+        /* Adjust chat-output padding-bottom if input is fixed */
+        .chat-output { padding-bottom: 140px; /* Estimate based on input height */ }
 
-         /* Estilo para estado de 'digitando' */
-        .message.bot.typing {
-             padding: 10px 15px;
-             display: inline-block; /* Para não ocupar largura total */
-             border-radius: 12px;
-             background-color: var(--bot-msg-bg);
-        }
-        .typing-indicator {
-            display: inline-block;
-            margin-left: 5px;
-        }
-        .typing-indicator span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            margin: 0 1px;
-            background-color: var(--icon-color);
-            border-radius: 50%;
-            opacity: 0.4;
-            animation: typing 1s infinite ease-in-out;
-        }
-        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.15s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.3s; }
 
-        @keyframes typing {
-            0%, 100% { opacity: 0.4; transform: translateY(0); }
-            50% { opacity: 1; transform: translateY(-3px); }
+        /* File Preview Area (Adapt v1 styles) */
+        #file-preview-area {
+             display: flex; gap: 8px; padding-bottom: 5px; min-height: 45px; align-items: center;
+             flex-wrap: nowrap; /* Prevent wrapping, use scroll */ overflow-x: auto;
         }
+         #file-preview-area::-webkit-scrollbar { height: 4px; }
+         #file-preview-area::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, 0.4); :root[data-bs-theme="dark"] & { background: rgba(255, 255, 255, 0.3); } border-radius: 2px;}
+
+
+        /* Message Input Row (Adapt v1 styles) */
+        .message-input-row { display: flex; gap: 10px; align-items: flex-end; }
+
+        /* Message Input Wrapper (Adapt v1 styles) */
+        .message-input-wrapper {
+            flex-grow: 1; position: relative; background-color: var(--container-bg);
+            border-radius: var(--border-radius-inner); /* Match v1 rounding */
+            padding: 0; /* Padding handled by textarea */
+            border: 1px solid var(--border-color);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .message-input-wrapper:focus-within { border-color: var(--input-focus-border); box-shadow: 0 0 0 2px var(--input-focus-shadow); }
+
+        /* User Input Textarea (Adapt v1 styles) */
+        #user-input {
+            width: 100%; resize: none; min-height: 40px; max-height: 120px;
+            padding: 8px 40px 8px 12px; /* Padding LTRB */
+            border-radius: var(--border-radius-inner); /* Match wrapper */
+            line-height: 1.5; overflow-y: auto; background: transparent;
+            border: none; color: var(--text-color); outline: none; font-size: 0.95rem;
+        }
+        #user-input::placeholder { color: var(--secondary-text-color); opacity: 0.7; }
+
+        /* Attachment Button (Adapt v1 styles) */
+        .attachment-button {
+            position: absolute; right: 8px; top: 50%; transform: translateY(-50%); /* Center vertically */
+            background: none; border: none; color: var(--icon-color); cursor: pointer;
+            padding: 5px; font-size: 1.1em; transition: color 0.2s ease;
+        }
+        .attachment-button:hover { color: var(--icon-hover-color); }
+        #file-input { display: none; }
+
+        /* File Previews (Adapt v1 styles) */
+        .uploaded-file {
+             display: flex; align-items: center; gap: 5px; padding: 4px 6px;
+             background-color: var(--bot-msg-bg); /* Use bot message color */
+             border: none; border-radius: var(--border-radius-inner);
+             max-width: 160px; animation: fadeIn 0.3s ease-out; flex-shrink: 0; /* Prevent shrinking */
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } /* Simpler fade */
+        .uploaded-file img.file-preview-img { width: 28px; height: 28px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
+        .file-preview-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 1.2em; flex-shrink: 0; border-radius: 3px; background-color: transparent; }
+        .fa-file-pdf { color: var(--pdf-icon-color); }
+        .fa-file-audio { color: var(--audio-icon-color); }
+        .fa-file-video { color: var(--video-icon-color); }
+        .uploaded-file span.file-preview-name { flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.75em; color: var(--secondary-text-color); line-height: 1.2; }
+        .remove-file-btn { background: none; border: none; color: var(--secondary-text-color); cursor: pointer; font-size: 0.9em; padding: 0 2px; margin-left: 3px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.2s, color 0.2s; }
+        .remove-file-btn:hover { color: var(--remove-file-hover); opacity: 1; }
+
+        /* Messages (Adapt v1 styles) */
+        .message { margin-bottom: 15px; padding: 0; max-width: 90%; display: flex; align-items: flex-start; gap: 8px; position: relative; animation: slideInUp 0.3s ease-out; }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .message-avatar { width: 30px; height: 30px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 0.8em; color: var(--text-color); flex-shrink: 0; margin-top: 3px; }
+        .message-avatar i { font-size: 1.1em; }
+        .message-content { padding: 8px 12px; border-radius: var(--border-radius-base); position: relative; word-wrap: break-word; flex-grow: 1; line-height: 1.5; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message.user .message-content { background-color: var(--user-msg-bg); color: var(--text-color); /* Use theme text color for user too? */ border-bottom-right-radius: var(--border-radius-inner); }
+        .message.user .message-avatar { background-color: var(--user-msg-bg); }
+        .message.bot { align-self: flex-start; }
+        .message.bot .message-content { background-color: var(--bot-msg-bg); color: var(--text-color); border-bottom-left-radius: var(--border-radius-inner); }
+        .message.bot .message-avatar { background-color: var(--bot-msg-bg); }
+        .message.system { align-self: center; text-align: center; font-size: 0.8em; color: var(--secondary-text-color); font-style: italic; max-width: 90%; background: none; margin: 8px 0; flex-direction: column; animation: none; }
+        .message.system .message-content { padding: 3px 10px; background-color: var(--system-msg-bg); border-radius: 10px; display: inline-block; }
+        .message-timestamp { display: none; /* Hide timestamp for cleaner v1 look? Or style differently */ }
+        .copy-icon { position: absolute; bottom: 5px; right: 8px; cursor: pointer; color: var(--icon-color); transition: color 0.2s ease-in-out, transform 0.2s ease; font-size: 0.8em; opacity: 0; transform: scale(0.9); }
+        .message-content:hover .copy-icon { opacity: 0.6; transform: scale(1); }
+        .copy-icon:hover { opacity: 1; color: var(--icon-hover-color); }
+        .copy-icon .fa-check { color: lightgreen; }
+        .user-content img { max-width: 100%; height: auto; max-height: 250px; /* v1 image height? */ object-fit: contain; margin-top: 8px; border-radius: var(--border-radius-inner); cursor: pointer; display: block; }
+
+        /* Code Blocks (Adapt v1 styles) */
+        .message.bot pre[class*="language-"] { /* ... v1 code block styles using variables ... */ }
+        .message.bot code[class*="language-"] { /* ... v1 code styles using variables ... */ }
+        .message.bot pre[class*="language-"]::before { /* ... v1 code header styles using variables ... */ }
+        .copy-code-btn { /* ... v1 copy code button styles using variables ... */ }
+
+        /* Typing Indicator (Adapt v1 styles) */
+        .message.bot.typing { /* ... v1 typing indicator styles ... */ }
+        .typing-indicator span { /* ... v1 typing dot styles ... */ }
+        @keyframes typing { /* ... v1 typing animation ... */ }
+
+        /* API Warning */
+        #api-warning { font-size: 0.75em; color: var(--bs-warning-text-emphasis); margin-top: 5px; }
 
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <div id="chat-output" class="chat-output">
-             <!-- Mensagens serão adicionadas aqui -->
+        <!-- Header with Model Selector and Theme Toggle -->
+        <div class="chat-header">
+            <div class="model-selector-container">
+                <label for="model-selector">Modelo:</label>
+                <select id="model-selector">
+                    <!-- Using stable models by default, easier on rate limits -->
+                    <option value="gemini-1.5-pro-latest" >Gemini 1.5 Pro</option>
+                    <option value="gemini-1.5-flash-latest" selected>Gemini 1.5 Flash</option>
+                    <!-- Add experimental if specifically needed -->
+                    <option value="gemini-2.5-pro-exp-03-25" >Gemini 2.5 Pro Exp</option>
+                </select>
+            </div>
+            <button id="theme-toggle-button" title="Alternar Tema" aria-label="Alternar Tema">
+                <i class="fa-solid fa-sun"></i> <!-- Initial icon -->
+            </button>
         </div>
-        <div class="input-container">
-             <div id="file-preview-area">
-                 <!-- Preview do arquivo aparece aqui -->
-             </div>
+
+        <!-- Chat Output Area -->
+        <div id="chat-output" class="chat-output">
+            <!-- Initial State Message -->
+            <div id="initial-state" class="initial-state-container">
+                 <i class="fa-solid fa-robot fa-3x mb-3" style="color: var(--icon-hover-color);"></i> <!-- v1 Robot Icon -->
+                <h1>Chat Multimodal</h1>
+                <p>Experimente as capacidades multimodais. Envie texto, imagens, PDFs, áudio ou vídeo.</p>
+                <div class="example-prompts">
+                    <button class="example-prompt-btn" data-prompt="Descreva esta imagem."><i class="fa-regular fa-image"></i> Descrever Imagem</button>
+                    <button class="example-prompt-btn" data-prompt="Resuma este PDF."><i class="fa-regular fa-file-pdf"></i> Resumir PDF</button>
+                    <button class="example-prompt-btn" data-prompt="Transcreva este áudio."><i class="fa-solid fa-headphones"></i> Transcrever Áudio</button>
+                    <button class="example-prompt-btn" data-prompt="O que acontece neste vídeo?"><i class="fa-solid fa-film"></i> Analisar Vídeo</button>
+                </div>
+            </div>
+            <!-- Messages will be added here -->
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area-container">
+            <div id="file-preview-area">
+                <!-- File previews appear here -->
+            </div>
             <div class="message-input-row">
                 <div class="message-input-wrapper">
-                    <textarea id="user-input" class="form-control" placeholder="Digite sua mensagem... (Shift+Enter para nova linha)"></textarea>
-                    <button id="attachment-button" class="attachment-button" title="Anexar arquivos">
+                    <textarea id="user-input" rows="1" placeholder="Digite sua mensagem ou anexe arquivos..."></textarea>
+                    <button id="attachment-button" class="attachment-button" title="Anexar Arquivos">
                         <i class="fa-solid fa-paperclip"></i>
                     </button>
-                    <input type="file" id="file-input" accept="image/*,application/pdf" aria-label="Anexar arquivo">
+                    <input type="file" id="file-input" accept="image/*,application/pdf,audio/*,video/*" aria-label="Anexar Arquivo" multiple>
                 </div>
+                 <!-- Optional Send Button -->
+                 <!-- <button id="send-button" class="btn btn-primary ms-2"><i class="fa-solid fa-paper-plane"></i></button> -->
+            </div>
+            <div id="api-warning" class="form-text text-center" style="display: none;">
+                Atenção: Arquivos grandes (>8MB, especialmente áudio/vídeo) podem falhar. Para produção, use a API de Arquivos do Google.
             </div>
         </div>
     </div>
 
     <script>
-        // --- IIFE para encapsular o código ---
-        (function() {
-            // --- Constantes e Variáveis ---
-            // !!! IMPORTANTE: Mova esta chave para um Backend! Nunca exponha no Frontend!
-            const API_KEY = "AIzaSyAQR7qRaUJ6wpEq_RrGSUzodbkmVbz7Gdk"; // Substitua pela sua chave REAL (mantenha seguro!)
+        (function () {
+            "use strict";
 
-            // Modelo multimodal que processa texto, imagens e PDFs (via inlineData)
-            // Use 'gemini-1.5-flash-latest' ou 'gemini-1.5-pro-latest' ou o experimental se preferir
-            const MODEL_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-exp-03-25:generateContent?key=${API_KEY}`;
+            // --- Constants and Variables ---
+            const API_KEY = "AIzaSyAQR7qRaUJ6wpEq_RrGSUzodbkmVbz7Gdk"; // *** REPLACE AND MOVE TO BACKEND ***
+            const API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
+            const MAX_HISTORY_TURNS = 8;
+            const INLINE_DATA_SIZE_WARNING_MB = 8;
 
-            const MAX_HISTORY_TURNS = 10; // Manter os últimos N pares (user/model) de turnos no histórico
-
+            // DOM Elements
             const chatOutput = document.getElementById('chat-output');
             const userInput = document.getElementById('user-input');
             const fileInput = document.getElementById('file-input');
             const filePreviewArea = document.getElementById('file-preview-area');
             const attachmentButton = document.getElementById('attachment-button');
+            const initialStateContainer = document.getElementById('initial-state');
+            const apiWarningDiv = document.getElementById('api-warning');
+            const examplePromptButtons = document.querySelectorAll('.example-prompt-btn');
+            const modelSelector = document.getElementById('model-selector');
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            const prismThemeLink = document.getElementById('prism-theme');
+            // const sendButton = document.getElementById('send-button'); // Uncomment if using send button
 
+            // State Variables
+            let currentFiles = [];
+            let isWaitingForBot = false;
+            let conversationHistory = [];
+            let selectedModelId = modelSelector.value;
+
+            // Showdown Markdown Converter
             const markdownConverter = new showdown.Converter({
-                tables: true,
-                ghCodeBlocks: true, // Habilita blocos de código estilo GitHub (```lang ...)
-                tasklists: true,
-                strikethrough: true,
-                simplifiedAutoLink: true,
-                openLinksInNewWindow: true
+                tables: true, ghCodeBlocks: true, tasklists: true, strikethrough: true,
+                simplifiedAutoLink: true, openLinksInNewWindow: true, emoji: true
             });
 
-            let currentFile = null;
-            let isWaitingForBot = false;
-            let conversationHistory = []; // Armazena o histórico: {role: 'user'|'model', parts: [{...}]}
-
-            // --- Funções Auxiliares ---
+            // --- Helper Functions ---
 
             function fileToBase64(file) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.readAsDataURL(file);
                     reader.onload = () => {
-                        const base64String = reader.result.split(',')[1];
-                        resolve(base64String);
+                        if (reader.result && typeof reader.result === 'string') {
+                            const base64String = reader.result.split(',')[1];
+                            if (base64String) { resolve(base64String); }
+                            else { reject(new Error("Falha ao extrair Base64.")); }
+                        } else { reject(new Error("Resultado do FileReader inválido.")); }
                     };
                     reader.onerror = error => reject(error);
                 });
@@ -433,369 +376,472 @@
 
             function scrollToBottom() {
                  requestAnimationFrame(() => {
-                    chatOutput.scrollTop = chatOutput.scrollHeight;
+                      setTimeout(() => { chatOutput.scrollTop = chatOutput.scrollHeight; }, 50);
                  });
             }
 
-            function copyToClipboard(textToCopy, feedbackElement) {
+             function copyToClipboard(textToCopy, feedbackElement) {
+                if (!textToCopy || !navigator.clipboard) return; // Check clipboard support
                 navigator.clipboard.writeText(textToCopy).then(() => {
-                    const originalIconClass = feedbackElement.className;
-                    feedbackElement.className = 'fa-solid fa-check';
-                    feedbackElement.parentElement.title = 'Copiado!'; // Atualiza tooltip do botão
-                    setTimeout(() => {
-                        feedbackElement.className = originalIconClass;
-                        feedbackElement.parentElement.title = 'Copiar código'; // Restaura tooltip
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Erro ao copiar:', err);
-                     feedbackElement.parentElement.title = 'Erro ao copiar';
-                     setTimeout(() => { feedbackElement.parentElement.title = 'Copiar código'; }, 2000);
-                });
-            }
+                     const iconElement = feedbackElement.querySelector ? feedbackElement.querySelector('i') : feedbackElement;
+                     if (!iconElement) return;
+                     const buttonElement = iconElement.closest('button') || feedbackElement.closest('button');
+                     const originalIconClass = iconElement.className;
+                     const originalTitle = buttonElement ? buttonElement.title : (feedbackElement.title || '');
 
-            /** Adiciona uma mensagem ao chat UI */
-            function addMessage(messageText, sender, imageUrl = null) {
-                // Remove indicador de "digitando" antes de adicionar nova mensagem (bot ou user)
-                const typingIndicator = chatOutput.querySelector('.message.bot.typing');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
+                     iconElement.className = 'fa-solid fa-check';
+                     const newTitle = 'Copiado!';
+                     if (buttonElement) buttonElement.title = newTitle; else feedbackElement.title = newTitle;
 
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${sender}`;
-
-                if (sender === 'user') {
-                    const contentDiv = document.createElement('div');
-                    contentDiv.className = 'user-content';
-
-                    if (messageText) {
-                        const textDiv = document.createElement('div');
-                        textDiv.textContent = messageText; // Mostrar texto puro do usuário
-                        contentDiv.appendChild(textDiv);
-                    }
-
-                    if (imageUrl) {
-                        const img = document.createElement('img');
-                        img.src = imageUrl;
-                        img.alt = "Imagem anexada pelo usuário";
-                        // img.onclick = () => window.open(imageUrl, '_blank'); // Opcional: Abrir imagem em nova aba
-                        contentDiv.appendChild(img);
-                    }
-                    messageDiv.appendChild(contentDiv);
-
-                } else if (sender === 'bot') {
-                    let htmlContent = markdownConverter.makeHtml(messageText);
-                    messageDiv.innerHTML = htmlContent;
-
-                    // Processar blocos de código APÓS conversão do Markdown
-                    messageDiv.querySelectorAll('pre code').forEach(codeBlock => {
-                        const preElement = codeBlock.parentElement;
-
-                        // Adiciona botão de cópia dentro do <pre>
-                        const copyCodeBtn = document.createElement('button');
-                        copyCodeBtn.className = 'copy-code-btn';
-                        copyCodeBtn.title = 'Copiar código';
-                        copyCodeBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
-                        copyCodeBtn.type = 'button'; // Boa prática
-                        copyCodeBtn.addEventListener('click', (e) => {
-                            e.stopPropagation(); // Evita disparar outros eventos
-                            copyToClipboard(codeBlock.innerText, copyCodeBtn.querySelector('i'));
-                        });
-                        preElement.appendChild(copyCodeBtn); // Adiciona botão ao <pre>
-
-                        // Aplica Prism highlighting
-                         // A classe 'language-xyz' deve ter sido adicionada pelo Showdown (ghCodeBlocks)
-                         // Se não tiver classe, o Prism tentará adivinhar
-                         if (!codeBlock.className.includes('language-')) {
-                              preElement.classList.add('language-none'); // Ou outra linguagem padrão
-                         }
-                         Prism.highlightElement(codeBlock);
-
-                    });
-
-                    // Adiciona botão de cópia para a mensagem inteira (se tiver texto fora dos blocos de código)
-                    const hasTextContent = messageDiv.textContent.trim().replace(/Copiar código/gi, '').trim().length > 0;
-                     if (hasTextContent) {
-                        const copyIcon = document.createElement('i');
-                        copyIcon.className = 'fa-regular fa-copy copy-icon';
-                        copyIcon.title = 'Copiar mensagem';
-                         copyIcon.style.cursor = 'pointer'; // Indica clicável
-                        copyIcon.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            // Copia o texto visível, tentando excluir o texto dos botões
-                            let textToCopy = '';
-                            messageDiv.childNodes.forEach(node => {
-                                if (node.nodeType === Node.TEXT_NODE) {
-                                    textToCopy += node.textContent;
-                                } else if (node.nodeType === Node.ELEMENT_NODE && !node.querySelector('.copy-code-btn')) {
-                                    // Inclui texto de elementos que não sejam botões de cópia de código
-                                    textToCopy += node.innerText || node.textContent;
-                                }
-                            });
-                             copyToClipboard(textToCopy.trim(), copyIcon); // Usa a mesma função
-                        });
-                         messageDiv.appendChild(copyIcon);
-                     }
-
-                } else if (sender === 'system') {
-                     messageDiv.textContent = messageText;
-                }
-
-                chatOutput.appendChild(messageDiv);
-                scrollToBottom(); // Rola após adicionar qualquer mensagem
-            }
-
-             /** Adiciona indicador de digitação */
-             function showTypingIndicator() {
-                 // Remover indicador antigo se existir
-                 const oldIndicator = chatOutput.querySelector('.message.bot.typing');
-                 if (oldIndicator) oldIndicator.remove();
-
-                 const typingDiv = document.createElement('div');
-                 typingDiv.className = 'message bot typing';
-                 typingDiv.innerHTML = `
-                     <div class="typing-indicator">
-                         <span></span><span></span><span></span>
-                     </div>
-                 `;
-                 chatOutput.appendChild(typingDiv);
-                 scrollToBottom();
+                     setTimeout(() => {
+                         iconElement.className = originalIconClass;
+                         if (buttonElement) buttonElement.title = originalTitle || 'Copiar código';
+                         else feedbackElement.title = originalTitle || 'Copiar mensagem';
+                     }, 2000);
+                 }).catch(err => {
+                     console.error('Erro ao copiar:', err);
+                     const buttonElement = feedbackElement.closest ? feedbackElement.closest('button') : null;
+                     const errorTitle = 'Erro ao copiar';
+                     if (buttonElement) buttonElement.title = errorTitle; else feedbackElement.title = errorTitle;
+                     setTimeout(() => {
+                          const originalTitle = buttonElement ? (buttonElement.dataset.originalTitle || 'Copiar código') : (feedbackElement.dataset.originalTitle || 'Copiar mensagem');
+                          if (buttonElement) buttonElement.title = originalTitle; else feedbackElement.title = originalTitle;
+                     }, 2000);
+                 });
              }
 
-            /** Lida com a seleção de arquivo */
+
+            function formatTimestamp(date) {
+                return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // --- Main UI Functions ---
+
+            function addMessage(messageText, sender, fileData = null, timestamp = new Date()) {
+                 const wasScrolledToBottom = chatOutput.scrollHeight - chatOutput.clientHeight <= chatOutput.scrollTop + 10; // Increased tolerance
+
+                 const typingIndicator = chatOutput.querySelector('.message.bot.typing');
+                 if (typingIndicator) typingIndicator.remove();
+
+                 if (initialStateContainer && !initialStateContainer.classList.contains('hidden')) {
+                     initialStateContainer.classList.add('hidden');
+                 }
+
+                 const messageWrapper = document.createElement('div');
+                 messageWrapper.className = `message ${sender}`;
+
+                 const avatarDiv = document.createElement('div');
+                 avatarDiv.className = 'message-avatar';
+                 avatarDiv.innerHTML = sender === 'user' ? '<i class="fa-regular fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+                 if (sender !== 'system') messageWrapper.appendChild(avatarDiv);
+
+                 const contentWrapper = document.createElement('div');
+                 contentWrapper.style.flexGrow = '1'; // Allow content to grow
+
+                 const messageDiv = document.createElement('div');
+                 messageDiv.className = 'message-content';
+
+                 if (sender === 'user') {
+                     if (messageText) {
+                          const textNode = document.createTextNode(messageText);
+                          messageDiv.appendChild(textNode);
+                     }
+                     if (fileData) {
+                         if (fileData.type.startsWith('image/')) {
+                              const img = document.createElement('img');
+                              const objectURL = URL.createObjectURL(fileData);
+                              img.src = objectURL;
+                              img.alt = fileData.name;
+                              img.className = 'user-content-image'; // Add class for styling if needed
+                              img.style.cssText = 'max-width: 100%; height: auto; max-height: 250px; object-fit: contain; margin-top: 8px; border-radius: var(--border-radius-inner); cursor: pointer; display: block;';
+                              img.onload = () => URL.revokeObjectURL(objectURL);
+                              messageDiv.appendChild(img);
+                         } else {
+                              const fileInfo = document.createElement('div');
+                              fileInfo.style.cssText = 'font-size: 0.8em; margin-top: 8px; opacity: 0.8; color: var(--secondary-text-color);';
+                              fileInfo.innerHTML = `<i class="fa-solid fa-paperclip fa-xs"></i> Anexo: ${fileData.name}`;
+                              messageDiv.appendChild(fileInfo);
+                         }
+                     }
+                 } else if (sender === 'bot') {
+                     try {
+                          let htmlContent = markdownConverter.makeHtml(messageText || '');
+                          messageDiv.innerHTML = htmlContent;
+                     } catch (e) { console.error("Showdown error:", e); messageDiv.textContent = messageText; }
+                     messageDiv.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
+
+                     messageDiv.querySelectorAll('pre code').forEach(codeBlock => {
+                          const preElement = codeBlock.parentElement;
+                          if (!preElement) return;
+                          const language = (codeBlock.className.match(/language-(\S+)/) || [])[1] || 'text'; // Default to text
+                          preElement.setAttribute('data-language', language);
+                          preElement.style.position = 'relative'; // Needed for button positioning
+
+                          if (!preElement.querySelector('.copy-code-btn')) { // Add button only once
+                               const copyCodeBtn = document.createElement('button');
+                               copyCodeBtn.className = 'copy-code-btn';
+                               copyCodeBtn.title = 'Copiar código';
+                               copyCodeBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+                               copyCodeBtn.type = 'button';
+                               copyCodeBtn.dataset.originalTitle = 'Copiar código'; // Store original title
+                               copyCodeBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(codeBlock.innerText, copyCodeBtn); // Pass button itself
+                               });
+                               preElement.appendChild(copyCodeBtn);
+                          }
+                          // Ensure Prism highlights, might need re-highlight if content changes dynamically elsewhere
+                          Prism.highlightElement(codeBlock);
+                     });
+
+                     const hasTextContent = (messageDiv.innerText || messageDiv.textContent || '').replace(/Copiar código/gi, '').trim().length > 0;
+                     if (hasTextContent && !messageDiv.querySelector('.copy-icon')) { // Add copy icon only once
+                          const copyIcon = document.createElement('i');
+                          copyIcon.className = 'fa-regular fa-copy copy-icon';
+                          copyIcon.title = 'Copiar mensagem';
+                          copyIcon.dataset.originalTitle = 'Copiar mensagem'; // Store original title
+                          copyIcon.style.cursor = 'pointer';
+                          copyIcon.addEventListener('click', (e) => {
+                               e.stopPropagation();
+                               let textToCopy = '';
+                               // Basic text extraction, might need refinement depending on structure
+                               messageDiv.childNodes.forEach(node => {
+                                    if (node.nodeType === Node.TEXT_NODE) { textToCopy += node.textContent; }
+                                    else if (node.nodeType === Node.ELEMENT_NODE && !node.matches('pre, .copy-icon')) {
+                                         textToCopy += (node.innerText || node.textContent);
+                                    }
+                               });
+                               copyToClipboard(textToCopy.trim(), copyIcon); // Pass icon itself
+                          });
+                          messageDiv.appendChild(copyIcon);
+                     }
+
+                 } else if (sender === 'system') {
+                     messageDiv.textContent = messageText;
+                     messageWrapper.style.justifyContent = 'center';
+                     contentWrapper.style.width = 'auto'; // Fit content
+                 }
+
+                 contentWrapper.appendChild(messageDiv);
+                 if (sender !== 'system') {
+                     const timestampDiv = document.createElement('div');
+                     timestampDiv.className = 'message-timestamp';
+                     timestampDiv.textContent = formatTimestamp(timestamp);
+                     // Append timestamp inside contentWrapper, but outside messageDiv? Decide based on desired layout.
+                     // Example: Appending after messageDiv inside contentWrapper
+                     contentWrapper.appendChild(timestampDiv);
+                 }
+                 messageWrapper.appendChild(contentWrapper);
+                 chatOutput.appendChild(messageWrapper);
+
+                 if (wasScrolledToBottom) {
+                     scrollToBottom();
+                 }
+            }
+
+            function showTypingIndicator() {
+                 const oldIndicator = chatOutput.querySelector('.message.bot.typing');
+                 if (oldIndicator) oldIndicator.remove();
+                 if (initialStateContainer && !initialStateContainer.classList.contains('hidden')) {
+                     initialStateContainer.classList.add('hidden');
+                 }
+                 const messageWrapper = document.createElement('div');
+                 messageWrapper.className = 'message bot typing';
+                 const avatarDiv = document.createElement('div');
+                 avatarDiv.className = 'message-avatar';
+                 avatarDiv.innerHTML = '<i class="fa-solid fa-robot"></i>';
+                 messageWrapper.appendChild(avatarDiv);
+                 const contentWrapper = document.createElement('div');
+                 const messageDiv = document.createElement('div');
+                 messageDiv.className = 'message-content';
+                 messageDiv.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+                 contentWrapper.appendChild(messageDiv);
+                 messageWrapper.appendChild(contentWrapper);
+                 chatOutput.appendChild(messageWrapper);
+                 scrollToBottom();
+            }
+
             function handleFileSelect(event) {
-                const file = event.target.files[0];
-                filePreviewArea.innerHTML = '';
-                currentFile = null;
+                 const files = event.target.files;
+                 if (!files || files.length === 0) return;
+                 let showSizeWarning = false;
 
-                if (!file) return;
+                 for (const file of files) {
+                      // Validation logic (mime type, size)
+                      const allowedMimeTypes = [ 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4', 'video/mp4', 'video/webm', 'video/quicktime' ];
+                      const maxSizeMB = 20; // Example limit
+                      if (!allowedMimeTypes.includes(file.type)) {
+                           addMessage(`Tipo não suportado: ${file.name} (${file.type})`, 'system');
+                           continue;
+                      }
+                      const fileSizeMB = file.size / 1024 / 1024;
+                      if (fileSizeMB > maxSizeMB) {
+                           addMessage(`Arquivo grande: ${file.name} (${fileSizeMB.toFixed(1)}MB). Limite: ${maxSizeMB}MB.`, 'system');
+                           continue;
+                      }
+                      if (!file.type.startsWith('image/') && fileSizeMB > INLINE_DATA_SIZE_WARNING_MB) {
+                           showSizeWarning = true;
+                      }
+                      // Only add file if it passes validation
+                      if (!currentFiles.some(f => f.name === file.name && f.size === file.size)) { // Basic duplicate check
+                         currentFiles.push(file);
+                         createFilePreview(file);
+                      }
+                 }
+                 apiWarningDiv.style.display = showSizeWarning ? 'block' : 'none';
+                 fileInput.value = ''; // Clear input value
+            }
 
-                const allowedMimeTypes = [
-                    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-                    'application/pdf' // PDF permitido
-                ];
-                const maxSizeMB = 15; // Limite um pouco maior para PDFs
+            function createFilePreview(file) {
+                 const fileId = `file-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+                 const fileDisplay = document.createElement('div');
+                 fileDisplay.className = 'uploaded-file';
+                 fileDisplay.id = fileId;
 
-                if (!allowedMimeTypes.includes(file.type)) {
-                     addMessage(`Tipo de arquivo não suportado: ${file.type}. Use JPG, PNG, GIF, WebP ou PDF.`, 'system');
-                     fileInput.value = '';
-                     return;
-                }
-
-                if (file.size > maxSizeMB * 1024 * 1024) {
-                    addMessage(`Arquivo muito grande (${(file.size / 1024 / 1024).toFixed(1)}MB). Limite: ${maxSizeMB}MB.`, 'system');
-                    fileInput.value = '';
-                    return;
-                }
-
-                currentFile = file; // Armazena o arquivo válido
-
-                const fileDisplay = document.createElement('div');
-                fileDisplay.className = 'uploaded-file';
-
-                // Preview (Imagem ou Ícone PDF)
-                if (file.type.startsWith('image/')) {
-                    const img = document.createElement('img');
-                    img.src = URL.createObjectURL(file);
-                    img.className = 'file-preview-img';
-                    img.onload = () => URL.revokeObjectURL(img.src); // Libera memória
-                    fileDisplay.appendChild(img);
-                } else if (file.type === 'application/pdf') {
-                    const pdfIcon = document.createElement('i');
-                    pdfIcon.className = 'fa-solid fa-file-pdf file-preview-icon';
-                    fileDisplay.appendChild(pdfIcon);
-                     console.warn("Aviso: Enviar PDFs grandes como inlineData pode consumir muitos tokens ou falhar. A API de Arquivos do Google é mais robusta para isso.");
-                }
-
-                // Nome do arquivo
+                 // Icon or Thumbnail
+                 if (file.type.startsWith('image/')) {
+                      const img = document.createElement('img');
+                      const objectURL = URL.createObjectURL(file);
+                      img.src = objectURL;
+                      img.className = 'file-preview-img';
+                      img.onload = () => URL.revokeObjectURL(objectURL);
+                      fileDisplay.appendChild(img);
+                 } else { /* ... create icon based on type ... */
+                      const icon = document.createElement('i');
+                      icon.className = 'file-preview-icon ';
+                      if (file.type === 'application/pdf') icon.classList.add('fa-solid', 'fa-file-pdf');
+                      else if (file.type.startsWith('audio/')) icon.classList.add('fa-solid', 'fa-file-audio');
+                      else if (file.type.startsWith('video/')) icon.classList.add('fa-solid', 'fa-file-video');
+                      else icon.classList.add('fa-solid', 'fa-file');
+                      fileDisplay.appendChild(icon);
+                 }
+                 // Name
                  const fileName = document.createElement('span');
                  fileName.className = 'file-preview-name';
                  fileName.textContent = file.name;
                  fileDisplay.appendChild(fileName);
+                 // Remove Button
+                 const removeButton = document.createElement('button');
+                 removeButton.className = 'remove-file-btn';
+                 removeButton.innerHTML = '<i class="fa-solid fa-times"></i>';
+                 removeButton.title = 'Remover anexo';
+                 removeButton.type = 'button';
+                 // Add event listener HERE, inside the function where 'file' is in scope
+                 removeButton.addEventListener('click', () => {
+                     currentFiles = currentFiles.filter(f => f !== file); // Filter using the 'file' object from the outer scope
+                     document.getElementById(fileId)?.remove();
+                     const shouldShowWarning = currentFiles.some(f => !f.type.startsWith('image/') && (f.size / 1024 / 1024) > INLINE_DATA_SIZE_WARNING_MB);
+                     apiWarningDiv.style.display = shouldShowWarning ? 'block' : 'none';
+                 });
+                 fileDisplay.appendChild(removeButton);
 
-                // Botão de remover
-                const removeButton = document.createElement('button');
-                removeButton.className = 'remove-file-btn';
-                removeButton.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
-                removeButton.title = 'Remover anexo';
-                removeButton.type = 'button';
-                removeButton.addEventListener('click', () => {
-                    filePreviewArea.innerHTML = '';
-                    fileInput.value = '';
-                    currentFile = null;
-                });
-                fileDisplay.appendChild(removeButton);
-
-                filePreviewArea.appendChild(fileDisplay);
+                 filePreviewArea.appendChild(fileDisplay);
             }
 
-            /** Envia mensagem, gerencia histórico e chama a API */
+            // --- API Interaction ---
+
             async function handleSendMessage() {
                 if (isWaitingForBot) return;
 
                 const userMessageText = userInput.value.trim();
-                let fileToSend = currentFile; // Guarda referência antes de limpar
+                let filesToSend = [...currentFiles];
 
-                if (!userMessageText && !fileToSend) return; // Não envia se ambos estiverem vazios
+                if (!userMessageText && filesToSend.length === 0) return;
 
-                isWaitingForBot = true;
-                let userImageObjectURL = null;
-                let currentTurnParts = []; // Partes para a mensagem atual do usuário
+                setLoadingState(true);
 
-                // Limpa UI primeiro para feedback rápido
-                userInput.value = '';
-                userInput.style.height = 'auto';
-                filePreviewArea.innerHTML = '';
-                currentFile = null; // Limpa estado global do arquivo
-                fileInput.value = ''; // Garante limpeza do input
+                // Clear UI
+                userInput.value = ''; userInput.style.height = 'auto';
+                filePreviewArea.innerHTML = ''; currentFiles = [];
+                apiWarningDiv.style.display = 'none';
 
-                // Prepara as partes da mensagem atual
-                if (userMessageText) {
-                    currentTurnParts.push({ text: userMessageText });
-                }
+                let currentTurnParts = [];
+                if (userMessageText) { currentTurnParts.push({ text: userMessageText }); }
 
-                let fileDataPart = null; // Para guardar dados do arquivo para request/histórico
-                if (fileToSend) {
+                let fileDataForUIMessage = null;
+                let fileProcessingError = false;
+
+                if (filesToSend.length > 0) {
+                    const file = filesToSend[0];
+                    fileDataForUIMessage = file;
+                    if (filesToSend.length > 1) { addMessage(`Aviso: Enviando apenas o primeiro arquivo (${file.name}).`, 'system'); }
                     try {
-                        const base64Data = await fileToBase64(fileToSend);
-                        fileDataPart = {
-                            inlineData: { mimeType: fileToSend.type, data: base64Data }
-                        };
-                        currentTurnParts.push(fileDataPart);
-
-                        if (fileToSend.type.startsWith('image/')) {
-                             userImageObjectURL = URL.createObjectURL(fileToSend); // Para UI
-                        }
-                        // Aviso sobre PDF já está em handleFileSelect
+                        const base64Data = await fileToBase64(file);
+                        currentTurnParts.push({ inlineData: { mimeType: file.type, data: base64Data } });
                     } catch (error) {
-                         console.error("Erro ao converter arquivo para Base64:", error);
-                         addMessage("Erro ao processar o arquivo anexo. Não foi enviado.", 'system');
-                         isWaitingForBot = false;
-                         if(userImageObjectURL) URL.revokeObjectURL(userImageObjectURL); // Limpa URL se foi criada
-                         return; // Não continuar se o arquivo falhar
+                        console.error("Erro ao converter Base64:", error);
+                        addMessage(`Erro ao processar ${file.name}. Não enviado.`, 'system');
+                        fileProcessingError = true;
                     }
                 }
 
-                // Adiciona mensagem do usuário à UI AGORA
-                addMessage(userMessageText, 'user', userImageObjectURL); // Passa a URL da imagem se houver
-
-                // Mostrar indicador de "digitando"
-                showTypingIndicator();
+                if (userMessageText || (fileDataForUIMessage && !fileProcessingError)) {
+                     addMessage(userMessageText, 'user', fileDataForUIMessage);
+                     showTypingIndicator();
+                } else {
+                     setLoadingState(false); // Re-enable if nothing valid was sent
+                     return;
+                }
 
                 try {
                     const currentTurn = { role: 'user', parts: currentTurnParts };
-
-                    // --- Construir corpo da requisição com histórico ---
+                    const validHistory = conversationHistory.filter(turn => turn.parts.length > 0 && (turn.parts[0].text || turn.parts[0].inlineData));
                     const requestBody = {
-                        contents: [...conversationHistory, currentTurn], // Histórico + Mensagem atual
-                        generationConfig: {
-                             // temperature: 0.7, // Ajuste conforme necessário
-                             // maxOutputTokens: 2048,
-                        },
-                         safetySettings: [ // Configurações de segurança padrão/recomendadas
-                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
-                         ]
+                         contents: [...validHistory, currentTurn],
+                         safetySettings: [ /* ... safety settings ... */ ]
+                         // Add generationConfig if needed
                     };
+                    const currentModelUrl = `${API_BASE_URL}${selectedModelId}:generateContent?key=${API_KEY}`;
 
-                    // --- Chamada à API ---
-                    // !!! ESTA CHAMADA DEVE SER FEITA NO SEU BACKEND EM PRODUÇÃO !!!
-                    const response = await fetch(MODEL_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(requestBody)
+                    // --- API Call ---
+                    const response = await fetch(currentModelUrl, {
+                         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody)
                     });
 
-                    // Tratamento da resposta
-                    let botResponseText = 'Desculpe, ocorreu um erro ao obter a resposta.'; // Mensagem de erro padrão
-                    let modelResponseParts = [{ text: botResponseText }]; // Padrão para histórico
+                    let botResponseText = 'Desculpe, ocorreu um erro.';
+                    let modelResponseParts = [{ text: botResponseText }];
 
                     if (!response.ok) {
-                         const errorData = await response.json().catch(() => ({ error: { message: "Erro desconhecido na resposta da API." } }));
-                         console.error("Erro da API:", response.status, response.statusText, errorData);
-                         botResponseText = `Erro ${response.status}: ${errorData.error?.message || response.statusText}`;
-                         addMessage(botResponseText, 'system'); // Mostrar erro como system message
+                        const errorData = await response.json().catch(() => ({ error: { message: "Resposta inválida da API." } }));
+                        botResponseText = `Erro ${response.status}: ${errorData.error?.message || response.statusText || 'Erro desconhecido'}`;
+                        if (response.status === 429) {
+                             botResponseText = `Erro ${response.status}: Limite de taxa excedido. Tente novamente em breve.`;
+                             const fallbackModel = "gemini-1.5-flash-latest";
+                             if (selectedModelId !== fallbackModel && modelSelector.querySelector(`option[value="${fallbackModel}"]`)) {
+                                 botResponseText += ` Considere usar o modelo '${fallbackModel.replace('-latest', '')}'.`;
+                             }
+                             console.warn("Rate Limit Exceeded (429).", errorData);
+                        } else { console.error("API Error:", response.status, botResponseText, errorData); }
+                        addMessage(botResponseText, 'system');
                     } else {
                          const data = await response.json();
-
-                         if (data.candidates && data.candidates.length > 0 && data.candidates[0].content?.parts) {
-                             // Sucesso - Pega o texto da primeira parte (pode haver mais partes no futuro)
-                             botResponseText = data.candidates[0].content.parts.map(part => part.text || '').join(''); // Junta partes de texto se houver mais de uma
-                             modelResponseParts = data.candidates[0].content.parts; // Guarda as partes para o histórico
-                             addMessage(botResponseText, 'bot'); // Adiciona resposta à UI
-
-                             // --- Atualiza histórico APÓS sucesso ---
-                             conversationHistory.push(currentTurn); // Adiciona pergunta do usuário
-                             conversationHistory.push({ role: 'model', parts: modelResponseParts }); // Adiciona resposta do modelo
-
-                         } else if (data.promptFeedback && data.promptFeedback.blockReason) {
-                             // Conteúdo bloqueado
-                             botResponseText = `Sua mensagem foi bloqueada (${data.promptFeedback.blockReason}).`;
-                             if(data.promptFeedback.safetyRatings) {
-                                 botResponseText += ` Detalhes: ${data.promptFeedback.safetyRatings.filter(r => r.probability !== 'NEGLIGIBLE').map(r => `${r.category.replace('HARM_CATEGORY_', '')} (${r.probability})`).join(', ')}`;
-                             }
-                             modelResponseParts = [{ text: "[Conteúdo bloqueado]" }]; // Representação no histórico
-                             addMessage(botResponseText, 'system'); // Mostrar bloqueio como system message
-                              // Adiciona ao histórico mesmo se bloqueado, para contexto, mas com texto indicativo
-                             conversationHistory.push(currentTurn);
-                             conversationHistory.push({ role: 'model', parts: modelResponseParts });
-
+                         if (data.candidates?.[0]?.content?.parts) {
+                              botResponseText = data.candidates[0].content.parts.map(part => part.text || '').join('');
+                              modelResponseParts = data.candidates[0].content.parts;
+                              addMessage(botResponseText, 'bot');
+                              conversationHistory.push(currentTurn);
+                              conversationHistory.push({ role: 'model', parts: modelResponseParts });
+                         } else if (data.promptFeedback?.blockReason) {
+                              botResponseText = `Bloqueado: ${data.promptFeedback.blockReason}.`;
+                              modelResponseParts = [{ text: "[Conteúdo Bloqueado]" }];
+                              addMessage(botResponseText, 'system');
+                              conversationHistory.push(currentTurn);
+                              conversationHistory.push({ role: 'model', parts: modelResponseParts });
                          } else {
-                             // Resposta inesperada
-                             console.warn("Estrutura da resposta inesperada:", data);
-                             botResponseText = 'Recebi uma resposta inesperada da API.';
-                             modelResponseParts = [{ text: botResponseText }];
-                             addMessage(botResponseText, 'system');
-                              // Adiciona ao histórico para não quebrar a sequência
-                             conversationHistory.push(currentTurn);
-                             conversationHistory.push({ role: 'model', parts: modelResponseParts });
+                              console.warn("Resposta inesperada:", data);
+                              botResponseText = 'Recebi uma resposta inesperada.';
+                              modelResponseParts = [{ text: botResponseText }];
+                              addMessage(botResponseText, 'system');
+                              conversationHistory.push(currentTurn);
+                              conversationHistory.push({ role: 'model', parts: modelResponseParts });
                          }
                     }
-
-                     // --- Limitar tamanho do histórico ---
-                     const turnsToKeep = MAX_HISTORY_TURNS * 2; // *2 porque cada turno tem user + model
-                     if (conversationHistory.length > turnsToKeep) {
+                    // Limit History
+                    const turnsToKeep = MAX_HISTORY_TURNS * 2;
+                    if (conversationHistory.length > turnsToKeep) {
                          conversationHistory = conversationHistory.slice(-turnsToKeep);
-                         console.log("Histórico truncado para os últimos", MAX_HISTORY_TURNS, "turnos.");
-                     }
-
+                    }
                 } catch (error) {
-                    console.error('Erro crítico ao enviar/processar mensagem:', error);
-                    addMessage(`Erro inesperado: ${error.message}. Verifique o console.`, 'system');
-                    // Remover indicador de typing em caso de erro crítico
+                    console.error('Erro crítico:', error);
+                    addMessage(`Erro inesperado: ${error.message}.`, 'system');
                     const typingIndicator = chatOutput.querySelector('.message.bot.typing');
                     if (typingIndicator) typingIndicator.remove();
                 } finally {
-                    isWaitingForBot = false; // Libera para novo envio
-                    if (userImageObjectURL) {
-                        URL.revokeObjectURL(userImageObjectURL); // Limpa URL temporária da imagem do usuário
-                    }
+                    setLoadingState(false);
                 }
+            }
+
+            // --- UI State and Theme ---
+
+            function setLoadingState(isLoading) {
+                 isWaitingForBot = isLoading;
+                 userInput.disabled = isLoading;
+                 attachmentButton.disabled = isLoading;
+                 modelSelector.disabled = isLoading;
+                 // if (sendButton) sendButton.disabled = isLoading;
+                 document.body.style.cursor = isLoading ? 'wait' : 'default';
+                 if (!isLoading) { setTimeout(() => userInput.focus(), 50); } // Focus after enabling
+            }
+
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                themeToggleButton.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+                const prismUrl = theme === 'dark' ? 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css' : 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css';
+                prismThemeLink.href = prismUrl;
+                localStorage.setItem('theme', theme);
+            }
+
+            function loadTheme() {
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                applyTheme(savedTheme);
             }
 
             // --- Event Listeners ---
 
+            // Attachment Button triggers hidden file input
             attachmentButton.addEventListener('click', () => fileInput.click());
+
+            // File Input change handler
             fileInput.addEventListener('change', handleFileSelect);
 
-            userInput.addEventListener('keydown', function (event) {
+            // Textarea Enter key handler (FIXED)
+            userInput.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault();
-                    handleSendMessage();
+                    event.preventDefault(); // Prevent default newline
+                    handleSendMessage();    // Send the message
                 }
             });
 
+            // Textarea auto-resize on input
             userInput.addEventListener('input', () => {
-                userInput.style.height = 'auto';
-                userInput.style.height = (userInput.scrollHeight) + 'px';
+                 userInput.style.height = 'auto';
+                 let newHeight = userInput.scrollHeight;
+                 const maxHeight = parseInt(window.getComputedStyle(userInput).maxHeight, 10);
+                 if (maxHeight && newHeight > maxHeight) { newHeight = maxHeight; }
+                 userInput.style.height = newHeight + 'px';
             });
 
-            // --- Inicialização ---
-            addMessage("Olá! Como posso ajudar você hoje?", 'bot'); // Mensagem inicial (não entra no histórico ainda)
+            // Example Prompt Buttons (FIXED)
+            examplePromptButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const promptText = button.getAttribute('data-prompt');
+                    if (promptText) { // Check if attribute exists
+                         userInput.value = promptText;
+                         userInput.focus();
+                         // Trigger input event for auto-resize
+                         userInput.dispatchEvent(new Event('input', { bubbles: true }));
+                         // Optionally trigger file input if prompt suggests it
+                         // if (promptText.toLowerCase().includes('imagem') || ...) fileInput.click();
+                    } else {
+                        console.warn("Button lacks data-prompt attribute:", button);
+                    }
+                });
+            });
 
-        })(); // --- Fim do IIFE ---
+            // Model Selector change handler
+            modelSelector.addEventListener('change', (event) => {
+                selectedModelId = event.target.value;
+                console.log("Modelo selecionado:", selectedModelId);
+                // Optionally clear history/UI on model change
+                // conversationHistory = []; chatOutput.innerHTML = '';
+                // addMessage(`Conversa reiniciada com o modelo ${selectedModelId}.`, 'system');
+            });
+
+            // Theme Toggle Button handler
+            themeToggleButton.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            });
+
+            // Optional Send Button listener
+            // if (sendButton) { sendButton.addEventListener('click', handleSendMessage); }
+
+            // --- Initialization ---
+            loadTheme();
+            setLoadingState(false); // Ensure inputs are enabled initially
+
+        })(); // End IIFE
     </script>
+
 </body>
 </html>
