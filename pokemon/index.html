@@ -552,6 +552,47 @@
 
         // Initialize
         fetchPokemon();
+        
+        // Font loading detection and handling for Cloudflare
+        document.fonts.ready.then(function() {
+            // Check if Press Start 2P font is loaded
+            if (!document.fonts.check("1em 'Press Start 2P'")) {
+                console.log("Press Start 2P font not loaded properly, applying fixes");
+                
+                // Force reload the font with a bypass for Cloudflare
+                const fontLink = document.createElement('link');
+                fontLink.rel = 'stylesheet';
+                fontLink.href = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap&_cf_bust=' + new Date().getTime();
+                document.head.appendChild(fontLink);
+                
+                // Apply direct font-face as a fallback
+                const style = document.createElement('style');
+                style.textContent = `
+                    @font-face {
+                        font-family: 'Press Start 2P';
+                        font-style: normal;
+                        font-weight: 400;
+                        font-display: swap;
+                        src: url(https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivNm.woff2) format('woff2');
+                        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+                    }
+                    
+                    h1, .pokemon-name, .page-btn, .page-info {
+                        font-family: 'Press Start 2P', monospace, cursive !important;
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                // Force a reflow to apply the fonts
+                document.body.style.visibility = 'hidden';
+                setTimeout(() => {
+                    document.body.style.visibility = '';
+                }, 50);
+            }
+        });
     </script>
+    
+    <!-- Preload the font file directly to bypass potential Cloudflare caching issues -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/pressstart2p/v14/e3t4euO8T-267oIAQAu6jDQyK3nVivNm.woff2" as="font" type="font/woff2" crossorigin>
 </body>
 </html>
