@@ -472,7 +472,7 @@
 <body>
     <div class="container">
         <header>
-            <a href="index.html" class="back-btn">← Back to Pokédex</a>
+            <a href="pokemon.html" class="back-btn">← Voltar à Pokédex</a>
             <div class="pokemon-id" id="pokemon-id">#000</div>
         </header>
         
@@ -484,7 +484,7 @@
                 </div>
                 
                 <div class="pokemon-info">
-                    <h1 class="pokemon-name" id="pokemon-name">Loading...</h1>
+                    <h1 class="pokemon-name" id="pokemon-name">Carregando...</h1>
                     <div class="pokemon-types" id="pokemon-types"></div>
                 </div>
                 
@@ -496,42 +496,42 @@
             </div>
             
             <div class="detail-section">
-                <h2 class="section-title">About</h2>
-                <p class="pokemon-description" id="pokemon-description">Loading Pokémon data...</p>
+                <h2 class="section-title">Sobre</h2>
+                <p class="pokemon-description" id="pokemon-description">Carregando dados do Pokémon...</p>
                 
                 <div class="profile-grid" id="profile-grid">
-                    <!-- Profile info will be added here -->
+                    <!-- Informações do perfil serão adicionadas aqui -->
                 </div>
                 
-                <h2 class="section-title">Base Stats</h2>
+                <h2 class="section-title">Estatísticas Base</h2>
                 <div class="stats-container" id="stats-container">
-                    <!-- Stats will be added here -->
+                    <!-- Estatísticas serão adicionadas aqui -->
                 </div>
                 
-                <h2 class="section-title">Type Effectiveness</h2>
+                <h2 class="section-title">Efetividade de Tipo</h2>
                 <div class="weaknesses-container" id="weaknesses-container">
-                    <!-- Weaknesses will be added here -->
+                    <!-- Fraquezas serão adicionadas aqui -->
                 </div>
                 
-                <h2 class="section-title">Abilities</h2>
+                <h2 class="section-title">Habilidades</h2>
                 <div class="abilities-container" id="abilities-container">
-                    <!-- Abilities will be added here -->
+                    <!-- Habilidades serão adicionadas aqui -->
                 </div>
                 
-                <h2 class="section-title">Evolution Chain</h2>
+                <h2 class="section-title">Cadeia de Evolução</h2>
                 <div class="evolutions-container" id="evolutions-container">
-                    <!-- Evolution chain will be added here -->
+                    <!-- Cadeia de evolução será adicionada aqui -->
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Modal for ability details -->
+    <!-- Modal para detalhes de habilidade -->
     <div class="modal" id="ability-modal">
         <div class="modal-content">
             <span class="close-modal" id="close-modal">&times;</span>
-            <h3 class="modal-title" id="modal-title">Ability Name</h3>
-            <p class="modal-text" id="modal-text">Loading ability information...</p>
+            <h3 class="modal-title" id="modal-title">Nome da Habilidade</h3>
+            <p class="modal-text" id="modal-text">Carregando informações da habilidade...</p>
         </div>
     </div>
     
@@ -616,6 +616,53 @@
             nextPokemonBtn.href = `pokemon-detail.html?id=${id < 151 ? id + 1 : 1}`;
         }
         
+        // Traduções dos tipos de Pokémon
+        const typeTranslations = {
+            'normal': 'Normal',
+            'fire': 'Fogo',
+            'water': 'Água',
+            'electric': 'Elétrico',
+            'grass': 'Planta',
+            'ice': 'Gelo',
+            'fighting': 'Lutador',
+            'poison': 'Venenoso',
+            'ground': 'Terra',
+            'flying': 'Voador',
+            'psychic': 'Psíquico',
+            'bug': 'Inseto',
+            'rock': 'Pedra',
+            'ghost': 'Fantasma',
+            'dragon': 'Dragão',
+            'dark': 'Sombrio',
+            'steel': 'Metálico',
+            'fairy': 'Fada'
+        };
+        
+        // Traduções para categorias de habitat
+        const habitatTranslations = {
+            'cave': 'Caverna',
+            'forest': 'Floresta',
+            'grassland': 'Campo',
+            'mountain': 'Montanha',
+            'rare': 'Raro',
+            'rough-terrain': 'Terreno Acidentado',
+            'sea': 'Mar',
+            'urban': 'Urbano',
+            'waters-edge': 'Beira d\'Água',
+            'unknown': 'Desconhecido'
+        };
+        
+        // Traduções para estatísticas
+        const statTranslations = {
+            'hp': 'HP',
+            'attack': 'Ataque',
+            'defense': 'Defesa',
+            'special-attack': 'Atq. Esp.',
+            'special-defense': 'Def. Esp.',
+            'speed': 'Velocidade',
+            'total': 'Total'
+        };
+        
         function displayPokemonData(pokemon, species) {
             // Format ID with leading zeros
             const formattedId = String(pokemon.id).padStart(3, '0');
@@ -633,7 +680,7 @@
                 const type = typeInfo.type.name;
                 const typeBadge = document.createElement('span');
                 typeBadge.classList.add('type-badge', `type-${type}`);
-                typeBadge.textContent = type;
+                typeBadge.textContent = typeTranslations[type] || type;
                 pokemonTypes.appendChild(typeBadge);
             });
             
@@ -648,11 +695,17 @@
             img.alt = pokemon.name;
             pokemonImage.appendChild(img);
             
-            // Set description (find English flavor text)
-            const englishFlavorText = species.flavor_text_entries.find(entry => entry.language.name === "en");
-            pokemonDescription.textContent = englishFlavorText ? 
-                englishFlavorText.flavor_text.replace(/\f/g, ' ') : 
-                "No description available for this Pokémon.";
+            // Set description (find Portuguese flavor text if available, otherwise use English)
+            const ptFlavorText = species.flavor_text_entries.find(entry => entry.language.name === "pt-br");
+            const enFlavorText = species.flavor_text_entries.find(entry => entry.language.name === "en");
+            
+            if (ptFlavorText) {
+                pokemonDescription.textContent = ptFlavorText.flavor_text.replace(/\f/g, ' ');
+            } else if (enFlavorText) {
+                pokemonDescription.textContent = enFlavorText.flavor_text.replace(/\f/g, ' ');
+            } else {
+                pokemonDescription.textContent = "Não há descrição disponível para este Pokémon.";
+            }
             
             // Set profile information
             displayProfileInfo(pokemon, species);
@@ -672,12 +725,12 @@
             
             // Create profile items
             const profileItems = [
-                { label: "Height", value: `${(pokemon.height / 10).toFixed(1)} m` },
-                { label: "Weight", value: `${(pokemon.weight / 10).toFixed(1)} kg` },
-                { label: "Category", value: getCategory(species) },
-                { label: "Gender", value: getGenderRatio(species) },
-                { label: "Habitat", value: species.habitat ? species.habitat.name : "Unknown" },
-                { label: "Base Experience", value: pokemon.base_experience || "Unknown" }
+                { label: "Altura", value: `${(pokemon.height / 10).toFixed(1)} m` },
+                { label: "Peso", value: `${(pokemon.weight / 10).toFixed(1)} kg` },
+                { label: "Categoria", value: getCategory(species) },
+                { label: "Gênero", value: getGenderRatio(species) },
+                { label: "Habitat", value: species.habitat ? (habitatTranslations[species.habitat.name] || species.habitat.name) : "Desconhecido" },
+                { label: "Exp. Base", value: pokemon.base_experience || "Desconhecido" }
             ];
             
             profileItems.forEach(item => {
@@ -694,18 +747,23 @@
         }
         
         function getCategory(species) {
-            const genusEntry = species.genera.find(genus => genus.language.name === "en");
-            return genusEntry ? genusEntry.genus : "Unknown";
+            // Try to find Portuguese genus first
+            const ptGenusEntry = species.genera.find(genus => genus.language.name === "pt-br");
+            if (ptGenusEntry) return ptGenusEntry.genus;
+            
+            // Fall back to English
+            const enGenusEntry = species.genera.find(genus => genus.language.name === "en");
+            return enGenusEntry ? enGenusEntry.genus : "Desconhecido";
         }
         
         function getGenderRatio(species) {
             if (species.gender_rate === -1) {
-                return "Genderless";
+                return "Sem Gênero";
             }
             
             const femalePercentage = (species.gender_rate / 8) * 100;
             const malePercentage = 100 - femalePercentage;
-            return `${malePercentage}% Male, ${femalePercentage}% Female`;
+            return `${malePercentage}% Macho, ${femalePercentage}% Fêmea`;
         }
         
         function displayStats(stats) {
@@ -733,13 +791,11 @@
                 const statRow = document.createElement('div');
                 statRow.classList.add('stat-row');
                 
-                // Format stat name for display
-                let displayName = statName;
-                if (statName === 'special-attack') displayName = 'sp. atk';
-                else if (statName === 'special-defense') displayName = 'sp. def';
+                // Translated stat name
+                const translatedName = statTranslations[statName] || statName;
                 
                 statRow.innerHTML = `
-                    <div class="stat-name">${displayName}</div>
+                    <div class="stat-name">${translatedName}</div>
                     <div class="stat-value">${stat.base_stat}</div>
                     <div class="stat-bar-container">
                         <div class="stat-bar" style="width: ${percentage}%; background-color: ${statConfig.color}"></div>
@@ -753,7 +809,7 @@
             const totalRow = document.createElement('div');
             totalRow.classList.add('stat-row');
             totalRow.innerHTML = `
-                <div class="stat-name" style="font-weight: bold">TOTAL</div>
+                <div class="stat-name" style="font-weight: bold">${statTranslations['total']}</div>
                 <div class="stat-value" style="font-weight: bold">${totalStat}</div>
                 <div class="stat-bar-container">
                     <div class="stat-bar" style="width: ${(totalStat / 600) * 100}%; background: linear-gradient(to right, #FF5959, #FFDE00)"></div>
@@ -779,7 +835,7 @@
                 badge.classList.add('weakness-badge', `type-${type}`);
                 
                 badge.innerHTML = `
-                    <div>${type}</div>
+                    <div>${typeTranslations[type] || type}</div>
                     <div class="weakness-multiplier">×${multiplier}</div>
                 `;
                 
@@ -787,7 +843,7 @@
             });
             
             if (sortedEffectiveness.length === 0) {
-                weaknessesContainer.innerHTML = '<p>No notable weaknesses or resistances.</p>';
+                weaknessesContainer.innerHTML = '<p>Sem fraquezas ou resistências notáveis.</p>';
             }
         }
         
@@ -826,7 +882,7 @@
                 
                 abilityItem.innerHTML = `
                     <div class="ability-name">${formatAbilityName(ability.ability.name)}</div>
-                    ${ability.is_hidden ? '<div class="ability-hidden">(Hidden Ability)</div>' : ''}
+                    ${ability.is_hidden ? '<div class="ability-hidden">(Habilidade Oculta)</div>' : ''}
                 `;
                 
                 abilityItem.addEventListener('click', () => showAbilityDetails(ability.ability));
@@ -842,7 +898,7 @@
         
         async function showAbilityDetails(ability) {
             modalTitle.textContent = formatAbilityName(ability.name);
-            modalText.textContent = "Loading ability information...";
+            modalText.textContent = "Carregando informações da habilidade...";
             
             // Show modal
             abilityModal.style.display = "flex";
@@ -851,18 +907,23 @@
                 const response = await fetch(ability.url);
                 const abilityData = await response.json();
                 
-                // Find English effect text
-                const effectEntry = abilityData.effect_entries.find(entry => entry.language.name === "en");
+                // Try to find Portuguese effect text first
+                let effectEntry = abilityData.effect_entries.find(entry => entry.language.name === "pt-br");
+                
+                // Fall back to English if Portuguese is not available
+                if (!effectEntry) {
+                    effectEntry = abilityData.effect_entries.find(entry => entry.language.name === "en");
+                }
                 
                 if (effectEntry) {
                     modalText.textContent = effectEntry.effect;
                 } else {
-                    modalText.textContent = "No description available for this ability.";
+                    modalText.textContent = "Não há descrição disponível para esta habilidade.";
                 }
                 
             } catch (error) {
-                console.error("Error fetching ability details:", error);
-                modalText.textContent = "Failed to load ability details. Please try again later.";
+                console.error("Erro ao buscar detalhes da habilidade:", error);
+                modalText.textContent = "Falha ao carregar detalhes da habilidade. Por favor, tente novamente mais tarde.";
             }
         }
         
