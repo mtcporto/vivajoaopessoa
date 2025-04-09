@@ -44,7 +44,7 @@
         }
         
         h1 {
-            font-family: 'Press Start 2P', cursive !important;
+            font-family: 'Press Start 2P', cursive;
             color: var(--pokedex-red);
             text-shadow: 3px 3px 0 var(--pokedex-dark-red);
             font-size: 3rem;
@@ -170,7 +170,7 @@
         }
         
         .pokemon-name {
-            font-family: 'Press Start 2P', cursive !important;
+            font-family: 'Press Start 2P', cursive;
             font-size: 1.3rem;
             color: #333;
             text-align: center;
@@ -291,7 +291,7 @@
             border: none;
             border-radius: 5px;
             padding: 10px 15px;
-            font-family: 'Press Start 2P', cursive !important;
+            font-family: 'Press Start 2P', cursive;
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.3s;
@@ -311,7 +311,7 @@
         }
         
         .page-info {
-            font-family: 'Press Start 2P', cursive !important;
+            font-family: 'Press Start 2P', cursive;
             font-size: 0.8rem;
             color: #333;
             display: flex;
@@ -417,7 +417,7 @@
             const expiryTime = localStorage.getItem(cacheExpiry);
             const now = new Date().getTime();
             
-            if (cachedData && expiryTime && now < parseInt(expiryTime)) {
+            if (cachedData && expiryTime && parseInt(expiryTime) > now) { // Corrigido a condição de expiração
                 console.log('Usando dados de Pokémon do cache local');
                 try {
                     const parsedData = JSON.parse(cachedData);
@@ -440,7 +440,7 @@
                     prevBtn.addEventListener('click', goToPrevPage);
                     nextBtn.addEventListener('click', goToNextPage);
                     
-                    return;
+                    return true; // Retornando true para indicar que o cache foi usado
                 } catch (e) {
                     console.error('Erro ao usar cache:', e);
                     // Em caso de erro, continuar com a busca normal
@@ -449,6 +449,7 @@
             
             // Se não temos cache ou expirou, buscar dados novos
             await fetchPokemon();
+            return false; // Retornando false para indicar que o cache não foi usado
         }
         
         async function fetchPokemon() {
@@ -583,8 +584,9 @@
                     
                     // Armazenar no cache local
                     localStorage.setItem('pokedex_data', JSON.stringify(pokemonList));
-                    localStorage.setItem('pokedex_expiry', new Date().getTime() + cacheDuration);
-                    console.log('Dados de Pokémon salvos no cache local');
+                    const expiryDate = new Date().getTime() + cacheDuration; // Calculando o timestamp corretamente
+                    localStorage.setItem('pokedex_expiry', expiryDate.toString()); // Converter para string
+                    console.log('Dados de Pokémon salvos no cache local, expiração:', new Date(expiryDate));
                     
                     // Atualizar a visualização final
                     updateDisplay();
@@ -785,8 +787,13 @@
             window.location.href = `pokemon-detail.html?id=${pokemonId}`;
         }
 
-        // Initialize with cache support
-        fetchPokemonWithCache();
+        // Inicializar verificando explicitamente o retorno da função de cache
+        // Para garantir que o fetchPokemon() só seja chamado se o cache não for usado
+        fetchPokemonWithCache().then(cacheUsed => {
+            if (!cacheUsed) {
+                console.log('Cache não disponível ou expirado, buscar dados novos');
+            }
+        });
     </script>
 </body>
 </html>
