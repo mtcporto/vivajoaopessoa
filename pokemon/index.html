@@ -40,7 +40,6 @@
         
         h1 {
             font-family: 'Press Start 2P', cursive;
-            src: "PressStart2P-Regular.ttf";
             color: var(--pokedex-red);
             text-shadow: 3px 3px 0 var(--pokedex-dark-red);
             font-size: 3rem;
@@ -369,6 +368,7 @@
         let currentPage = 1;
         const pokemonPerPage = 12;
         let activeTypeFilter = null;
+        let isLoadingMore = false;
         
         // All Pokémon types for filters
         const pokemonTypes = [
@@ -379,34 +379,150 @@
 
         async function fetchPokemon() {
             try {
-                // Fetch the first 151 Pokémon (Gen 1)
-                const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
-                const data = await response.json();
+                // Primeiro, busque apenas os primeiros pokémons para exibição rápida
+                const initialBatchSize = 12; // Mesmo número que pokemonPerPage
+                
+                // Fetch data for all available Pokemon
+                const fullResponse = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+                const fullData = await fullResponse.json();
+                const allResults = fullData.results;
                 
                 // Remove loader
                 document.querySelector('.loader').remove();
                 
-                // Get detailed information for each Pokémon
-                const promises = data.results.map(pokemon => {
+                // Carregue inicialmente apenas os primeiros pokémons
+                const initialResults = allResults.slice(0, initialBatchSize);
+                const initialPromises = initialResults.map(pokemon => {
                     return fetch(pokemon.url).then(res => res.json());
                 });
                 
-                pokemonList = await Promise.all(promises);
+                // Mostrar mensagem de carregamento
+                cardContainer.innerHTML = '<p style="text-align:center;width:100%;padding:20px;">Carregando os primeiros Pokémon...</p>';
+                
+                // Aguarde apenas o carregamento inicial
+                const initialPokemon = await Promise.all(initialPromises);
+                
+                // Defina a lista inicial e atualize a exibição
+                pokemonList = initialPokemon;
                 filteredPokemonList = [...pokemonList];
                 
-                // Create type filters
+                // Crie os filtros de tipo
                 createTypeFilters();
                 
-                // Display first page of Pokémon
+                // Exiba a primeira página imediatamente
                 updateDisplay();
                 
-                // Add event listeners
+                // Adicione os event listeners
                 searchInput.addEventListener('input', handleSearch);
                 prevBtn.addEventListener('click', goToPrevPage);
                 nextBtn.addEventListener('click', goToNextPage);
+                
+                // Adicione o indicador de progresso discreto no canto da tela
+                const progressIndicator = document.createElement('div');
+                progressIndicator.style.position = 'fixed';
+                progressIndicator.style.bottom = '10px';
+                progressIndicator.style.right = '10px';
+                progressIndicator.style.padding = '5px 10px';
+                progressIndicator.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                progressIndicator.style.color = 'white';
+                progressIndicator.style.borderRadius = '5px';
+                progressIndicator.style.fontSize = '12px';
+                progressIndicator.style.zIndex = '1000';
+                progressIndicator.id = 'progress-indicator';
+                progressIndicator.textContent = `Carregando Pokémon... ${initialBatchSize}/${allResults.length}`;
+                document.body.appendChild(progressIndicator);
+                
+                // Agora carregue o restante dos pokémons em segundo plano
+                isLoadingMore = true;
+                
+                // Função para carregar em lotes
+                async function loadBatches() {
+                    const batchSize = 50; // Tamanho de lote maior para carregar mais rápido em segundo plano
+                    
+                    // Crie um array de todos os pokémons que ainda precisamos carregar
+                    const remainingResults = allResults.slice(initialBatchSize);
+                    let loadedCount = initialBatchSize;
+                    
+                    for (let i = 0; i < remainingResults.length; i += batchSize) {
+                        if (!document.getElementById('progress-indicator')) {
+                            // O indicador foi removido, pare o carregamento
+                            break;
+                        }
+                        
+                        const batchResults = remainingResults.slice(i, i + batchSize);
+                        const batchPromises = batchResults.map(pokemon => {
+                            return fetch(pokemon.url)
+                                .then(res => res.json())
+                                .catch(err => {
+                                    console.warn(`Falha ao carregar o Pokémon ${pokemon.name}`, err);
+                                    return null; // Retorne null para pokémons que falharam
+                                });
+                        });
+                        
+                        const batchPokemon = await Promise.all(batchPromises);
+                        // Filtrar pokémons nulos que falharam
+                        const validBatchPokemon = batchPokemon.filter(p => p !== null);
+                        
+                        // Atualizar a lista principal
+                        pokemonList = [...pokemonList, ...validBatchPokemon];
+                        
+                        // Se o filtro atual não for "todos", atualize a lista filtrada apenas com os pokémons do tipo atual
+                        if (activeTypeFilter) {
+                            const newFilteredPokemon = validBatchPokemon.filter(pokemon => 
+                                pokemon.types.some(typeInfo => typeInfo.type.name === activeTypeFilter)
+                            );
+                            filteredPokemonList = [...filteredPokemonList, ...newFilteredPokemon];
+                        } else {
+                            filteredPokemonList = [...pokemonList];
+                        }
+                        
+                        loadedCount += validBatchPokemon.length;
+                        
+                        // Atualizar o indicador de progresso
+                        const progress = Math.min(100, Math.round((loadedCount / allResults.length) * 100));
+                        const indicator = document.getElementById('progress-indicator');
+                        if (indicator) {
+                            indicator.textContent = `Carregando Pokémon... ${progress}% (${loadedCount}/${allResults.length})`;
+                        }
+                        
+                        // Re-renderize se estiver na última página para mostrar mais pokémons se houver
+                        if (currentPage === Math.ceil(filteredPokemonList.length / pokemonPerPage)) {
+                            updateDisplay();
+                        }
+                        
+                        // Pequena pausa para não sobrecarregar a CPU/rede
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    
+                    isLoadingMore = false;
+                    const indicator = document.getElementById('progress-indicator');
+                    if (indicator) {
+                        // Após o carregamento, exiba "Concluído" por 2 segundos, depois remova
+                        indicator.textContent = "Carregamento concluído!";
+                        indicator.style.backgroundColor = 'rgba(0, 128, 0, 0.7)';
+                        setTimeout(() => {
+                            indicator.style.opacity = '0';
+                            indicator.style.transition = 'opacity 1s';
+                            setTimeout(() => indicator.remove(), 1000);
+                        }, 2000);
+                    }
+                    
+                    // Atualizar a visualização final
+                    updateDisplay();
+                }
+                
+                // Inicie o carregamento em segundo plano
+                loadBatches();
+                
             } catch (error) {
-                console.error('Error fetching Pokémon data:', error);
-                cardContainer.innerHTML = '<p class="error">Failed to load Pokémon data. Please try again later.</p>';
+                console.error('Erro ao buscar dados de Pokémon:', error);
+                cardContainer.innerHTML = '<p class="error">Falha ao carregar dados de Pokémon. Por favor, tente novamente mais tarde.</p>';
+                
+                const indicator = document.getElementById('progress-indicator');
+                if (indicator) {
+                    indicator.textContent = "Erro no carregamento";
+                    indicator.style.backgroundColor = 'rgba(255, 0, 0, 0.7)';
+                }
             }
         }
 
