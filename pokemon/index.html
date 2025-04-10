@@ -335,16 +335,6 @@
             }
         }
 
-        @font-face {
-            font-family: 'Press Start 2P';
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: 'Roboto';
-            font-display: swap;
-        }
-
         h1, h2, .page-btn, .page-info, .pokemon-name {
             font-family: 'Press Start 2P', cursive, monospace;
             -webkit-font-smoothing: none;
@@ -429,25 +419,15 @@
             
             const expiryTime = localStorage.getItem(cacheExpiry);
             const now = new Date().getTime();
-            const chunks = localStorage.getItem('pokedex_chunks');
             
-            if (expiryTime && parseInt(expiryTime) > now && chunks) {
-                console.log('Usando dados de Pokémon do cache local');
+            if (expiryTime && parseInt(expiryTime) > now) {
+                console.log('Verificando cache local...');
                 try {
-                    // Load all chunks
-                    const numChunks = parseInt(chunks);
-                    let allPokemon = [];
-                    
-                    for (let i = 0; i < numChunks; i++) {
-                        const chunkData = localStorage.getItem(`pokedex_data_${i}`);
-                        if (chunkData) {
-                            const chunkPokemon = JSON.parse(chunkData);
-                            allPokemon = [...allPokemon, ...chunkPokemon];
-                        }
-                    }
-                    
-                    if (allPokemon.length > 0) {
-                        pokemonList = allPokemon;
+                    // Primeiro tente obter dados do formato único
+                    const allPokemonData = localStorage.getItem('pokedex_data_all');
+                    if (allPokemonData) {
+                        console.log('Usando dados de Pokémon do cache único');
+                        pokemonList = JSON.parse(allPokemonData);
                         filteredPokemonList = [...pokemonList];
                         
                         // Remove loader
@@ -465,6 +445,44 @@
                         nextBtn.addEventListener('click', goToNextPage);
                         
                         return true;
+                    }
+                    
+                    // Caso contrário, tente o formato em lotes
+                    const chunks = localStorage.getItem('pokedex_chunks');
+                    if (chunks) {
+                        // Load all chunks
+                        const numChunks = parseInt(chunks);
+                        let allPokemon = [];
+                        
+                        for (let i = 0; i < numChunks; i++) {
+                            const chunkData = localStorage.getItem(`pokedex_data_${i}`);
+                            if (chunkData) {
+                                const chunkPokemon = JSON.parse(chunkData);
+                                allPokemon = [...allPokemon, ...chunkPokemon];
+                            }
+                        }
+                        
+                        if (allPokemon.length > 0) {
+                            console.log('Usando dados de Pokémon do cache em pedaços');
+                            pokemonList = allPokemon;
+                            filteredPokemonList = [...pokemonList];
+                            
+                            // Remove loader
+                            document.querySelector('.loader')?.remove();
+                            
+                            // Create type filters
+                            createTypeFilters();
+                            
+                            // Show first page
+                            updateDisplay();
+                            
+                            // Add event listeners
+                            searchInput.addEventListener('input', handleSearch);
+                            prevBtn.addEventListener('click', goToPrevPage);
+                            nextBtn.addEventListener('click', goToNextPage);
+                            
+                            return true;
+                        }
                     }
                 } catch (e) {
                     console.error('Erro ao usar cache:', e);
@@ -606,20 +624,65 @@
                         }, 2000);
                     }
                     
-                    // Armazenar no cache local
+                    // Armazenar no cache local com uma versão otimizada
                     try {
-                        // Store data in chunks of 100 Pokémon
-                        const chunkSize = 100;
-                        for (let j = 0; j < pokemonList.length; j += chunkSize) {
-                            const chunk = pokemonList.slice(j, j + chunkSize);
-                            localStorage.setItem(`pokedex_data_${Math.floor(j/chunkSize)}`, JSON.stringify(chunk));
+                        // Salva apenas os dados essenciais para economizar espaço
+                        const simplifiedPokemonList = pokemonList.map(pokemon => ({
+                            id: pokemon.id,
+                            name: pokemon.name,
+                            height: pokemon.height,
+                            weight: pokemon.weight,
+                            types: pokemon.types,
+                            sprites: {
+                                front_default: pokemon.sprites.front_default,
+                                other: {
+                                    'official-artwork': {
+                                        front_default: pokemon.sprites.other?.['official-artwork']?.front_default || null
+                                    }
+                                }
+                            }
+                        }));
+                        
+                        // Limpar cache antigo antes de salvar
+                        for (let key in localStorage) {
+                            if (key.startsWith('pokedex_data_')) {
+                                localStorage.removeItem(key);
+                            }
                         }
                         
-                        // Store the total count and expiry
-                        localStorage.setItem('pokedex_chunks', Math.ceil(pokemonList.length/chunkSize));
-                        const expiryDate = new Date().getTime() + cacheDuration;
-                        localStorage.setItem('pokedex_expiry', expiryDate.toString());
-                        console.log(`Dados de Pokémon salvos em ${Math.ceil(pokemonList.length/chunkSize)} partes, expiração:`, new Date(expiryDate));
+                        // Tente armazenar em um único item para começar
+                        try {
+                            localStorage.setItem('pokedex_data_all', JSON.stringify(simplifiedPokemonList));
+                            localStorage.setItem('pokedex_chunks', '1');
+                            
+                            const expiryDate = new Date().getTime() + cacheDuration;
+                            localStorage.setItem('pokedex_expiry', expiryDate.toString());
+                            console.log('Dados de Pokémon salvos em um único item, expiração:', new Date(expiryDate));
+                        } catch (storageError) {
+                            // Se falhar, divida em mais fatias
+                            console.log('Falha ao salvar todos os Pokémon de uma vez, tentando em pedaços menores...');
+                            
+                            const chunkSize = 50; // Tamanho menor para evitar exceder a cota
+                            let storedChunks = 0;
+                            
+                            for (let j = 0; j < simplifiedPokemonList.length; j += chunkSize) {
+                                try {
+                                    const chunk = simplifiedPokemonList.slice(j, j + chunkSize);
+                                    localStorage.setItem(`pokedex_data_${Math.floor(j/chunkSize)}`, JSON.stringify(chunk));
+                                    storedChunks++;
+                                } catch (e) {
+                                    console.warn(`Não foi possível salvar o lote ${Math.floor(j/chunkSize)}, atingido limite de armazenamento`);
+                                    break; // Para de tentar salvar se exceder a cota
+                                }
+                            }
+                            
+                            if (storedChunks > 0) {
+                                localStorage.setItem('pokedex_chunks', storedChunks.toString());
+                                const expiryDate = new Date().getTime() + cacheDuration;
+                                localStorage.setItem('pokedex_expiry', expiryDate.toString());
+                                console.log(`Dados de Pokémon salvos em ${storedChunks} partes, expiração:`, new Date(expiryDate));
+                            }
+                        }
                     } catch (e) {
                         console.warn('Não foi possível salvar no cache local:', e);
                     }
