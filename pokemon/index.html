@@ -334,6 +334,22 @@
                 grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
             }
         }
+
+        @font-face {
+            font-family: 'Press Start 2P';
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Roboto';
+            font-display: swap;
+        }
+
+        h1, h2, .page-btn, .page-info, .pokemon-name {
+            font-family: 'Press Start 2P', cursive, monospace;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: none;
+        }
     </style>
 </head>
 <body>
@@ -408,48 +424,56 @@
 
         // Função para verificar e usar cache local
         async function fetchPokemonWithCache() {
-            const cacheKey = 'pokedex_data';
             const cacheExpiry = 'pokedex_expiry';
-            const cacheDuration = 24 * 60 * 60 * 1000; // 24 horas em milissegundos
+            const cacheDuration = 24 * 60 * 60 * 1000;
             
-            // Verificar se temos dados em cache válidos
-            const cachedData = localStorage.getItem(cacheKey);
             const expiryTime = localStorage.getItem(cacheExpiry);
             const now = new Date().getTime();
+            const chunks = localStorage.getItem('pokedex_chunks');
             
-            if (cachedData && expiryTime && parseInt(expiryTime) > now) { // Corrigido a condição de expiração
+            if (expiryTime && parseInt(expiryTime) > now && chunks) {
                 console.log('Usando dados de Pokémon do cache local');
                 try {
-                    const parsedData = JSON.parse(cachedData);
+                    // Load all chunks
+                    const numChunks = parseInt(chunks);
+                    let allPokemon = [];
                     
-                    // Usar os dados em cache
-                    pokemonList = parsedData;
-                    filteredPokemonList = [...pokemonList];
+                    for (let i = 0; i < numChunks; i++) {
+                        const chunkData = localStorage.getItem(`pokedex_data_${i}`);
+                        if (chunkData) {
+                            const chunkPokemon = JSON.parse(chunkData);
+                            allPokemon = [...allPokemon, ...chunkPokemon];
+                        }
+                    }
                     
-                    // Remover o loader
-                    document.querySelector('.loader')?.remove();
-                    
-                    // Criar filtros de tipo
-                    createTypeFilters();
-                    
-                    // Mostrar a primeira página
-                    updateDisplay();
-                    
-                    // Adicionar event listeners
-                    searchInput.addEventListener('input', handleSearch);
-                    prevBtn.addEventListener('click', goToPrevPage);
-                    nextBtn.addEventListener('click', goToNextPage);
-                    
-                    return true; // Retornando true para indicar que o cache foi usado
+                    if (allPokemon.length > 0) {
+                        pokemonList = allPokemon;
+                        filteredPokemonList = [...pokemonList];
+                        
+                        // Remove loader
+                        document.querySelector('.loader')?.remove();
+                        
+                        // Create type filters
+                        createTypeFilters();
+                        
+                        // Show first page
+                        updateDisplay();
+                        
+                        // Add event listeners
+                        searchInput.addEventListener('input', handleSearch);
+                        prevBtn.addEventListener('click', goToPrevPage);
+                        nextBtn.addEventListener('click', goToNextPage);
+                        
+                        return true;
+                    }
                 } catch (e) {
                     console.error('Erro ao usar cache:', e);
-                    // Em caso de erro, continuar com a busca normal
                 }
             }
             
-            // Se não temos cache ou expirou, buscar dados novos
+            // If no cache or expired, fetch new data
             await fetchPokemon();
-            return false; // Retornando false para indicar que o cache não foi usado
+            return false;
         }
         
         async function fetchPokemon() {
@@ -583,10 +607,22 @@
                     }
                     
                     // Armazenar no cache local
-                    localStorage.setItem('pokedex_data', JSON.stringify(pokemonList));
-                    const expiryDate = new Date().getTime() + cacheDuration; // Calculando o timestamp corretamente
-                    localStorage.setItem('pokedex_expiry', expiryDate.toString()); // Converter para string
-                    console.log('Dados de Pokémon salvos no cache local, expiração:', new Date(expiryDate));
+                    try {
+                        // Store data in chunks of 100 Pokémon
+                        const chunkSize = 100;
+                        for (let j = 0; j < pokemonList.length; j += chunkSize) {
+                            const chunk = pokemonList.slice(j, j + chunkSize);
+                            localStorage.setItem(`pokedex_data_${Math.floor(j/chunkSize)}`, JSON.stringify(chunk));
+                        }
+                        
+                        // Store the total count and expiry
+                        localStorage.setItem('pokedex_chunks', Math.ceil(pokemonList.length/chunkSize));
+                        const expiryDate = new Date().getTime() + cacheDuration;
+                        localStorage.setItem('pokedex_expiry', expiryDate.toString());
+                        console.log(`Dados de Pokémon salvos em ${Math.ceil(pokemonList.length/chunkSize)} partes, expiração:`, new Date(expiryDate));
+                    } catch (e) {
+                        console.warn('Não foi possível salvar no cache local:', e);
+                    }
                     
                     // Atualizar a visualização final
                     updateDisplay();
@@ -698,15 +734,20 @@
             }
         }
 
+        // Fix the updateDisplay function to correctly handle button states
         function updateDisplay() {
             const startIndex = (currentPage - 1) * pokemonPerPage;
             const endIndex = startIndex + pokemonPerPage;
             const pokemonToDisplay = filteredPokemonList.slice(startIndex, endIndex);
             
-            // Update pagination info and buttons
+            // Update pagination info
             pageInfo.textContent = `Página ${currentPage}`;
+            
+            // Update button states correctly
             prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage >= Math.ceil(filteredPokemonList.length / pokemonPerPage);
+            
+            const maxPage = Math.ceil(filteredPokemonList.length / pokemonPerPage);
+            nextBtn.disabled = currentPage >= maxPage;
             
             // Display Pokémon
             displayPokemon(pokemonToDisplay);
