@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat XMPP</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/strophe/strophe.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #075E54;
+      --secondary-color: #128C7E;
+      --accent-color: #25D366;
+      --bg-color: #f5f7fa;
+      --text-color: #333;
+      --light-color: #fff;
+      --border-color: #e1e4e8;
+      --border-radius: 8px;
+      --sidebar-width: 300px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      height: 100vh;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      height: 100%;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #128c7e;
+      color: var(--light-color);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    
+    .header h2 {
+      font-weight: 600;
+    }
+    
+    .status-indicator {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+    }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    
+    .status-dot.connected {
+      background-color: #4caf50;
+    }
+    
+    .status-dot.connecting {
+      background-color: #ff9800;
+    }
+    
+    .status-dot.disconnected {
+      background-color: #f44336;
+    }
+    
+    .login-panel, .main-panel {
+      background-color: var(--light-color);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .login-panel {
+      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .login-panel.hidden, .main-panel.hidden {
+      display: none;
+    }
+    
+    .main-panel {
+      display: flex;
+      height: calc(100vh - 100px);
+      overflow: hidden;
+    }
+    
+    .sidebar {
+      width: var(--sidebar-width);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative; /* Importante para posicionamento */
+    }
+    
+    .user-profile {
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      background-color: #f0f2f5;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .search-bar {
+      padding: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      font-size: 14px;
+      background-color: #f0f2f5;
+    }
+    
+    .contact-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .contact-item {
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #f0f2f5;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .contact-item:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .contact-item.active {
+      background-color: #e9edef;
+    }
+    
+    .contact-item.unread {
+      font-weight: bold;
+      background-color: #e8f5e9;
+    }
+    
+    .sidebar-footer {
+      padding: 10px;
+      background-color: #f0f2f5;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+    }
+    
+    .btn {
+      padding: 10px 15px;
+      background-color: #128c7e;
+      color: var(--light-color);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background-color: var(--secondary-color);
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background-color: var(--primary-color);
+      color: var(--light-color);
+    }
+    
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    
+    .chat-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 2; /* Garante que fique acima da tela de boas-vindas quando visível */
+    }
+    
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      border-bottom: 1px solid #eee;
+      background-color: #f0f2f5;
+    }
+    
+    .recipient-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--secondary-color);
+      color: var(--light-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    
+    .avatar.online::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background-color: var(--accent-color);
+      border-radius: 50%;
+      bottom: 0;
+      right: 0;
+      border: 2px solid white;
+    }
+    
+    .contact-status {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    
+    .contact-status.online {
+      background-color: #4caf50;
+    }
+    
+    .contact-status.offline {
+      background-color: #9e9e9e;
+    }
+    
+    .contact-info {
+      flex: 1;
+    }
+    
+    .contact-name {
+      font-weight: 500;
+    }
+    
+    .contact-presence {
+      font-size: 12px;
+      color: #666;
+    }
+    
+/* Substitua o estilo atual do chat-messages por este: */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+  background-color: #e5ddd5 !important; /* Força a cor de fundo */
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkEEjIV/uLR8gAABZ5JREFUaEPtmVtsFFUYgL/Z2QvdLZS2hV7oxZbSUqhQQQyXgMao+GJMeCCQGNQEfTDRQOKDl5AQH4iPKtGYGCVEIQQkSIwPoiIqlJY7LQVa2tKWdkvbZbvb3Xb3zBw/wGzKZWemhTNrTL+kD/v/Z/7z/+fMnP/8ozAVkUgkFcvqua4boxnAfR9tKjGmkM/aSnRtDgqzgGxgOrI8DdCQUpnAHSUQkRJv3jx76ciRI7oQIup0+rIMQ1eAKIppKBScEY/HWLBgYUplZeUl5M8KKpCFTOB79+7dtnHjxprDh49MWPHo6Ci6rvP8888xZ87smEae/y9d1ykpKbE0NjaGL12+jJR66YoVK+YCfwF/AMPAeCC/uqrq3AMPPJAwpKGhITRNo6ioaOKGn2jII8irUlRYaDH+ZyzomrbHLyzAQw891HT48OE9wCAQBiKGO+k0mUxRwzAmRQghCAaDFBQUpAfipmmaFhJCmP5hpxnweDzk5+db4vH4RPeKxWKkp6dTXFyMLMuBCzCZTOL3+0mn04yNjU24GKmURT8h3G63KRCRJAm32w1gF00YYrFYcDqd6JOAJJNJxsfHUVUVp9NpGsQQQgh0Xcd08RMEyPJEF2NgMMEwprBNxdgghMAY59JEY1RVRQgxpWsTyFSXlUluxTTIZJdbbW0tLpfLVJ5NmzZRXl6en0gksiyKoglTFVUVn8/nslgsjbZt2/6sqqoqKSsrW6WqqtNUssOHD1NbW7uvt7f3cCAQ+NKYRX5+flJRlNGurq7s5ubmjby3dT+dnZ0oipJJKTlZFouFZDLJ008/RXNzM93d3ZimUBQJRbEyOjpKe3v7NS9Yr9fb7/f7s5uamkxXC/bgwYN0dHS86PF4GCvfQHh4BJvNhqKYL8PpsONyuUin09y6dYtLly7tVQECgcDltWvXlrpcrkkrbrr0+Xzs3LkTVVU9g4ODBAIBAoHADdXqvHclMJvmzZtHZWUl4XCYy5cv47rjOn5/L+3t7WzZsgVVVSeVU9M0Nm/eTFFREXV1dVFbOp0mHo+b7llCCFwuF+Pj41y9ehW73U5paSlWq3l3zmazUVJSwujoKH19fciSJCFJErquI4S4q+JCCOx2O+FwGK/XS1VVFYsXL54UBiAjI4OKigr8fj/JZBLJZrPhdDqxWCymcwghcDgcDAwM0NjYSGVlJU6nc9IQgGnTplFTU0MkEuH69eukUikkl8tFdnY2Vqt1UpB0Os3MmTMpLi4mFotNCgKQmZnJqlWr6OnpwePxYAiEEEiJRIKsrCwURbmrmxlLKhgMsmbNGnJzc6cEAcjKymL16tV0dXXR09ODEAJJkiQMISUSCfLy8rBarQghDEE8Hg9r166lvLx8yhCAGTNmsG7dOrq7u/H5fOi6/m+DS6fTSJGxMRYuXEhGRgZCCBKJBGNjY1gsa1m5cuW9QADy8vJ48sknuXHjBt3d3RnGcZRMIEkmEIlEiEajPPPMM+Tm5iKEoK2tDZ/f733sscdW3CsGwO12s2HDBkKhEF1dXURjMWTjONrtKdj46vP5RuvXry+cPXs2uq5z9epVurq6CIVCvqamJvFeQQByc3PZuHEjkUiEYDCI1+tNKopyzQSSbDYboVCoHiAvLw9d17l27Rrd3d3E4/HYH3/+QT5Ze3G8Xp/AQCAQeKB8AfPnz//PYcZnn33KwMAAXm8vX3/zNaqqasaUzcgxajKZlIE8IUSBpmn7hRD5VquVrKwsIpEIoVCIaDRKNBqlo6ODb7/7djwajSpAGDAEMuRMJpMBIKSqaseOHTvObtmyxTIyMqKZuTVvn+2NxsZGtm/fHunr63MBQ0ACiAMpwBCoPBKJdLz33ntNu3fvfvOzzz/7z39KevXVV0in0w937tnzETJmFAgCYSAF6LeXlHG6pgL/ACiMIt6EjvCsAAAAAElFTkSuQmCC') !important;
+  display: flex;
+  flex-direction: column;
+}
+    
+    .welcome-message {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #666;
+      background-color: #f8f9fa;
+      z-index: 1; /* Garante que fique acima do chat quando visível */
+    }
+    
+    .typing-indicator {
+      font-style: italic;
+      color: #777;
+      font-size: 12px;
+      padding: 5px 15px;
+      height: 20px;
+    }
+    
+    .message-input-container {
+      position: sticky;
+      bottom: 0;
+      background-color: #f0f2f5;
+      border-top: 1px solid var(--border-color);
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      margin-top: auto;
+    }
+    
+    .message-input {
+      display: flex;
+      flex: 1;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 0 10px;
+    }
+    
+    #msg {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+    
+    .message {
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      max-width: 65%;
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message.received {
+      align-self: flex-start;
+    }
+    
+    .message.sent {
+      align-self: flex-end;
+    }
+    
+    .message-bubble {
+      padding: 8px 12px;
+      border-radius: 8px;
+      position: relative;
+      word-break: break-word;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    }
+    
+    .message.received .message-bubble {
+      background-color: white;
+      border-top-left-radius: 0;
+    }
+    
+    .message.sent .message-bubble {
+      background-color: #dcf8c6;
+      border-top-right-radius: 0;
+    }
+    
+    .message-header {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 2px;
+    }
+    
+    .message-body {
+      font-size: 14px;
+    }
+    
+    .message-time {
+      font-size: 11px;
+      color: #999;
+      margin-top: 2px;
+      align-self: flex-end;
+    }
+    
+    .system-message {
+      text-align: center;
+      color: #ffffff;
+      margin: 10px 0;
+      font-style: italic;
+      font-size: 12px;
+      background-color: #128c7e;
+      padding: 5px 10px;
+      border-radius: 10px;
+      display: inline-block;
+      margin: 5px auto;
+      max-width: 80%;
+      align-self: center;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+    }
+    
+    .modal-content {
+      background-color: white;
+      border-radius: 8px;
+      margin: 10% auto;
+      padding: 20px;
+      width: 400px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .modal-header h3 {
+      margin: 0;
+    }
+    
+    .close-modal {
+      cursor: pointer;
+      font-size: 20px;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+    
+    .modal-buttons .btn {
+      margin-left: 10px;
+    }
+    
+    .badge {
+      display: inline-block;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 5px;
+        height: 100%;
+      }
+      
+      .header {
+        margin-bottom: 10px;
+        padding: 10px;
+      }
+      
+      .main-panel {
+        flex-direction: column;
+        height: calc(100vh - 80px);
+      }
+      
+      .sidebar {
+        width: 100%;
+        height: 40vh;
+        min-height: 200px;
+        max-height: 300px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+      
+      .chat-area {
+        height: 60vh;
+        min-height: 300px;
+      }
+      
+      .chat-messages {
+        min-height: 200px;
+      }
+      
+      .message {
+        max-width: 85%;
+      }
+      
+      .message-input-container {
+        padding: 5px;
+      }
+    }
+
+    .contact-menu {
+      margin-left: auto;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .contact-item:hover .contact-menu {
+      opacity: 1;
+    }
+
+    .renew-sub-btn {
+      padding: 2px 5px;
+      background: transparent;
+      color: #666;
+      border: none;
+    }
+
+    .renew-sub-btn:hover {
+      color: var(--primary-color);
+      background: transparent;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #bd2130;
+    }
+
+    /* Adicione este CSS para o menu de contatos */
+    .contact-menu {
+      position: relative;
+      margin-left: auto;
+    }
+
+    .contact-menu-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 180px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      z-index: 10;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .contact-menu-dropdown.show {
+      display: block;
+    }
+
+    .contact-menu-dropdown a {
+      padding: 10px 15px;
+      text-decoration: none;
+      display: block;
+      color: #333;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+
+    .contact-menu-dropdown a:hover {
+      background-color: #f5f5f5;
+    }
+
+    .contact-menu-dropdown i {
+      margin-right: 8px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2><i class="bi bi-chat-dots"></i> XMPP Chat</h2>
+      <div class="status-indicator">
+        <div id="status-dot" class="status-dot disconnected"></div>
+        <span id="status-text">Desconectado</span>
+      </div>
+    </div>
+    
+    <!-- Login Panel -->
+    <div id="login-panel" class="login-panel">
+      <form id="login-form" onsubmit="event.preventDefault(); connect();">
+        <div class="form-group">
+          <label for="jid"><i class="bi bi-person-fill"></i> JID:</label>
+          <input type="text" id="jid" class="form-control" placeholder="usuario@xmpp.jp">
+        </div>
+        
+        <div class="form-group">
+          <label for="pass"><i class="bi bi-key-fill"></i> Senha:</label>
+          <input type="password" id="pass" class="form-control" placeholder="Sua senha" autocomplete="current-password">
+        </div>
+        
+        <div class="form-group remember-me">
+          <label>
+            <input type="checkbox" id="remember-me"> Lembrar-me neste dispositivo
+          </label>
+        </div>
+        
+        <button type="submit" id="connect-btn" class="btn">
+          <i class="bi bi-box-arrow-in-right"></i> Conectar
+        </button>
+      </form>
+    </div>
+    
+    <!-- Main Panel (Contact List & Chat) -->
+    <div id="main-panel" class="main-panel hidden">
+      <!-- Contact List Sidebar -->
+      <div class="sidebar">
+        <div class="user-profile">
+          <div class="avatar" id="user-avatar"></div>
+          <div class="contact-info">
+            <div id="user-jid"></div>
+            <div><span id="user-status">Online</span></div>
+          </div>
+        </div>
+        
+        <div class="search-bar">
+          <input type="text" class="search-input" placeholder="Pesquisar ou adicionar contato..." id="search-contacts">
+        </div>
+        
+        <div class="contact-list" id="contact-list">
+          <!-- Contacts will be added here by JavaScript -->
+        </div>
+        
+        <div class="sidebar-footer">
+          <button class="btn btn-sm" id="add-contact-btn"><i class="bi bi-person-plus-fill"></i> Adicionar</button>
+          <button class="btn btn-sm btn-outline" onclick="disconnect()"><i class="bi bi-box-arrow-right"></i> Desconectar</button>
+        </div>
+      </div>
+      
+      <!-- Chat Area -->
+      <div class="chat-area">
+        <div id="welcome-screen" class="welcome-message">
+          <i class="bi bi-chat-square-text"></i>
+          <h3>Bem-vindo ao XMPP Chat</h3>
+          <p>Selecione um contato para iniciar uma conversa ou adicione novos contatos.</p>
+        </div>
+        
+        <div id="chat-container" class="chat-container hidden">
+          <div class="chat-header">
+            <div class="recipient-info">
+              <div class="avatar" id="recipient-avatar"></div>
+              <div class="contact-info">
+                <div class="contact-name" id="recipient-name">Carregando...</div>
+                <div class="contact-presence" id="recipient-presence">Offline</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="chat-messages" id="chat-messages"></div>
+          
+          <div class="typing-indicator" id="typing-indicator"></div>
+          
+          <div class="message-input-container">
+            <div class="message-input">
+              <input type="text" id="msg" placeholder="Digite sua mensagem..." disabled>
+            </div>
+            <button onclick="sendMessage()" class="btn" id="send-btn" disabled>
+              <i class="bi bi-send"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Contact Modal -->
+  <div id="add-contact-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Adicionar Contato</h3>
+        <span class="close-modal" id="close-contact-modal">&times;</span>
+      </div>
+      <div class="form-group">
+        <label for="new-contact">JID do Contato:</label>
+        <input type="text" id="new-contact" class="form-control" placeholder="amigo@xmpp.jp">
+      </div>
+      <div class="modal-buttons">
+        <button class="btn btn-outline" id="cancel-add-contact">Cancelar</button>
+        <button class="btn" id="confirm-add-contact">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variáveis globais
+    let connection;
+    let typingTimer;
+    let currentContact = null;
+    let contacts = {}; // Armazena contatos e seus status
+    let conversations = {}; // Armazena histórico de conversas
+    let unreadMessages = {}; // Contador de mensagens não lidas
+    
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Eventos de input
+      document.getElementById('msg').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+      
+      document.getElementById('msg').addEventListener('input', function() {
+        sendTypingNotification();
+      });
+      
+      // Evento de pesquisa de contatos
+      document.getElementById('search-contacts').addEventListener('input', function() {
+        filterContacts(this.value);
+      });
+      
+      // Evento para modal de adicionar contato
+      document.getElementById('add-contact-btn').addEventListener('click', function() {
+        document.getElementById('add-contact-modal').style.display = 'block';
+      });
+      
+      document.getElementById('close-contact-modal').addEventListener('click', function() {
+        document.getElementById('add-contact-modal').style.display = 'none';
+      });
+      
+      document.getElementById('cancel-add-contact').addEventListener('click', function() {
+        document.getElementById('add-contact-modal').style.display = 'none';
+      });
+      
+      document.getElementById('confirm-add-contact').addEventListener('click', function() {
+        addContact();
+      });
+      
+      // Fechar modal clicando fora
+      window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('add-contact-modal')) {
+          document.getElementById('add-contact-modal').style.display = 'none';
+        }
+      });
+
+      // Tentar auto-login
+      tryAutoLogin();
+    });
+    
+    function updateStatus(status, text) {
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      
+      statusDot.className = 'status-dot ' + status;
+      statusText.textContent = text;
+    }
+    
+    function showMainPanel() {
+      document.getElementById('login-panel').classList.add('hidden');
+      document.getElementById('main-panel').classList.remove('hidden');
+      
+      // Configurar informações do usuário
+      const jid = connection.jid;
+      const userJid = jid.split('/')[0];
+      const initial = userJid.split('@')[0].charAt(0).toUpperCase();
+      
+      document.getElementById('user-avatar').textContent = initial;
+      document.getElementById('user-jid').textContent = userJid;
+    }
+    
+    function showLoginPanel() {
+      document.getElementById('main-panel').classList.add('hidden');
+      document.getElementById('login-panel').classList.remove('hidden');
+    }
+    
+    // Modifique a função connect() para salvar credenciais
+    function connect() {
+      const jid = document.getElementById('jid').value.trim();
+      const pass = document.getElementById('pass').value;
+      
+      // Validação básica
+      if (!jid || !pass) {
+        alert('Por favor, preencha JID e senha.');
+        return;
+      }
+      
+      if (!jid.includes('@')) {
+        alert('JID deve estar no formato usuario@dominio');
+        return;
+      }
+      
+      // Salvar credenciais (se o checkbox estiver marcado)
+      if (document.getElementById('remember-me').checked) {
+        localStorage.setItem('xmpp_jid', jid);
+        localStorage.setItem('xmpp_pass', pass);
+        localStorage.setItem('xmpp_remember', 'true');
+      }
+      
+      // Atualizar interface
+      document.getElementById('connect-btn').disabled = true;
+      document.getElementById('connect-btn').innerHTML = '<i class="bi bi-hourglass"></i> Conectando...';
+      updateStatus('connecting', 'Conectando...');
+      
+      // Criar conexão - tentar WebSocket primeiro, com fallback para BOSH
+      try {
+        console.log("Tentando conectar via WebSocket...");
+        connection = new Strophe.Connection("https://conversejs.org/http-bind/");
+        connection.connect(jid, pass, function(status) {
+          handleConnectionStatus(status);
+        });
+      } catch (e) {
+        console.error("Erro ao conectar via WebSocket:", e);
+        console.log("Tentando conectar via BOSH...");
+        
+        try {
+          connection = new Strophe.Connection("https://xmpp.jp/http-bind/");
+          
+          connection.connect(jid, pass, function(status) {
+            handleConnectionStatus(status);
+          });
+        } catch (e2) {
+          console.error("Erro ao conectar via BOSH:", e2);
+          updateStatus('disconnected', 'Falha na conexão');
+          alert('Erro ao conectar: ' + e2.message);
+          document.getElementById('connect-btn').disabled = false;
+          document.getElementById('connect-btn').innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Conectar';
+        }
+      }
+    }
+    
+    // Adicione esta função auxiliar
+    function handleConnectionStatus(status) {
+      if (status === Strophe.Status.CONNECTING) {
+        updateStatus('connecting', 'Conectando...');
+      } else if (status === Strophe.Status.CONNFAIL) {
+        updateStatus('disconnected', 'Falha na conexão');
+        alert('Falha na conexão. Verifique sua internet e tente novamente.');
+        document.getElementById('connect-btn').disabled = false;
+        document.getElementById('connect-btn').innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Conectar';
+      } else if (status === Strophe.Status.AUTHENTICATING) {
+        updateStatus('connecting', 'Autenticando...');
+      } else if (status === Strophe.Status.AUTHFAIL) {
+        updateStatus('disconnected', 'Falha na autenticação');
+        alert('Falha na autenticação. Verifique seu JID e senha.');
+        document.getElementById('connect-btn').disabled = false;
+        document.getElementById('connect-btn').innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Conectar';
+      } else if (status === Strophe.Status.CONNECTED) {
+        updateStatus('connected', 'Conectado');
+        showMainPanel();
+        
+        // Adicionar handlers
+        connection.addHandler(onMessage, null, "message", null);
+        connection.addHandler(onPresence, null, "presence", null);
+        connection.addHandler(onIQ, null, "iq", null);
+        
+        // Enviar presença
+        connection.send($pres().tree());
+        
+        // Solicitar lista de contatos (roster)
+        requestRoster();
+        
+        // Configurar atualização periódica de presença
+        setTimeout(() => {
+          forcePresenceUpdate();
+        }, 2000);
+        
+        // Atualizar presença a cada 30 segundos
+        setInterval(() => {
+          connection.send($pres().tree());
+        }, 30000);
+
+        // Adicione após requestRoster():
+        setTimeout(() => {
+          setupPresenceChecks();
+        }, 2000);
+
+        // Adicione após a linha que solicita a lista de contatos (requestRoster()):
+        loadConversations();
+      } else if (status === Strophe.Status.DISCONNECTED) {
+        updateStatus('disconnected', 'Desconectado');
+        document.getElementById('connect-btn').disabled = false;
+        document.getElementById('connect-btn').innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Conectar';
+        showLoginPanel();
+        
+        // Limpar dados
+        contacts = {};
+        conversations = {};
+        unreadMessages = {};
+        currentContact = null;
+        
+        // Limpar a interface
+        document.getElementById('contact-list').innerHTML = '';
+        document.getElementById('chat-messages').innerHTML = '';
+      }
+    }
+    
+    // Adicione função para desconectar e limpar dados
+    function disconnect(clearStorage = false) {
+      if (clearStorage) {
+        localStorage.removeItem('xmpp_jid');
+        localStorage.removeItem('xmpp_pass');
+        localStorage.removeItem('xmpp_remember');
+      }
+      
+      if (connection) {
+        // Enviar presença offline antes de desconectar
+        const presence = $pres({type: 'unavailable'})
+          .c('status').t('Offline');
+        connection.send(presence);
+        
+        // Desconectar com um pequeno atraso para garantir que a presença seja enviada
+        setTimeout(() => {
+          connection.disconnect();
+        }, 500);
+      }
+      
+      // Mostrar tela de boas-vindas ao desconectar
+      showWelcomeScreen();
+    }
+    
+    // Adicione função para tentar reconectar automaticamente
+    function tryAutoLogin() {
+      if (localStorage.getItem('xmpp_remember') === 'true') {
+        const jid = localStorage.getItem('xmpp_jid');
+        const pass = localStorage.getItem('xmpp_pass');
+        
+        if (jid && pass) {
+          document.getElementById('jid').value = jid;
+          document.getElementById('pass').value = pass;
+          document.getElementById('remember-me').checked = true;
+          
+          // Aguardar DOM estar pronto
+          setTimeout(() => {
+            connect();
+          }, 500);
+        }
+      }
+    }
+    
+    function requestRoster() {
+      const iq = $iq({type: 'get'}).c('query', {xmlns: 'jabber:iq:roster'});
+      
+      connection.sendIQ(iq, function(response) {
+        const items = response.getElementsByTagName('item');
+        
+        for (let i = 0; i < items.length; i++) {
+          const jid = items[i].getAttribute('jid');
+          const name = items[i].getAttribute('name') || jid.split('@')[0];
+          const subscription = items[i].getAttribute('subscription');
+          
+          // Adicionar contato à lista
+          contacts[jid] = {
+            name: name,
+            status: 'offline',
+            subscription: subscription
+          };
+          
+          // Inicializar conversa vazia
+          if (!conversations[jid]) {
+            conversations[jid] = [];
+          }
+          
+          // Inicializar contador de mensagens
+          if (!unreadMessages[jid]) {
+            unreadMessages[jid] = 0;
+          }
+        }
+        
+        // Atualizar a lista de contatos na UI
+        updateContactList();
+        
+        // Enviar solicitação de presença para todos os contatos
+        connection.send($pres().tree());
+      });
+    }
+    
+    function updateContactList() {
+      const contactList = document.getElementById('contact-list');
+      contactList.innerHTML = '';
+      
+      // Ordenar contatos: online primeiro, depois por nome
+      const sortedContacts = Object.keys(contacts).sort((a, b) => {
+        // Ordenar primeiro por status (online primeiro)
+        if (contacts[a].status === 'online' && contacts[b].status !== 'online') return -1;
+        if (contacts[a].status !== 'online' && contacts[b].status === 'online') return 1;
+        
+        // Depois por nome
+        return contacts[a].name.localeCompare(contacts[b].name);
+      });
+      
+      sortedContacts.forEach(jid => {
+        const contact = contacts[jid];
+        
+        const contactItem = document.createElement('div');
+        contactItem.className = `contact-item${currentContact === jid ? ' active' : ''}${unreadMessages[jid] > 0 ? ' unread' : ''}`;
+        contactItem.dataset.jid = jid;
+        contactItem.onclick = () => selectContact(jid);
+        
+        const initial = contact.name.charAt(0).toUpperCase();
+        const statusClass = contact.status === 'online' ? 'online' : 'offline';
+        
+        contactItem.innerHTML = `
+          <div class="avatar" style="position: relative;">
+            ${initial}
+            <div class="contact-status ${statusClass}" style="position: absolute; bottom: 2px; right: 2px;"></div>
+          </div>
+          <div class="contact-info">
+            <div class="contact-name">${contact.name}</div>
+            <div class="contact-presence">
+              ${contact.status === 'online' ? 'Online' : 'Offline'}
+            </div>
+          </div>
+          ${unreadMessages[jid] > 0 ? `<div class="badge">${unreadMessages[jid]}</div>` : ''}
+          <div class="contact-menu">
+            <button class="btn btn-sm" onclick="event.stopPropagation(); toggleContactMenu('${jid}');">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <div class="contact-menu-dropdown" id="menu-${jid.replace('@', '-')}">
+              <a href="#" onclick="event.stopPropagation(); renewSubscription('${jid}'); return false;">
+                <i class="bi bi-arrow-repeat"></i> Renovar assinatura
+              </a>
+              <a href="#" onclick="event.stopPropagation(); removeContact('${jid}'); return false;">
+                <i class="bi bi-trash"></i> Excluir contato
+              </a>
+            </div>
+          </div>
+        `;
+        
+        contactList.appendChild(contactItem);
+      });
+      
+      // Adicionar mensagem se não houver contatos
+      if (sortedContacts.length === 0) {
+        contactList.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Nenhum contato. Use o botão abaixo para adicionar.</div>';
+      }
+    }
+    
+    function filterContacts(query) {
+      const contactItems = document.querySelectorAll('.contact-item');
+      
+      query = query.toLowerCase();
+      contactItems.forEach(item => {
+        const contactName = item.querySelector('.contact-name').textContent.toLowerCase();
+        const contactJid = item.dataset.jid.toLowerCase();
+        
+        if (contactName.includes(query) || contactJid.includes(query)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+    
+    // Substitua a função selectContact por esta versão melhorada
+    function selectContact(jid) {
+      // Atualizar contato atual
+      currentContact = jid;
+      
+      // Resetar contador de mensagens não lidas
+      unreadMessages[jid] = 0;
+      
+      // Atualizar UI de contatos
+      updateContactList();
+      
+      // Configurar a interface do chat - uma abordagem mais limpa
+      const welcomeScreen = document.getElementById('welcome-screen');
+      const chatContainer = document.getElementById('chat-container');
+      
+      // 1. Primeiro ocultar a tela de boas-vindas completamente
+      welcomeScreen.style.display = 'none';
+      
+      // 2. Mostrar o container de chat
+      chatContainer.classList.remove('hidden');
+      chatContainer.style.display = 'flex';
+      
+      // Configurar informações do destinatário
+      const contact = contacts[jid];
+      const initial = contact.name.charAt(0).toUpperCase();
+      
+      // Usar getElementById para garantir que os elementos existem
+      const avatarElement = document.getElementById('recipient-avatar');
+      const nameElement = document.getElementById('recipient-name');
+      const presenceElement = document.getElementById('recipient-presence');
+      
+      if (avatarElement) avatarElement.textContent = initial;
+      if (nameElement) nameElement.textContent = contact.name;
+      if (presenceElement) presenceElement.textContent = contact.status === 'online' ? 'Online' : 'Offline';
+      
+      // Habilitar ou desabilitar campo de entrada baseado no status do contato
+      const msgInput = document.getElementById('msg');
+      const sendBtn = document.getElementById('send-btn');
+      
+      // Verificar se estamos no modo de forçar comunicação
+      if (forceCommunication) {
+        if (msgInput) msgInput.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        if (msgInput) msgInput.placeholder = "Modo de emergência - contato pode não receber mensagens";
+      } else {
+        if (msgInput) msgInput.disabled = contact.status !== 'online';
+        if (sendBtn) sendBtn.disabled = contact.status !== 'online';
+        
+        if (msgInput) {
+          if (contact.status !== 'online') {
+            msgInput.placeholder = "Contato offline. Não é possível enviar mensagens.";
+          } else {
+            msgInput.placeholder = "Digite sua mensagem...";
+          }
+        }
+      }
+      
+      // Carregar histórico de mensagens
+      loadConversation(jid);
+      
+      // Focar no campo de entrada se estiver habilitado
+      if (msgInput && !msgInput.disabled) {
+        msgInput.focus();
+      }
+      
+      // Forçar um recálculo de layout após o carregamento das mensagens
+      setTimeout(() => {
+        const chatMessages = document.getElementById('chat-messages');
+        if (chatMessages) {
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+      }, 100);
+    }
+
+    // Adicione esta função para retornar à tela de boas-vindas
+    function showWelcomeScreen() {
+      const welcomeScreen = document.getElementById('welcome-screen');
+      const chatContainer = document.getElementById('chat-container');
+      
+      chatContainer.style.display = 'none';
+      chatContainer.classList.add('hidden');
+      welcomeScreen.style.display = 'flex';
+      
+      currentContact = null;
+    }
+    
+    function loadConversation(jid) {
+      const chatMessages = document.getElementById('chat-messages');
+      chatMessages.innerHTML = '';
+      
+      if (!conversations[jid] || conversations[jid].length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'system-message';
+        emptyMessage.textContent = 'Nenhuma mensagem anterior. Comece a conversa!';
+        chatMessages.appendChild(emptyMessage);
+        return;
+      }
+      
+      // Renderizar todas as mensagens da conversa
+      conversations[jid].forEach(msg => {
+        if (msg.type === 'system') {
+          addSystemMessage(msg.text, chatMessages);
+        } else {
+          addMessageToChat(msg.from, msg.text, msg.time, msg.from !== jid, chatMessages);
+        }
+      });
+      
+      // Rolar para baixo
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function addMessageToChat(from, text, time = new Date(), isSent = false, container = null) {
+      // Se não for especificado um container, usar o atual
+      const chatMessages = container || document.getElementById('chat-messages');
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+      
+      // Obter o nome de usuário do JID ou usar o nome do contato
+      let displayName;
+      if (isSent) {
+        displayName = 'Você';
+      } else {
+        const jid = from.split('/')[0];
+        displayName = contacts[jid] ? contacts[jid].name : from.split('@')[0];
+      }
+      
+      // Formatar hora
+      const formattedTime = typeof time === 'string' ? time : time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      
+      messageDiv.innerHTML = `
+        <div class="message-bubble">
+          <div class="message-body">${escapeHtml(text)}</div>
+        </div>
+        <div class="message-time">${formattedTime}</div>
+      `;
+      
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function addSystemMessage(text, container = null) {
+      const chatMessages = container || document.getElementById('chat-messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'system-message';
+      messageDiv.textContent = text;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+    
+    function addMessageToConversation(jid, from, text, time = new Date(), type = 'chat') {
+      // Criar registro da conversa se não existir
+      if (!conversations[jid]) {
+        conversations[jid] = [];
+      }
+      
+      // Adicionar mensagem ao histórico
+      conversations[jid].push({
+        from: from,
+        text: text,
+        time: time,
+        type: type
+      });
+      
+      // Salvar após adicionar mensagem
+      saveConversations();
+    }
+    
+    function playNotificationSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.type = 'sine';
+      oscillator.frequency.value = 600;
+      gainNode.gain.value = 0.1;
+      
+      oscillator.start();
+      
+      setTimeout(() => {
+        oscillator.stop();
+      }, 200);
+    }
+    
+    // Modifique a função sendMessage() para incluir depuração e garantir o JID completo
+    function sendMessage() {
+      if (!connection || connection.connected === false) {
+        alert('Você precisa estar conectado para enviar mensagens.');
+        return;
+      }
+      
+      if (!currentContact) {
+        alert('Selecione um contato para enviar mensagens.');
+        return;
+      }
+      
+      const msgInput = document.getElementById('msg');
+      const text = msgInput.value.trim();
+      
+      if (text === '') return;
+      
+      // Log para debug
+      console.log(`Enviando mensagem para: ${currentContact}`);
+      
+      // Garantir que estamos enviando para o JID completo
+      const targetJid = currentContact;
+      
+      // Criar e enviar mensagem com cabeçalhos completos
+      const message = $msg({
+        to: targetJid,
+        type: "chat",
+        from: connection.jid,
+        id: 'msg_' + Math.floor(Math.random() * 100000)
+      })
+      .c("body").t(text).up()
+      .c("active", {xmlns: "http://jabber.org/protocol/chatstates"});
+      
+      // Log da mensagem XMPP para debug
+      console.log("Enviando XMPP:", Strophe.serialize(message));
+      
+      connection.send(message);
+      
+      // Adicionar à conversa
+      addMessageToConversation(currentContact, connection.jid.split('/')[0], text);
+      
+      // Adicionar à interface de chat
+      addMessageToChat(connection.jid, text, new Date(), true);
+      
+      // Limpar input e focar
+      msgInput.value = "";
+      msgInput.focus();
+    }
+    
+    function sendTypingNotification() {
+      if (!connection || connection.connected === false || !currentContact) return;
+      
+      clearTimeout(typingTimer);
+      
+      // Enviar notificação "composing"
+      const composingMsg = $msg({to: currentContact, type: "chat"})
+        .c("composing", {xmlns: "http://jabber.org/protocol/chatstates"});
+      
+      connection.send(composingMsg);
+      
+      // Após 5 segundos sem digitar, enviar "paused"
+      typingTimer = setTimeout(() => {
+        const pausedMsg = $msg({to: currentContact, type: "chat"})
+          .c("paused", {xmlns: "http://jabber.org/protocol/chatstates"});
+        
+        connection.send(pausedMsg);
+      }, 5000);
+    }
+    
+    function addContact() {
+      const jid = document.getElementById('new-contact').value.trim();
+      
+      // Validação básica
+      if (!jid) {
+        alert('Por favor, informe o JID do contato.');
+        return;
+      }
+      
+      if (!jid.includes('@')) {
+        alert('JID deve estar no formato usuario@dominio');
+        return;
+      }
+      
+      // Verificar se o contato já existe
+      if (contacts[jid]) {
+        alert('Este contato já está na sua lista.');
+        document.getElementById('add-contact-modal').style.display = 'none';
+        return;
+      }
+      
+      // Enviar solicitação de presença (subscribe)
+      const presence = $pres({to: jid, type: 'subscribe'});
+      connection.send(presence);
+      
+      // Adicionar contato ao roster via IQ
+      const iq = $iq({type: 'set'})
+        .c('query', {xmlns: 'jabber:iq:roster'})
+        .c('item', {jid: jid});
+      
+      connection.sendIQ(iq, function() {
+        // Contato adicionado com sucesso
+        alert('Solicitação de contato enviada para ' + jid);
+        
+        // Adicionar contato à lista local (será atualizado quando o servidor responder)
+        contacts[jid] = {
+          name: jid.split('@')[0],
+          status: 'offline',
+          subscription: 'none'
+        };
+        
+        // Inicializar conversa
+        if (!conversations[jid]) {
+          conversations[jid] = [];
+          addMessageToConversation(jid, 'system', 'Solicitação de contato enviada.', new Date(), 'system');
+        }
+        
+        // Inicializar contador de mensagens
+        if (!unreadMessages[jid]) {
+          unreadMessages[jid] = 0;
+        }
+        
+        // Atualizar UI
+        updateContactList();
+        
+        // Fechar modal
+        document.getElementById('add-contact-modal').style.display = 'none';
+        document.getElementById('new-contact').value = '';
+      }, function(error) {
+        alert('Erro ao adicionar contato: ' + error.textContent);
+      });
+    }
+    
+    // Adicione essa função após a função addContact()
+    function renewSubscription(jid) {
+      if (!jid) {
+        // Se não for especificado, usar o contato atual
+        if (!currentContact) {
+          alert('Selecione um contato primeiro');
+          return;
+        }
+        jid = currentContact;
+      }
+      
+      // Enviar nova solicitação de assinatura
+      const presence = $pres({to: jid, type: 'subscribe'});
+      connection.send(presence);
+      
+      // Adicionar mensagem informativa
+      addSystemMessage(`Solicitação de assinatura enviada para ${jid}`);
+      addMessageToConversation(jid, 'system', 'Solicitação de assinatura enviada. Aguardando aceitação.', new Date(), 'system');
+    }
+
+    function onMessage(msg) {
+      const from = msg.getAttribute("from");
+      const jid = from.split('/')[0]; // Remover resource do JID
+      const body = msg.getElementsByTagName("body")[0];
+      
+      // Processar mensagem de chat
+      if (body) {
+        const text = Strophe.getText(body);
+        
+        // Adicionar à conversa
+        addMessageToConversation(jid, from, text);
+        
+        // Se este contato está sendo visualizado, mostrar a mensagem
+        if (currentContact === jid) {
+          addMessageToChat(from, text);
+        } else {
+          // Caso contrário, incrementar contador de mensagens não lidas
+          unreadMessages[jid] = (unreadMessages[jid] || 0) + 1;
+          updateContactList();
+          
+          // Tocar som de notificação
+          playNotificationSound();
+        }
+      }
+      
+      // Processar indicações de digitação
+      processTypingNotifications(msg, jid);
+      
+      return true;
+    }
+    
+    // Melhore a função processTypingNotifications
+    function processTypingNotifications(msg, jid) {
+      // Verificar se a mensagem é do contato atual
+      if (jid !== currentContact) return;
+      
+      const typingIndicator = document.getElementById('typing-indicator');
+      if (!typingIndicator) return;
+      
+      // Verificar elementos de estado de chat
+      const composingEl = msg.getElementsByTagName("composing");
+      const pausedEl = msg.getElementsByTagName("paused");
+      const activeEl = msg.getElementsByTagName("active");
+      
+      if (composingEl && composingEl.length > 0) {
+        typingIndicator.textContent = "Digitando...";
+      } else if ((pausedEl && pausedEl.length > 0) || (activeEl && activeEl.length > 0)) {
+        typingIndicator.textContent = "";
+      }
+    }
+    
+    function onPresence(presence) {
+      const from = presence.getAttribute("from");
+      const to = presence.getAttribute("to");
+      const type = presence.getAttribute("type");
+      const jid = from.split('/')[0];
+      
+      // Ignorar nossa própria presença
+      if (jid === connection.jid.split('/')[0]) return true;
+      
+      // Processar atualizações de presença (online/offline)
+      if (!type) {
+        // Presença online
+        if (contacts[jid]) {
+          const oldStatus = contacts[jid].status;
+          contacts[jid].status = 'online';
+          
+          // Se o status mudou, atualizar a UI e notificar
+          if (oldStatus !== 'online') {
+            updateContactList();
+            
+            // Adicionar mensagem de sistema se for o contato atual
+            if (currentContact === jid) {
+              addSystemMessage(`${contacts[jid].name} está online.`);
+              
+              // Habilitar campos de entrada
+              document.getElementById('msg').disabled = false;
+              document.getElementById('send-btn').disabled = false;
+              document.getElementById('msg').placeholder = "Digite sua mensagem...";
+              document.getElementById('recipient-presence').textContent = 'Online';
+            }
+            
+            // Adicionar à conversa
+            addMessageToConversation(jid, 'system', `${contacts[jid].name} está online.`, new Date(), 'system');
+          }
+        }
+      } else if (type === 'unavailable') {
+        // Presença offline
+        if (contacts[jid]) {
+          const oldStatus = contacts[jid].status;
+          contacts[jid].status = 'offline';
+          
+          // Se o status mudou, atualizar a UI e notificar
+          if (oldStatus !== 'offline') {
+            updateContactList();
+            
+            // Adicionar mensagem de sistema se for o contato atual
+            if (currentContact === jid) {
+              addSystemMessage(`${contacts[jid].name} está offline.`);
+              
+              // Desabilitar campos de entrada
+              document.getElementById('msg').disabled = true;
+              document.getElementById('send-btn').disabled = true;
+              document.getElementById('msg').placeholder = "Contato offline. Não é possível enviar mensagens.";
+              document.getElementById('recipient-presence').textContent = 'Offline';
+            }
+            
+            // Adicionar à conversa
+            addMessageToConversation(jid, 'system', `${contacts[jid].name} está offline.`, new Date(), 'system');
+          }
+        }
+      } else if (type === 'subscribe') {
+        // Solicitação de assinatura de presença
+        const confirmSubscription = confirm(`${jid} deseja ver seu status online. Aceitar?`);
+        
+        if (confirmSubscription) {
+          // Aceitar a solicitação
+          connection.send($pres({to: jid, type: 'subscribed'}));
+          
+          // Se não tivermos uma assinatura para eles, solicitar também
+          if (!contacts[jid] || contacts[jid].subscription !== 'both') {
+            connection.send($pres({to: jid, type: 'subscribe'}));
+          }
+          
+          // Adicionar o contato se ainda não existir
+          if (!contacts[jid]) {
+            const iq = $iq({type: 'set'})
+              .c('query', {xmlns: 'jabber:iq:roster'})
+              .c('item', {jid: jid});
+            
+            connection.sendIQ(iq);
+            
+            // Enviar solicitação de assinatura de volta
+            connection.send($pres({to: jid, type: 'subscribe'}));
+            
+            // Adicionar contato à lista local
+            contacts[jid] = {
+              name: jid.split('@')[0],
+              status: 'offline',
+              subscription: 'none'
+            };
+            
+            // Inicializar conversa
+            if (!conversations[jid]) {
+              conversations[jid] = [];
+            }
+            
+            // Inicializar contador de mensagens
+            if (!unreadMessages[jid]) {
+              unreadMessages[jid] = 0;
+            }
+            
+            // Atualizar UI
+            updateContactList();
+          }
+          
+          // Adicionar mensagem de sistema
+          addMessageToConversation(jid, 'system', `Você aceitou a solicitação de contato de ${jid}.`, new Date(), 'system');
+        } else {
+          // Rejeitar a solicitação
+          connection.send($pres({to: jid, type: 'unsubscribed'}));
+        }
+      } else if (type === 'subscribed') {
+        // Solicitação de assinatura aceita
+        if (contacts[jid]) {
+          // Atualizar status de assinatura
+          if (contacts[jid].subscription === 'from') {
+            contacts[jid].subscription = 'both';
+          } else {
+            contacts[jid].subscription = 'to';
+          }
+          updateContactList();
+          
+          // Enviar presença novamente para garantir que o status seja atualizado
+          connection.send($pres().tree());
+          
+          // Adicionar mensagem de sistema
+          addMessageToConversation(jid, 'system', `${contacts[jid].name} aceitou sua solicitação. Agora você pode ver quando está online.`, new Date(), 'system');
+          
+          if (currentContact === jid) {
+            addSystemMessage(`${contacts[jid].name} aceitou sua solicitação. Agora você pode ver quando está online.`);
+          }
+        }
+      }
+      
+      return true;
+    }
+    
+    function onIQ(iq) {
+      const query = iq.getElementsByTagName('query')[0];
+      
+      // Processar atualizações de roster
+      if (query && query.getAttribute('xmlns') === 'jabber:iq:roster') {
+        const items = query.getElementsByTagName('item');
+        
+        for (let i = 0; i < items.length; i++) {
+          const jid = items[i].getAttribute('jid');
+          const name = items[i].getAttribute('name') || jid.split('@')[0];
+          const subscription = items[i].getAttribute('subscription');
+          
+          // Atualizar ou adicionar contato
+          if (subscription === 'remove') {
+            // Remover contato
+            delete contacts[jid];
+            delete conversations[jid];
+            delete unreadMessages[jid];
+            
+            // Se este contato estava selecionado, limpar
+            if (currentContact === jid) {
+              currentContact = null;
+              document.getElementById('welcome-screen').classList.remove('hidden');
+              document.getElementById('chat-container').classList.add('hidden');
+            }
+          } else {
+            // Adicionar ou atualizar contato
+            if (!contacts[jid]) {
+              // Novo contato
+              contacts[jid] = {
+                name: name,
+                status: 'offline',
+                subscription: subscription
+              };
+              
+              // Inicializar conversa
+              if (!conversations[jid]) {
+                conversations[jid] = [];
+              }
+              
+              // Inicializar contador de mensagens
+              if (!unreadMessages[jid]) {
+                unreadMessages[jid] = 0;
+              }
+            } else {
+              // Atualizar contato existente
+              contacts[jid].name = name;
+              contacts[jid].subscription = subscription;
+            }
+          }
+        }
+        
+        // Atualizar UI
+        updateContactList();
+      }
+      
+      return true;
+    }
+
+    // Adicione esta função para forçar a presença online e as assinaturas
+    function forcePresenceUpdate() {
+      // Enviar presença geral
+      connection.send($pres().tree());
+      
+      // Para cada contato, enviar presença direta e solicitação de assinatura
+      Object.keys(contacts).forEach(jid => {
+        // Enviar probe de presença direta
+        connection.send($pres({to: jid}).tree());
+        
+        // Verificar se já temos assinatura completa
+        if (contacts[jid].subscription !== 'both') {
+          // Enviar solicitação de assinatura
+          connection.send($pres({to: jid, type: 'subscribe'}));
+          
+          // Aceitar automaticamente qualquer assinatura pendente
+          connection.send($pres({to: jid, type: 'subscribed'}));
+          
+          console.log(`Enviando solicitações de presença para: ${jid}`);
+        }
+      });
+      
+      addSystemMessage("Atualizando status de presença de todos os contatos...");
+    }
+
+    // Adicione esta função para verificação periódica de presença
+    function setupPresenceChecks() {
+      // Verificar presenças imediatamente
+      forcePresenceUpdate();
+      
+      // Configurar verificação periódica de presenças
+      setInterval(() => {
+        // Enviar solicitação de presença geral
+        connection.send($pres().tree());
+        
+        // Solicitar presenças diretamente para cada contato
+        Object.keys(contacts).forEach(jid => {
+          // Probe direto para este contato
+          connection.send($pres({to: jid, type: 'probe'}).tree());
+          
+          // Se o contato ainda estiver com status "offline", tentar forçar assinatura
+          if (contacts[jid].status !== 'online' && contacts[jid].subscription !== 'both') {
+            // Aceitar qualquer assinatura pendente
+            connection.send($pres({to: jid, type: 'subscribed'}).tree());
+            
+            // Solicitar assinatura se não tivermos
+            if (contacts[jid].subscription !== 'to' && contacts[jid].subscription !== 'both') {
+              connection.send($pres({to: jid, type: 'subscribe'}).tree());
+            }
+          }
+        });
+      }, 60000); // Verificar a cada 1 minuto
+    }
+
+    // Adicione esta função ao JavaScript
+    let forceCommunication = false;
+
+    function toggleForceMode() {
+      forceCommunication = !forceCommunication;
+      
+      const msgInput = document.getElementById('msg');
+      const sendBtn = document.getElementById('send-btn');
+      
+      if (forceCommunication) {
+        // Habilitar envio de mensagens independente do status
+        msgInput.disabled = false;
+        sendBtn.disabled = false;
+        msgInput.placeholder = "Modo de emergência - contato pode não receber mensagens";
+        
+        // Mudar aparência do botão
+        document.getElementById('force-communication-btn').classList.add('btn-danger');
+        addSystemMessage("Modo de emergência ativado. Tentando comunicação direta.");
+      } else {
+        // Resetar para o comportamento normal
+        const contact = contacts[currentContact];
+        msgInput.disabled = contact.status !== 'online';
+        sendBtn.disabled = contact.status !== 'online';
+        
+        if (contact.status !== 'online') {
+          msgInput.placeholder = "Contato offline. Não é possível enviar mensagens.";
+        } else {
+          msgInput.placeholder = "Digite sua mensagem...";
+        }
+        
+        // Resetar aparência do botão
+        document.getElementById('force-communication-btn').classList.remove('btn-danger');
+        addSystemMessage("Modo normal restaurado.");
+      }
+    }
+
+    // Adicione esta nova função para depuração
+    function showDebugInfo() {
+      if (!connection || !currentContact) {
+        alert("Conecte-se e selecione um contato primeiro.");
+        return;
+      }
+      
+      const debugInfo = {
+        "Seu JID completo": connection.jid,
+        "JID limpo (seu)": connection.jid.split('/')[0],
+        "JID do contato": currentContact,
+        "Assinatura": contacts[currentContact]?.subscription || "desconhecida",
+        "Status do contato": contacts[currentContact]?.status || "desconhecido"
+      };
+      
+      let message = "Informações de Depuração:\n\n";
+      Object.entries(debugInfo).forEach(([key, value]) => {
+        message += `${key}: ${value}\n`;
+      });
+      
+      message += "\nPara resolver problemas de roteamento de mensagens:";
+      message += "\n1. Garanta que ambos os contatos têm status de assinatura 'both'";
+      message += "\n2. Use o botão 'Renovar assinatura' em ambos os dispositivos";
+      message += "\n3. Tente usar formas de JID diferentes (com/sem recurso)";
+      
+      alert(message);
+      console.table(debugInfo);
+      
+      // Tentar enviar uma sonda (probe) para o contato
+      connection.send($pres({to: currentContact}).tree());
+    }
+
+    // Adicione esta função para auxiliar na correção de problemas de roteamento
+    function fixMessagingIssues(jid) {
+      // Tentar abordagens alternativas de endereçamento
+      
+      // 1. Tentar enviar para domínio diretamente
+      const domain = jid.split('@')[1];
+      console.log(`Enviando mensagem de diagnóstico para domínio ${domain}`);
+      
+      const testMsg = $msg({
+        to: domain,
+        type: 'chat',
+        id: 'test_' + Math.floor(Math.random() * 100000)
+      }).c('body').t('Mensagem de teste para servidor');
+      
+      connection.send(testMsg);
+      
+      // 2. Tentar forçar assinaturas bidirecionais
+      console.log(`Forçando assinaturas para ${jid}`);
+      connection.send($pres({to: jid, type: 'subscribed'}).tree());
+      connection.send($pres({to: jid, type: 'subscribe'}).tree());
+      
+      // 3. Notificar presença diretamente
+      connection.send($pres({to: jid}).tree());
+      
+      addSystemMessage(`Tentativas de correção de roteamento enviadas para ${jid}`);
+    }
+
+    // Adicione estas funções para gerenciar o menu de contatos
+
+    function toggleContactMenu(jid) {
+      const menuId = `menu-${jid.replace('@', '-')}`;
+      const menu = document.getElementById(menuId);
+      
+      // Fechar todos os outros menus primeiro
+      const allMenus = document.querySelectorAll('.contact-menu-dropdown');
+      allMenus.forEach(m => {
+        if (m.id !== menuId) {
+          m.classList.remove('show');
+        }
+      });
+      
+      // Alternar visibilidade deste menu
+      menu.classList.toggle('show');
+      
+      // Adicionar evento para fechar quando clicar fora
+      document.addEventListener('click', function closeMenu(e) {
+        if (!e.target.closest('.contact-menu')) {
+          menu.classList.remove('show');
+          document.removeEventListener('click', closeMenu);
+        }
+      });
+    }
+
+    // Modifique a função removeContact para usar a nova lógica
+    function removeContact(jid) {
+      if (!confirm(`Tem certeza que deseja remover ${jid} da sua lista de contatos?`)) {
+        return;
+      }
+      
+      // Enviar IQ para remover do roster
+      const iq = $iq({type: 'set'})
+        .c('query', {xmlns: 'jabber:iq:roster'})
+        .c('item', {jid: jid, subscription: 'remove'});
+      
+      connection.sendIQ(iq, function() {
+        // Remover contato da lista local
+        delete contacts[jid];
+        delete conversations[jid];
+        delete unreadMessages[jid];
+        
+        // Se este contato estava selecionado, voltar para a tela de boas-vindas
+        if (currentContact === jid) {
+          showWelcomeScreen();
+        }
+        
+        // Atualizar UI
+        updateContactList();
+        
+        addSystemMessage(`Contato ${jid} removido com sucesso.`);
+      }, function(error) {
+        alert('Erro ao remover contato: ' + error.textContent);
+      });
+      
+      // Cancelar assinatura de presença
+      connection.send($pres({to: jid, type: 'unsubscribed'}).tree());
+      connection.send($pres({to: jid, type: 'unsubscribe'}).tree());
+    }
+
+    // Adicione estas funções para salvar/carregar mensagens
+
+    // Função para salvar conversas no localStorage
+    function saveConversations() {
+      try {
+        // Converter timestamp para string para evitar problemas de serialização
+        const conversationsToSave = {};
+        
+        Object.keys(conversations).forEach(jid => {
+          conversationsToSave[jid] = conversations[jid].map(msg => {
+            return {
+              ...msg,
+              time: msg.time instanceof Date ? msg.time.toISOString() : msg.time
+            };
+          });
+        });
+        
+        localStorage.setItem('xmpp_conversations', JSON.stringify(conversationsToSave));
+      } catch (e) {
+        console.error("Erro ao salvar conversas:", e);
+      }
+    }
+
+    // Função para carregar conversas do localStorage
+    function loadConversations() {
+      try {
+        const savedConversations = localStorage.getItem('xmpp_conversations');
+        if (savedConversations) {
+          const parsed = JSON.parse(savedConversations);
+          
+          // Converter strings de data de volta para objetos Date
+          Object.keys(parsed).forEach(jid => {
+            conversations[jid] = parsed[jid].map(msg => {
+              return {
+                ...msg,
+                time: msg.time ? new Date(msg.time) : new Date()
+              };
+            });
+          });
+          
+          console.log("Conversas carregadas do localStorage");
+        }
+      } catch (e) {
+        console.error("Erro ao carregar conversas:", e);
+      }
+    }
+  </script>
+</body>
+</html>
