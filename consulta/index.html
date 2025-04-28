@@ -323,13 +323,27 @@
       return ultimasConsultas.length <= 5;
     }
 
-    // Atualizar o formato de apresentação dos resultados na função consultarCNPJ
+    // Atualizar a função consultarCNPJ para mostrar mensagens de erro mais informativas
     async function consultarCNPJ() {
       try {
         // Verificar se a API está respondendo
         const apiOk = await verificarAPIStatus();
         if (!apiOk) {
-          resultadoDiv.innerHTML = '<p class="erro">Serviço de consulta indisponível no momento. Tente novamente mais tarde.</p>';
+          resultadoDiv.innerHTML = `
+            <p class="erro">Serviço de consulta indisponível no momento.</p>
+            <p>Motivos possíveis:</p>
+            <ul>
+              <li>O site BrasilAPI está fora do ar</li>
+              <li>Seu navegador está bloqueando requisições por motivos de segurança (CORS)</li>
+              <li>Você atingiu o limite de consultas permitidas</li>
+            </ul>
+            <p>Recomendações:</p>
+            <ul>
+              <li>Aguarde alguns minutos e tente novamente</li>
+              <li>Utilize uma extensão como "CORS Unblock" ou "Allow CORS"</li>
+              <li>Hospede esta página em um servidor web em vez de abri-la diretamente do arquivo</li>
+            </ul>
+          `;
           resultadoDiv.style.display = 'block';
           return;
         }
@@ -587,26 +601,79 @@
           resultadoDiv.style.display = 'block';
         }
       } catch (error) {
-        // Tratamento de erro existente...
+        resultadoDiv.innerHTML = `
+          <p class="erro">${error.message}</p>
+          <p>Se o erro persistir, verifique:</p>
+          <ul>
+            <li>Sua conexão com a internet</li>
+            <li>Se você está utilizando o navegador corretamente</li>
+            <li>Se você atingiu o limite de consultas da API</li>
+          </ul>
+        `;
+        resultadoDiv.style.display = 'block';
+      } finally {
+        loader.style.display = 'none';
+        btnConsultar.disabled = false;
       }
     }
 
+    // Melhorar a função consultarCNPJComCache para lidar com CORS e rate limiting
     async function consultarCNPJComCache(cnpj) {
+      // Verificar se já temos no cache
       if (cacheConsultas[cnpj]) {
+        console.log("Usando dados do cache para", cnpj);
         return cacheConsultas[cnpj];
       }
       
-      const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
-      const data = await response.json();
-      cacheConsultas[cnpj] = data;
+      // Simulação de atraso para evitar sobrecarga de requisições
+      // Ajuda a evitar o erro 429 (Too Many Requests)
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Limpar cache se ficar muito grande
-      if (Object.keys(cacheConsultas).length > 50) {
-        const chaves = Object.keys(cacheConsultas);
-        delete cacheConsultas[chaves[0]];
+      try {
+        // Tentativa 1: API BrasilAPI
+        try {
+          const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
+          
+          // Se recebemos uma resposta 429 (Too Many Requests), precisamos esperar
+          if (response.status === 429) {
+            // Informar o usuário
+            throw new Error("Limite de consultas excedido. Aguarde alguns segundos e tente novamente.");
+          }
+          
+          // Se houver outro erro da API
+          if (!response.ok) {
+            if (response.status === 404) {
+              throw new Error("CNPJ não encontrado na base de dados.");
+            } else {
+              throw new Error(`Erro na consulta: ${response.status}`);
+            }
+          }
+          
+          // Resposta bem-sucedida
+          const data = await response.json();
+          cacheConsultas[cnpj] = data;
+          
+          // Limpar cache se ficar muito grande
+          if (Object.keys(cacheConsultas).length > 50) {
+            const chaves = Object.keys(cacheConsultas);
+            delete cacheConsultas[chaves[0]];
+          }
+          
+          return data;
+        } catch (error) {
+          // Se for um erro de CORS ou rate limit, tentamos utilizar um proxy CORS
+          if (error.message.includes("CORS") || error.message.includes("Limite de consultas")) {
+            throw new Error(
+              "Não foi possível acessar a API diretamente. Você está abrindo o arquivo localmente. " + 
+              "Para evitar erros de CORS, utilize uma extensão como 'CORS Unblock' ou hospede a página em um servidor."
+            );
+          }
+          
+          throw error;
+        }
+      } catch (error) {
+        throw error;
       }
-      
-      return data;
     }
 
     // Implementar função salvarHistorico modificada para evitar duplicações
@@ -776,13 +843,28 @@
       // Restaurar o conteúdo original
       document.body.innerHTML = conteudoOriginal;
       
-      // Recarregar os elementos da página
-      cnpjInput = document.getElementById('cnpj');
-      btnConsultar = document.getElementById('btnConsultar');
-      resultadoDiv = document.getElementById('resultado');
-      loader = document.getElementById('loader');
+      // Recarregar os elementos da página (usar let em vez de const aqui)
+      let cnpjInputTemp = document.getElementById('cnpj');
+      let btnConsultarTemp = document.getElementById('btnConsultar');
+      let resultadoDivTemp = document.getElementById('resultado');
+      let loaderTemp = document.getElementById('loader');
+      
+      // Restaurar as referências globais
+      cnpjInput = cnpjInputTemp;
+      btnConsultar = btnConsultarTemp;
+      resultadoDiv = resultadoDivTemp;
+      loader = loaderTemp;
       
       // Recarregar eventos
+      recarregarEventos();
+      
+      // Exibir histórico
+      atualizarHistoricoUI();
+    }
+
+    // Função para recarregar eventos após impressão
+    function recarregarEventos() {
+      // Formata o CNPJ enquanto o usuário digita
       cnpjInput.addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
         if (value.length > 14) value = value.slice(0, 14);
@@ -816,9 +898,6 @@
           consultarCNPJ();
         }
       });
-      
-      // Exibir histórico
-      atualizarHistoricoUI();
     }
 
     // Implementação da função exportarPDF
