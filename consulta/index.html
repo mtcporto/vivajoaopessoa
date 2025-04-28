@@ -171,6 +171,137 @@
       margin-top: 10px;
       font-size: 14px;
     }
+
+    /* Estilos para o Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 800px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.modal-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  color: #000;
+  text-decoration: none;
+}
+
+/* Estilos para as tabs */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  border-radius: 5px 5px 0 0;
+}
+
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 10px 16px;
+  transition: 0.3s;
+  font-size: 14px;
+  border-radius: 0;
+}
+
+.tab button:hover {
+  background-color: #ddd;
+}
+
+.tab button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.tabcontent {
+  display: none;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+}
+
+/* Estilos para o footer */
+.footer {
+  margin-top: 30px;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.9em;
+  color: #777;
+  border-top: 1px solid #eee;
+}
+
+/* Botão de informações */
+.info-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  border: none;
+  z-index: 100;
+}
+
+.info-button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+/* Adicionar na seção de estilos */
+.mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--bg-color);
+  border: 2px solid var(--primary-color);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
   </style>
 </head>
 <body>
@@ -684,6 +815,24 @@
       }
     }
 
+    // Adicionar consulta via proxies CORS públicos
+    async function consultarCNPJComProxy(cnpj) {
+      try {
+        // Usando allOrigins como proxy CORS público
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`)}`;
+        const response = await fetch(proxyUrl);
+        
+        if (!response.ok) {
+          throw new Error("Erro ao consultar via proxy");
+        }
+        
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        throw new Error("Falha na consulta via proxy: " + error.message);
+      }
+    }
+
     // Implementar função salvarHistorico modificada para evitar duplicações
     function salvarHistorico(cnpj, nome) {
       try {
@@ -1019,124 +1168,158 @@
       });
     }
 
-    // Corrigir a função mostrarMapa para usar uma API que suporte CORS
-    function mostrarMapa(endereco) {
-      const mapaDiv = document.getElementById('mapa');
+    // Melhorar a função mostrarMapa para geocodificar o endereço corretamente
+function mostrarMapa(endereco) {
+  const mapaDiv = document.getElementById('mapa');
+  
+  // Alternar visibilidade do mapa
+  if (mapaDiv.style.display === 'none') {
+    // Mostrar o mapa
+    mapaDiv.style.display = 'block';
+    mapaDiv.innerHTML = ''; // Limpar conteúdo anterior
+    
+    try {
+      // Criar container para o mapa
+      const mapContainer = document.createElement('div');
+      mapContainer.id = 'map-container';
+      mapContainer.style.height = '400px';
+      mapaDiv.appendChild(mapContainer);
       
-      // Alternar visibilidade do mapa
-      if (mapaDiv.style.display === 'none') {
-        // Mostrar o mapa
-        mapaDiv.style.display = 'block';
-        mapaDiv.innerHTML = ''; // Limpar conteúdo anterior
-        
-        try {
-          // Criar container para o mapa
-          const mapContainer = document.createElement('div');
-          mapContainer.id = 'map-container';
-          mapContainer.style.height = '400px';
-          mapaDiv.appendChild(mapContainer);
-          
-          // Extrair cidade e estado do endereço para centralização aproximada
-          const enderecoParts = endereco.split(',');
-          const localidade = enderecoParts[enderecoParts.length - 2] || '';
-          const estado = enderecoParts[enderecoParts.length - 1] || '';
-          
-          // Usar OpenStreetMap diretamente com localização aproximada do Brasil
-          let latitude = -15.77972;  // Latitude aproximada do centro do Brasil
-          let longitude = -47.92972; // Longitude aproximada do centro do Brasil
-          let zoom = 4;              // Zoom inicial para visualizar o Brasil
-          
-          // Se houver uma cidade/estado específico, tentar ajustar para essa região
-          // Coordenadas aproximadas de algumas capitais brasileiras
-          const coordenadasEstados = {
-            'SP': {lat: -23.5505, lon: -46.6333, zoom: 10},
-            'RJ': {lat: -22.9068, lon: -43.1729, zoom: 10},
-            'MG': {lat: -19.9167, lon: -43.9345, zoom: 10},
-            'RS': {lat: -30.0346, lon: -51.2177, zoom: 10},
-            'PR': {lat: -25.4195, lon: -49.2646, zoom: 10},
-            'SC': {lat: -27.5945, lon: -48.5477, zoom: 10},
-            'BA': {lat: -12.9711, lon: -38.5108, zoom: 10},
-            'DF': {lat: -15.7795, lon: -47.9297, zoom: 10},
-            'ES': {lat: -20.3155, lon: -40.3128, zoom: 10},
-            'GO': {lat: -16.6799, lon: -49.2550, zoom: 10},
-            'PB': {lat: -7.1195, lon: -34.8450, zoom: 12},
-            'PE': {lat: -8.0476, lon: -34.8770, zoom: 10}
-            // Adicione mais estados conforme necessário
-          };
-          
-          // Verificar se temos coordenadas para o estado
-          const estadoUF = estado.trim().toUpperCase();
-          if (Object.keys(coordenadasEstados).includes(estadoUF)) {
-            latitude = coordenadasEstados[estadoUF].lat;
-            longitude = coordenadasEstados[estadoUF].lon;
-            zoom = coordenadasEstados[estadoUF].zoom;
+      // Inicializar o mapa com zoom mais fechado para mostrar a cidade
+      const map = L.map('map-container').setView([-23.5505, -46.6333], 15);
+      
+      // Adicionar camada do OpenStreetMap
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      
+      // Usar o serviço Nominatim para geocodificar o endereço (é o serviço de geocodificação do OpenStreetMap)
+      const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&limit=1`;
+      
+      fetch(geocodeUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            // Coordenadas encontradas
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+            
+            // Atualizar a visualização do mapa
+            map.setView([lat, lon], 17);
+            
+            // Adicionar marcador
+            const marker = L.marker([lat, lon]).addTo(map);
+            marker.bindPopup(`<b>${endereco}</b>`).openPopup();
+          } else {
+            // Geocodificação falhou, usar plano alternativo
+            // Adicionar um marcador na cidade/estado usando o código que já temos
+            const enderecoParts = endereco.split(',');
+            const cidade = enderecoParts[enderecoParts.length - 2] || '';
+            const estado = enderecoParts[enderecoParts.length - 1] || '';
+            
+            // Link direto para Google Maps como solução alternativa
+            const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
+            
+            map.setView([-23.5505, -46.6333], 10);
+            L.popup()
+              .setLatLng([-23.5505, -46.6333])
+              .setContent(`<p>Endereço: ${endereco}</p>
+                          <a href="${googleMapsLink}" target="_blank" style="color: blue; text-decoration: underline;">
+                          Ver no Google Maps</a>`)
+              .openOn(map);
           }
-          
-          // Inicializar o mapa com las coordenadas encontradas
-          const map = L.map('map-container').setView([latitude, longitude], zoom);
-          
-          // Adicionar camada do OpenStreetMap
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          }).addTo(map);
-          
-          // Adicionar marker na localização aproximada com o endereço completo
-          const marker = L.marker([latitude, longitude]).addTo(map);
-          marker.bindPopup(`<b>Endereço aproximado:</b><br>${endereco}`).openPopup();
-          
-          // Adicionar nota sobre precisão
-          mapaDiv.insertAdjacentHTML('beforeend', `
-            <div style="margin-top: 5px; font-size: 0.9em; text-align: center; color: #666;">
-              Localização aproximada. Para maior precisão, 
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}" 
-                target="_blank">abra no Google Maps</a>
-            </div>
-          `);
-          
-          // Invalidar o tamanho para garantir que o mapa seja renderizado corretamente
-          setTimeout(() => {
-            map.invalidateSize();
-          }, 100);
-        } catch (error) {
-          console.error("Erro ao renderizar o mapa:", error);
-          mapaDiv.innerHTML = `
-            <div style="background: #f5f5f5; padding: 20px; text-align: center;">
-              <p>Não foi possível mostrar o mapa para este endereço.</p>
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}" 
-                 target="_blank" 
-                 style="display: inline-block; padding: 10px 20px; background: #4285F4; color: white; text-decoration: none; border-radius: 5px;">
-                Ver no Google Maps
-              </a>
-            </div>
-          `;
-        }
-      } else {
-        // Ocultar o mapa
-        mapaDiv.style.display = 'none';
-        mapaDiv.innerHTML = ''; // Importante: limpar o conteúdo para evitar problemas de inicialização
-      }
-      
-      // Atualizar texto do botão
-      const mapButtons = document.querySelectorAll('.btn-map');
-      mapButtons.forEach(btn => {
-        btn.innerHTML = mapaDiv.style.display === 'none' ? 
-          '<i class="fa fa-map-marker"></i> Ver no mapa' : 
-          '<i class="fa fa-map-marker"></i> Ocultar mapa';
-      });
-    }
-
-
-    function compartilharResultado(cnpj, razaoSocial) {
-      if (navigator.share) {
-        navigator.share({
-          title: `Dados do CNPJ: ${cnpj}`,
-          text: `Informações da empresa ${razaoSocial}`,
-          url: window.location.href
+        })
+        .catch(error => {
+          console.error("Erro ao geocodificar:", error);
+          // Em caso de erro, mostrar ao menos a visualização da cidade/estado
+          const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
+          map.setView([-23.5505, -46.6333], 10);
+          L.popup()
+            .setLatLng([-23.5505, -46.6333])
+            .setContent(`<p>Endereço: ${endereco}</p>
+                        <a href="${googleMapsLink}" target="_blank" style="color: blue; text-decoration: underline;">
+                        Ver no Google Maps</a>`)
+            .openOn(map);
         });
-      } else {
-        // Fallback: copiar link ou mostrar QR code
-      }
+
+      // Invalidar o tamanho para garantir que o mapa seja renderizado corretamente
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+    } catch (error) {
+      console.error("Erro ao renderizar o mapa:", error);
+      mapaDiv.innerHTML = `
+        <div style="background: #f5f5f5; padding: 20px; text-align: center;">
+          <p>Não foi possível mostrar o mapa para este endereço.</p>
+          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}" 
+             target="_blank" 
+             style="display: inline-block; padding: 10px 20px; background: #4285F4; color: white; text-decoration: none; border-radius: 5px;">
+            Ver no Google Maps
+          </a>
+        </div>
+      `;
     }
+  } else {
+    // Ocultar o mapa
+    mapaDiv.style.display = 'none';
+    mapaDiv.innerHTML = ''; // Limpar o conteúdo para evitar problemas de inicialização
+  }
+  
+  // Atualizar texto do botão
+  const mapButtons = document.querySelectorAll('.btn-map');
+  mapButtons.forEach(btn => {
+    btn.innerHTML = mapaDiv.style.display === 'none' ? 
+      '<i class="fa fa-map-marker"></i> Ver no mapa' : 
+      '<i class="fa fa-map-marker"></i> Ocultar mapa';
+  });
+}
+
+// Corrigir final da função mostrarMapa que está truncada
+function mostrarMapa(endereco) {
+  // Restante do código já foi implementado acima
+}
+
+    // Melhorar a função compartilharResultado
+function compartilharResultado(cnpj, razaoSocial) {
+  try {
+    const cnpjFormatado = cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+    
+    // Criar URL de compartilhamento
+    const shareUrl = `${window.location.origin}${window.location.pathname}?cnpj=${cnpj}`;
+    const shareText = `Dados da empresa ${razaoSocial} (CNPJ: ${cnpjFormatado})`;
+    
+    if (navigator.share) {
+      // API Web Share (móveis modernos)
+      navigator.share({
+        title: `Consulta CNPJ: ${razaoSocial}`,
+        text: shareText,
+        url: shareUrl
+      })
+      .catch(err => {
+        console.error('Erro ao compartilhar:', err);
+        fallbackShare();
+      });
+    } else {
+      fallbackShare();
+    }
+    
+    // Fallback para desktop
+    function fallbackShare() {
+      // Criar um input temporário
+      const input = document.createElement('input');
+      input.value = shareUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      
+      alert(`Link copiado para a área de transferência!\nVocê pode compartilhar os dados de "${razaoSocial}"`);
+    }
+  } catch (error) {
+    console.error('Erro ao compartilhar:', error);
+    alert('Não foi possível compartilhar este resultado');
+  }
+}
 
     // Função para limpar ações anteriores
     function limparAcoesAnteriores() {
@@ -1146,6 +1329,32 @@
 
     // Carregar o histórico ao iniciar a página
     document.addEventListener('DOMContentLoaded', function() {
+      // Verificar se está rodando via protocolo file (potenciais problemas de CORS)
+      if (window.location.protocol === 'file:') {
+        const corsWarning = document.createElement('div');
+        corsWarning.className = 'card';
+        corsWarning.style.backgroundColor = '#fff3cd';
+        corsWarning.style.color = '#856404';
+        corsWarning.style.marginBottom = '20px';
+        corsWarning.innerHTML = `
+          <h3>⚠️ Aviso: Possíveis problemas de CORS</h3>
+          <p>Esta página pode ter problemas ao acessar a API quando aberta diretamente do arquivo local.</p>
+          <p><strong>Soluções:</strong></p>
+          <ol>
+            <li>Use uma extensão como "CORS Unblock" ou "Allow CORS"</li>
+            <li>Hospede esta página em um servidor web local</li>
+          </ol>
+          <button id="dismiss-cors-warning" style="font-size: 12px; padding: 5px 10px;">Entendi</button>
+        `;
+        
+        document.querySelector('.container').insertAdjacentElement('afterbegin', corsWarning);
+        
+        document.getElementById('dismiss-cors-warning').addEventListener('click', function() {
+          corsWarning.style.display = 'none';
+        });
+      }
+      
+      // Continuar com o restante do código...
       limparAcoesAnteriores();
       atualizarHistoricoUI();
       
@@ -1157,6 +1366,205 @@
         consultarCNPJ();
       }
     });
+
+// Adicionar toggle de modo escuro
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-theme');
+  const isDarkMode = document.body.classList.contains('dark-theme');
+  localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+  
+  // Atualizar o botão
+  const darkModeButton = document.getElementById('dark-mode-toggle');
+  if (darkModeButton) {
+    darkModeButton.innerHTML = isDarkMode ? '☀️' : '🌙';
+    darkModeButton.setAttribute('aria-label', isDarkMode ? 'Modo claro' : 'Modo escuro');
+  }
+}
+
+// Adicionar botão de modo escuro
+const darkModeButton = document.createElement('button');
+darkModeButton.id = 'dark-mode-toggle';
+darkModeButton.className = 'mode-toggle';
+darkModeButton.innerHTML = '🌙';
+darkModeButton.setAttribute('aria-label', 'Alternar modo escuro');
+darkModeButton.addEventListener('click', toggleDarkMode);
+
+// Adicionar no evento DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+  // ... código existente ...
+  
+  // Adicionar botão de dark mode
+  document.body.appendChild(darkModeButton);
+  
+  // Verificar preferência salva de dark mode
+  if (localStorage.getItem('darkMode') === 'enabled') {
+    document.body.classList.add('dark-theme');
+    darkModeButton.innerHTML = '☀️';
+  }
+  
+  // ... resto do código existente ...
+});
+
+// Funções para o modal de documentação
+function openModal() {
+  document.getElementById('documentacao-modal').style.display = 'block';
+}
+
+function closeModal() {
+  document.getElementById('documentacao-modal').style.display = 'none';
+}
+
+function openTab(evt, tabName) {
+  // Ocultar todos os conteúdos de tab
+  var tabcontent = document.getElementsByClassName("tabcontent");
+  for (var i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Remover a classe "active" de todos os botões de tab
+  var tablinks = document.getElementsByClassName("tablinks");
+  for (var i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Mostrar o conteúdo da tab atual e marcar o botão como ativo
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+// Configurar os event listeners do modal quando o documento estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+  // Resto do código...
+  
+  // Adicionar o botão de informações
+  const infoButton = document.createElement('button');
+  infoButton.className = 'info-button';
+  infoButton.innerHTML = 'ℹ️';
+  infoButton.setAttribute('aria-label', 'Sobre esta aplicação');
+  infoButton.addEventListener('click', openModal);
+  document.body.appendChild(infoButton);
+  
+  // Configurar o modal de documentação
+  const closeButtons = document.getElementsByClassName('modal-close');
+  for (let i = 0; i < closeButtons.length; i++) {
+    closeButtons[i].addEventListener('click', closeModal);
+  }
+  
+  // Fechar o modal quando clicar fora do conteúdo
+  window.addEventListener('click', function(event) {
+    const modal = document.getElementById('documentacao-modal');
+    if (event.target === modal) {
+      closeModal();
+    }
+  });
+  
+  // Mostrar a primeira tab por padrão
+  document.getElementsByClassName('tablinks')[0].click();
+  
+  // Resto do código existente...
+});
   </script>
+
+<!-- Adicione este código antes de fechar a tag </body> -->
+<!-- Modal de Documentação -->
+<div id="documentacao-modal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close">&times;</span>
+    <h2>Sobre esta Aplicação</h2>
+    
+    <div class="tab">
+      <button class="tablinks active" onclick="openTab(event, 'visao-geral')">Visão Geral</button>
+      <button class="tablinks" onclick="openTab(event, 'tecnologias')">Tecnologias</button>
+      <button class="tablinks" onclick="openTab(event, 'ui-ux')">UI/UX</button>
+      <button class="tablinks" onclick="openTab(event, 'performance')">Performance</button>
+      <button class="tablinks" onclick="openTab(event, 'seguranca')">Segurança</button>
+      <button class="tablinks" onclick="openTab(event, 'acessibilidade')">Acessibilidade</button>
+    </div>
+
+    <div id="visao-geral" class="tabcontent" style="display: block;">
+      <h3>Consulta de CNPJ</h3>
+      <p>Esta aplicação permite consultar informações detalhadas de empresas brasileiras utilizando o número de CNPJ. Os dados são obtidos através da API pública BrasilAPI.</p>
+      <p>Recursos principais:</p>
+      <ul>
+        <li>Consulta de dados cadastrais de empresas</li>
+        <li>Visualização do endereço no mapa</li>
+        <li>Exportação dos resultados em PDF</li>
+        <li>Histórico de consultas recentes</li>
+        <li>Compartilhamento de resultados</li>
+      </ul>
+    </div>
+
+    <div id="tecnologias" class="tabcontent">
+      <h3>Tecnologias Utilizadas</h3>
+      <ul>
+        <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript Vanilla (ES6+)</li>
+        <li><strong>APIs:</strong> BrasilAPI (dados de CNPJ), Nominatim OpenStreetMap (geocodificação)</li>
+        <li><strong>Bibliotecas:</strong>
+          <ul>
+            <li>Leaflet.js - Renderização de mapas interativos</li>
+            <li>jsPDF - Geração de documentos PDF</li>
+            <li>html2canvas - Captura de elementos HTML para PDF</li>
+          </ul>
+        </li>
+        <li><strong>Armazenamento:</strong> localStorage (histórico de consultas)</li>
+        <li><strong>Metodologia:</strong> JavaScript modular, manipulação de DOM nativa</li>
+      </ul>
+    </div>
+
+    <div id="ui-ux" class="tabcontent">
+      <h3>Interface e Experiência do Usuário</h3>
+      <ul>
+        <li><strong>Design responsivo:</strong> Adaptação para diferentes tamanhos de tela</li>
+        <li><strong>Feedback visual:</strong> Loaders durante carregamento, formatação automática de CNPJ</li>
+        <li><strong>Tratamento de erros:</strong> Mensagens claras e informativas</li>
+        <li><strong>Histórico:</strong> Acesso rápido às consultas anteriores</li>
+        <li><strong>Exportação:</strong> Opções para imprimir ou gerar PDF</li>
+        <li><strong>Visualização:</strong> Organização de informações em cards temáticos</li>
+      </ul>
+    </div>
+
+    <div id="performance" class="tabcontent">
+      <h3>Otimizações de Performance</h3>
+      <ul>
+        <li><strong>Cache de consultas:</strong> Armazenamento temporário de resultados</li>
+        <li><strong>Carregamento sob demanda:</strong> Mapas e recursos visuais inicializados apenas quando necessário</li>
+        <li><strong>Rate limiting:</strong> Controle de número de requisições por minuto</li>
+        <li><strong>Tempo de resposta:</strong> Feedback imediato durante operações assíncronas</li>
+        <li><strong>Sanitização de dados:</strong> Limpeza e formatação de dados para visualização rápida</li>
+      </ul>
+    </div>
+
+    <div id="seguranca" class="tabcontent">
+      <h3>Medidas de Segurança</h3>
+      <ul>
+        <li><strong>Sanitização de HTML:</strong> Prevenção contra XSS</li>
+        <li><strong>Validação de entrada:</strong> Verificação rigorosa do formato CNPJ</li>
+        <li><strong>Tratamento de erros:</strong> Captura e gestão de exceções</li>
+        <li><strong>Proteção CORS:</strong> Gestão de requisições cross-origin</li>
+        <li><strong>Rate limiting:</strong> Prevenção contra sobrecarga de requisições</li>
+      </ul>
+    </div>
+
+    <div id="acessibilidade" class="tabcontent">
+      <h3>Recursos de Acessibilidade</h3>
+      <ul>
+        <li><strong>Semântica HTML:</strong> Uso apropriado de elementos HTML5</li>
+        <li><strong>Atributos ARIA:</strong> Melhor integração com leitores de tela</li>
+        <li><strong>Contraste de cores:</strong> Legibilidade aprimorada para o texto</li>
+        <li><strong>Navegação por teclado:</strong> Suporte para interagir sem mouse</li>
+        <li><strong>Mensagens de erro:</strong> Texto claro e orientações para correção</li>
+        <li><strong>Botões e controles:</strong> Dimensões adequadas para interação em touchscreens</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; <span id="copyright-year">2023</span> Desenvolvido por Marco Túlio | Consulta CNPJ</footer>
+
+<script>
+  // Atualizar o ano do copyright automaticamente
+  document.getElementById('copyright-year').textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
