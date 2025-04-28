@@ -324,8 +324,15 @@
     }
 
     // Atualizar a função consultarCNPJ para mostrar mensagens de erro mais informativas
+    // Adicionar no início da função consultarCNPJ
     async function consultarCNPJ() {
       try {
+        // Remover botões de ação anteriores se existirem
+        const acoesBotoesAnteriores = document.querySelector('.actions');
+        if (acoesBotoesAnteriores) {
+          acoesBotoesAnteriores.remove();
+        }
+        
         // Verificar se a API está respondendo
         const apiOk = await verificarAPIStatus();
         if (!apiOk) {
@@ -617,6 +624,7 @@
       }
     }
 
+
     // Melhorar a função consultarCNPJComCache para lidar com CORS e rate limiting
     async function consultarCNPJComCache(cnpj) {
       // Verificar se já temos no cache
@@ -798,13 +806,22 @@
       }
     }
 
-    // Função para consultar um CNPJ do histórico
+    // Melhorar a função consultarHistorico
     function consultarHistorico(cnpj) {
-      cnpjInput.value = cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
-      consultarCNPJ();
+    // Remover botões de ação anteriores se existirem
+    const acoesBotoesAnteriores = document.querySelector('.actions');
+    if (acoesBotoesAnteriores) {
+        acoesBotoesAnteriores.remove();
+    }
+    
+    // Formatar CNPJ para exibição
+    cnpjInput.value = cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+    
+    // Executar a consulta com um pequeno atraso para garantir que a UI foi atualizada
+    setTimeout(() => consultarCNPJ(), 50);
     }
 
-    // Implementação da função imprimirResultado
+    // Corrigir a função imprimirResultado substituindo as variáveis const por let
     function imprimirResultado() {
       if (resultadoDiv.style.display === 'none') {
         alert('Faça uma consulta primeiro.');
@@ -843,13 +860,13 @@
       // Restaurar o conteúdo original
       document.body.innerHTML = conteudoOriginal;
       
-      // Recarregar os elementos da página (usar let em vez de const aqui)
+      // Armazenar referências temporárias (usando let em vez de const)
       let cnpjInputTemp = document.getElementById('cnpj');
       let btnConsultarTemp = document.getElementById('btnConsultar');
       let resultadoDivTemp = document.getElementById('resultado');
       let loaderTemp = document.getElementById('loader');
       
-      // Restaurar as referências globais
+      // Restaurar variáveis globais
       cnpjInput = cnpjInputTemp;
       btnConsultar = btnConsultarTemp;
       resultadoDiv = resultadoDivTemp;
@@ -1121,8 +1138,15 @@
       }
     }
 
+    // Função para limpar ações anteriores
+    function limparAcoesAnteriores() {
+      // Remover todos os botões de ação anteriores
+      document.querySelectorAll('.actions').forEach(el => el.remove());
+    }
+
     // Carregar o histórico ao iniciar a página
     document.addEventListener('DOMContentLoaded', function() {
+      limparAcoesAnteriores();
       atualizarHistoricoUI();
       
       // Verificar se a URL tem um parâmetro de CNPJ para consulta automática
