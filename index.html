@@ -13,40 +13,74 @@
     <link rel="stylesheet" type="text/css" href="/alertas/alertas.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+    :root {
+      --vjp-teal: rgb(42, 174, 176);
+      --vjp-blue: rgb(0, 117, 201);
+      --vjp-yellow: rgb(255, 192, 102);
+      --vjp-pink: rgb(237, 55, 103);
+      --vjp-green: rgb(50, 183, 154);
+      --vjp-dark: #121212;
+    }
+    
     body {
-    font-family: Arial, sans-serif;
-    padding-bottom: 10px;
-    background-color: #F5F5DC; /* Cor de fundo offwhite */
-    }  
+      font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      padding-bottom: 0;
+      background-color: #fafafa;
+      color: #333;
+    }
+    
     .header {
-      background-color: black;
-      color: white;
-      padding: 10px;
-      text-align: center;
+      background-color: white;
+      color: var(--vjp-teal);
+      padding: 15px 0;
       font-size: 2em;
-      /* margin-bottom: 20px; */
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      height: 70px;
+      display: flex;
+      align-items: center;
     }    
     .card-weather {
+      font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
       margin-bottom: 20px;
       width: 100%;
       max-width: 100%;
-      margin-top: 5px;
+      background-image: linear-gradient(135deg, var(--vjp-teal), var(--vjp-blue));
+      color: white;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     .badge.bg-orange, .badge-yellow, .bg-warning  {
-  background-color: #d6c318;
-  color: black;
-}
+      background-color: var(--vjp-yellow);
+      color: black;
+    }
     .current-weather {
       margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+    
+    .current-weather-icon {
+      font-size: 3.5rem;
+      margin-bottom: 10px;
+    }
+    
     .week, .weather-icons, .temperatures {
-      margin: 0px;
+      margin: 10px 0;
+      padding: 5px 0;
     }
     .event-buttons-container {
     position: relative;
     width: 100%;
     height: 70px;
-    /* ... */
+    background-color: var(--vjp-dark);
+    color: white;
+    border-radius: 8px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
 }
 
 @media (max-width: 768px) {
@@ -75,16 +109,801 @@
       }
 }
 
+/* Estilos para a seção de ícones */
+.icon-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px 10px;
+    background-image: linear-gradient(135deg, var(--vjp-teal), var(--vjp-blue));
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
 
+.icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100px;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s;
+}
+
+.icon-item:hover {
+    transform: translateY(-5px);
+    /* Keep text color unchanged */
+}
+
+.icon-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: var(--vjp-yellow);
+    color: black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    transition: all 0.3s;
+}
+
+.icon-item:hover .icon-circle {
+    background-color: white;
+    color: var(--vjp-yellow);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.icon-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+/* Estilo para a logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.header-logo {
+    height: 70px;
+    width: auto;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.logo-text {
+    color: #000;
+    font-weight: 700;
+    font-size: 30px;
+}
+
+.header-title {
+    text-align: center;
+    margin: 0 auto;
+    font-weight: 700;
+    width: 100%;
+}
+
+/* Classes de cores */
+.text-vjp-teal {
+    color: var(--vjp-teal);
+}
+
+.text-vjp-yellow {
+    color: var(--vjp-yellow);
+}
+
+.text-vjp-pink {
+    color: var(--vjp-pink);
+}
+
+.text-vjp-green {
+    color: var(--vjp-green);
+}
+
+.bg-vjp-teal {
+    background-color: var(--vjp-teal);
+}
+
+.bg-vjp-yellow {
+    background-color: var(--vjp-yellow);
+}
+
+.bg-vjp-pink {
+    background-color: var(--vjp-pink);
+}
+
+.bg-vjp-green {
+    background-color: var(--vjp-green);
+}
+
+.bg-gradient-hero {
+    background-image: linear-gradient(135deg, var(--vjp-teal), var(--vjp-blue));
+}
+
+/* Footer styles */
+.footer {
+    background-color: var(--vjp-dark);
+    color: white;
+    padding: 3rem 1rem 1.5rem;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .footer-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.footer-logo img {
+    height: 3rem;
+    width: auto;
+    margin-right: 0.75rem;
+}
+
+.footer-logo h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.footer-social {
+    display: flex;
+    gap: 1rem;
+}
+
+.footer-social a {
+    color: white;
+    transition: color 0.2s;
+}
+
+.footer-social a:hover {
+    color: var(--vjp-yellow);
+}
+
+.footer h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.footer-links a {
+    color: #aaa;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+.footer-bottom {
+    border-top: 1px solid #333;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    text-align: center;
+    color: #888;
+    font-size: 0.875rem;
+}
+
+/* Estilos da seção de Cinema */
+.cinema-section {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    animation: fadeIn 0.8s ease-in-out;
+    background-color: #fdfdfd;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.filmes-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.2rem;
+}
+
+@media (min-width: 576px) {
+    .filmes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .filmes-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.filme-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.filme-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    border-color: var(--vjp-blue);
+}
+
+.filme-img-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+}
+
+.filme-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.filme-card:hover .filme-img {
+    filter: brightness(1.05);
+}
+
+.estreia-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--vjp-yellow);
+    color: var(--vjp-dark);
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    animation: pulse 2s infinite;
+}
+
+.estreia-badge i {
+    color: var(--vjp-dark);
+    font-size: 0.7rem;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.filme-info {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.filme-info h4 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--vjp-dark);
+}
+
+.filme-info p {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+
+.filme-rating {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.rating-livre { background-color: #28a745; color: white; }
+.rating-10 { background-color: #007bff; color: white; }
+.rating-12 { background-color: var(--vjp-yellow); color: black; }
+.rating-14 { background-color: #ff7f00; color: black; }
+.rating-16 { background-color: #dc3545; color: white; }
+.rating-18 { background-color: #000000; color: white; }
+
+.error-message {
+    grid-column: 1 / -1;
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.error-message i {
+    margin-right: 0.5rem;
+    color: var(--vjp-pink);
+}
+
+/* Estilos da seção de Artistas */
+.artistas-section {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    animation: fadeIn 0.8s ease-in-out;
+    background-color: #fdfdfd;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header i {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--vjp-dark);
+}
+
+.artistas-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.2rem;
+}
+
+@media (min-width: 576px) {
+    .artistas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .artistas-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.artista-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.artista-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    border-color: var(--vjp-yellow);
+}
+
+.artista-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.artista-card:hover .artista-img {
+    filter: brightness(1.05);
+}
+
+.artista-info {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.artista-info h4 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--vjp-dark);
+}
+
+.artista-info p {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0;
+    line-height: 1.4;
+}
+
+.ver-todos {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.btn-ver-todos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--vjp-blue);
+    color: white;
+    border: 1px solid var(--vjp-blue);
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.cinema-section .btn-ver-todos {
+    background-color: var(--vjp-blue);
+    color: white;
+    border-color: var(--vjp-blue);
+}
+
+.artistas-section .btn-ver-todos {
+    background-color: var(--vjp-yellow);
+    color: black;
+    border-color: var(--vjp-yellow);
+}
+
+.btn-ver-todos:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    filter: brightness(1.1);
+}
+
+.cinema-section .btn-ver-todos:hover {
+    background-color: var(--vjp-blue);
+    color: white;
+    filter: brightness(1.1);
+}
+
+.artistas-section .btn-ver-todos:hover {
+    background-color: var(--vjp-yellow);
+    color: black;
+    filter: brightness(1.1);
+}
+
+/* Estilos da seção de Bares e Restaurantes */
+.bares-section {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    animation: fadeIn 0.8s ease-in-out;
+    background-color: #fdfdfd;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.bares-section .btn-ver-todos {
+    background-color: var(--vjp-green);
+    color: white;
+    border-color: var(--vjp-green);
+}
+
+.bares-section .btn-ver-todos:hover {
+    background-color: var(--vjp-green);
+    color: white;
+    filter: brightness(1.1);
+}
+
+.bares-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.2rem;
+}
+
+@media (min-width: 576px) {
+    .bares-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .bares-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.bar-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.bar-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    border-color: var(--vjp-green);
+}
+
+.bar-img-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.bar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.bar-card:hover .bar-img {
+    filter: brightness(1.05);
+}
+
+.bar-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 5;
+    white-space: nowrap;
+    animation: fadeIn 0.5s ease-in-out;
+    background-color: var(--vjp-green);
+    color: white;
+}
+
+.bar-badge.tipo-italiana { background-color: #D32F2F; }
+.bar-badge.tipo-japonesa { background-color: #E91E63; }
+.bar-badge.tipo-brasileira { background-color: #2E7D32; }
+.bar-badge.tipo-hamburger { background-color: #FF9800; }
+.bar-badge.tipo-francesa { background-color: #1976D2; }
+.bar-badge.tipo-bar { background-color: #673AB7; }
+.bar-badge.tipo-regional { background-color: #009688; }
+.bar-badge.tipo-frutos-do-mar { background-color: #03A9F4; }
+.bar-badge.tipo-contemporânea { background-color: #9C27B0; }
+.bar-badge.tipo-internacional { background-color: #3F51B5; }
+.bar-badge.tipo-mexicana { background-color: #F44336; }
+.bar-badge.tipo-nordestina { background-color: #4CAF50; }
+.bar-badge.tipo-café { background-color: #795548; }
+.bar-badge.tipo-outros { background-color: var(--vjp-green); }
+
+.bar-info {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.bar-info h4 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--vjp-dark);
+}
+
+.bar-info p {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+/* Estilos da seção de Shows e Eventos */
+.shows-section {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    animation: fadeIn 0.8s ease-in-out;
+    background-color: #fdfdfd;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.shows-section .btn-ver-todos {
+    background-color: var(--vjp-pink);
+    color: white;
+    border-color: var(--vjp-pink);
+}
+
+.shows-section .btn-ver-todos:hover {
+    background-color: var(--vjp-pink);
+    color: white;
+    filter: brightness(1.1);
+}
+
+.eventos-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.2rem;
+}
+
+@media (min-width: 576px) {
+    .eventos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .eventos-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.evento-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.evento-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    border-color: var(--vjp-pink);
+}
+
+.evento-img-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.evento-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.evento-card:hover .evento-img {
+    filter: brightness(1.05);
+}
+
+.evento-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 5;
+    white-space: nowrap;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.evento-info {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.evento-info h4 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--vjp-dark);
+}
+
+.evento-info p {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.evento-data {
+    font-weight: 500;
+    color: var(--vjp-pink);
+}
+
+.evento-local {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.loading-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    grid-column: 1 / -1;
+    color: var(--vjp-teal);
+    height: 200px;
+}
     </style>
 </head>
 <body>
 
-    <header class="bg-gray-900 text-white py-4 header">
-        <div class="container mx-auto text-center">
-          <h1 class="text-3xl font-bold" style="text-align: center;">
-            <span id="typed-text">Viva</span>João Pessoa
-          </h1>        </div>
+    <header class="header">
+        <div class="logo-container">
+            <img src="imagens/logo.png" alt="Logo Viva João Pessoa" class="header-logo">
+            <span class="logo-text">Viva João Pessoa</span>
+        </div>
+        <div class="container mx-auto">
+          <h1 class="header-title">
+            <span id="typed-text" class="text-vjp-teal"></span>
+            <span class="text-vjp-blue">João Pessoa</span>
+          </h1>
+        </div>
     </header>
 
 
@@ -99,7 +918,7 @@
           </div>
     
           <!-- Container para quando não há alertas -->
-          <div id="noAlertMessage" class="no-alert-container text-center" style="display: none;">
+          <div id="noAlertMessage" class="no-alert-container text-center" style="display: none; background-color: var(--vjp-green); color: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
             <p><i class="fas fa-check-circle"></i> Sem alertas pra hoje!</p>
           </div>
         </div>
@@ -121,14 +940,142 @@
         </div>
       </div>
 
-        <div class="row" id="card-container"></div>
+        <!-- Seção de ícones -->
+        <div class="icon-grid" id="icon-grid"></div>
 
+        <!-- Seção de Shows e Eventos -->
+        <div id="shows" class="shows-section">
+            <div class="section-header">
+                <i class="fas fa-ticket-alt text-vjp-pink"></i>
+                <h2>Shows e Eventos</h2>
+            </div>
+            <div id="eventos-grid" class="eventos-grid">
+                <!-- Eventos serão carregados dinamicamente aqui -->
+                <div class="loading-placeholder">
+                    <i class="fas fa-ticket-alt"></i>
+                    <p>Carregando shows e eventos...</p>
+                </div>
+            </div>
+            <div class="ver-todos">
+                <a href="/shows/" class="btn-ver-todos">Ver todos os eventos</a>
+            </div>
+        </div>
+        
+        <!-- Seção de Bares e Restaurantes -->
+        <div id="bares" class="bares-section">
+            <div class="section-header">
+                <i class="fas fa-utensils text-vjp-green"></i>
+                <h2>Bares e Restaurantes</h2>
+            </div>
+            <div id="bares-grid" class="bares-grid">
+                <!-- Estabelecimentos serão carregados dinamicamente aqui -->
+                <div class="loading-placeholder">
+                    <i class="fas fa-utensils"></i>
+                    <p>Carregando bares e restaurantes...</p>
+                </div>
+            </div>
+            <div class="ver-todos">
+                <a href="/bares/" class="btn-ver-todos">Ver todos os estabelecimentos</a>
+            </div>
+        </div>
+        
+        <!-- Seção de Cinema -->
+        <div id="cinema" class="cinema-section">
+            <div class="section-header">
+                <i class="fas fa-film text-vjp-blue"></i>
+                <h2>Filmes em Cartaz</h2>
+            </div>
+            <div id="filmes-grid" class="filmes-grid">
+                <!-- Filmes serão carregados dinamicamente aqui -->
+                <div class="loading-placeholder">
+                    <i class="fas fa-film"></i>
+                    <p>Carregando filmes em cartaz...</p>
+                </div>
+            </div>
+            <div class="ver-todos">
+                <a href="/cinema/" class="btn-ver-todos">Ver programação completa</a>
+            </div>
+        </div>
+
+        <!-- Seção de Artistas -->
+        <div id="artistas" class="artistas-section">
+            <div class="section-header">
+                <i class="fas fa-music text-vjp-yellow"></i>
+                <h2>Artistas de João Pessoa</h2>
+            </div>
+            <div id="artistas-grid" class="artistas-grid">
+                <!-- Artistas serão carregados dinamicamente aqui -->
+                <div class="loading-placeholder">
+                    <i class="fas fa-music"></i>
+                    <p>Carregando artistas locais...</p>
+                </div>
+            </div>
+            <div class="ver-todos">
+                <a href="/artistas/" class="btn-ver-todos">Ver todos os artistas</a>
+            </div>
+        </div>
     </div>
 
-
-
-  <!-- Container para o footer -->
-  <div id="footer-placeholder"></div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- Coluna 1: Logo e Descrição -->
+            <div>
+                <div class="footer-logo">
+                    <img src="imagens/logo.png" alt="Viva João Pessoa">
+                    <h2>Viva João Pessoa</h2>
+                </div>
+                <p class="text-gray-300 mb-4">Seu guia completo para conhecer e explorar a cidade de João Pessoa.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Facebook">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="@viva.joaopessoa" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" aria-label="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="mailto:contato@vivajoaopessoa.com" aria-label="Email">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Coluna 2: Navegação -->
+            <div>
+                <h3>Navegação</h3>
+                <ul class="footer-links">
+                    <li><a href="clima">Clima</a></li>
+                    <li><a href="shows/">Shows & Eventos</a></li>
+                    <li><a href="cinema/">Cinema</a></li>
+                    <li><a href="bares/">Bares & Restaurantes</a></li>
+                </ul>
+            </div>
+            
+            <!-- Coluna 3: Mais Informações -->
+            <div>
+                <h3>Mais Informações</h3>
+                <ul class="footer-links">
+                    <li><a href="mares/">Tábua de Marés</a></li>
+                    <li><a href="noticias/">Notícias</a></li>
+                    <li><a href="artistas/">Artistas</a></li>
+                </ul>
+            </div>
+            
+            <!-- Coluna 4: Contato -->
+            <div>
+                <h3>Contato</h3>
+                <p>Tem alguma sugestão ou dúvida? Entre em contato conosco:</p>
+                <a href="mailto:contato@vivajoaopessoa.com" class="text-vjp-teal">contato@vivajoaopessoa.com</a>
+            </div>
+        </div>
+        
+        <!-- Rodapé -->
+        <div class="footer-bottom">
+            <p>© 2025 Viva João Pessoa. Todos os direitos reservados.</p>
+        </div>
+    </footer>
 
   
     <script>
@@ -159,144 +1106,191 @@
     return data ? JSON.parse(data) : null;
   }
 
-  // Dados dos cards (mantido igual)
+  
+  // Definição de dados dos cards para ícones - mantendo apenas os que devem aparecer
   const cardsData = [
     {
-    "titulo": "Shows e Eventos",
-    "texto": "Descubra os melhores shows e eventos da cidade.",
-    "link": "/shows/",
-    "imagem": "/imagens/shows.jpeg"
-  },          
-  {
-    "titulo": "Programação de Cinema",
-    "texto": "Confira os filmes em cartaz e a programação de cinema.",
-    "link": "/cinema/",
-    "imagem": "/imagens/cinema.jpeg"
-  },
-  {
-    "titulo": "Bares e Restaurantes",
-    "texto": "Bares e Restaurantes que você precisa conhecer.",
-    "link": "/bares/",
-    "imagem": "/imagens/bares.jpeg"
-  },
-//   {
-//     "titulo": "Programação - Cine Bangue",
-//     "texto": "Confira os filmes em cartaz e a programacao no Cine Bangue",
-//     "link": "/bangue/",
-//     "imagem": "/imagens/cinema2.jpeg"
-//   },
-  {
-    "titulo": "Tábua de Marés",
-    "texto": "Confira a tábua de marés atualizada.",
-    "link": "/mares/",
-    "imagem": "/imagens/mares.jpeg"
-  },
-  // {
-  //   "titulo": "Praias Impróprias",
-  //   "texto": "Praias Impróprias para Banho em João Pessoa.",
-  //   "link": "/qualidade/",
-  //   "imagem": "/imagens/praiaImpropria.jpeg"
-  // },
-
-  {
-    "titulo": "Últimas Notícias",
-    "texto": "Confira as últimas notícias sobre o que está acontecendo no Brasil.",
-    "link": "/noticias/",
-    "imagem": "/imagens/noticias.jpeg"
-  },
-      {
-    "titulo": "Notícias - João Pessoa",
-    "texto": "Confira as últimas notícias sobre o que está acontecendo em Joao Pessoa.",
-    "link": "/noticiaspb/",
-    "imagem": "/imagens/noticias4.jpeg"
-  },
-  // {
-  //   "titulo": "Atrações",
-  //   "texto": "Descubra as principais atrações turísticas.",
-  //   // "link": "https://www.tripadvisor.com.br/Attractions-g303428-Activities-Joao_Pessoa_State_of_Paraiba.html",
-  //   "link": "/guia/",
-  //   "imagem": "/imagens/atracoes.jpeg"
-  // },
+      titulo: "Bares e Restaurantes",
+      texto: "Descubra os melhores lugares para comer e beber",
+      link: "/bares/"
+    },
     {
-    "titulo": "Artistas",
-    "texto": "Artistas da nossa cidade.",
-    "link": "/artistas/",
-    "imagem": "/imagens/artistas.jpeg"
-  }
-];
+      titulo: "Tábua de Marés",
+      texto: "Consulte as previsões de marés para as praias",
+      link: "/mares/"
+    },
+    {
+      titulo: "Últimas Notícias",
+      texto: "Fique por dentro das notícias nacionais",
+      link: "/noticias/"
+    },
+    {
+      titulo: "Notícias - João Pessoa",
+      texto: "Acompanhe as notícias locais de João Pessoa",
+      link: "/noticiaspb/"
+    }
+  ];
 
-  // Funções de criação e carregamento dos cards
-  function createCards(cardsData) {
-    const container = document.getElementById('card-container');
+  // Funções de criação e carregamento dos ícones
+  function createIcons(cardsData) {
+    const container = document.getElementById('icon-grid');
     container.innerHTML = '';
 
-    cardsData.forEach(card => {
-      const cardHTML = `
-        <div class="col-md-4 col-sm-6 mb-4">
-          <div class="card dark-card">
-            <img src="${card.imagem}" class="card-img-top" alt="${card.titulo}">
-            <div class="card-body">
-              <h5 class="card-title">${card.titulo}</h5>
-              <p class="card-text">${card.texto}</p>
-              <a href="${card.link}" class="btn btn-success" target="_blank">Ver mais</a>
-            </div>
+    // Links que queremos ocultar do grid de ícones
+    const excludedLinks = ['/shows/', '/cinema/', '/artistas/'];
+
+    // Mapeamento de títulos para ícones do FontAwesome
+    const iconMapping = {
+      "Bares e Restaurantes": "fa-utensils",
+      "Tábua de Marés": "fa-water",
+      "Últimas Notícias": "fa-newspaper",
+      "Notícias - João Pessoa": "fa-bullhorn"
+    };
+
+    // Filtra os cards para remover aqueles com links excluídos
+    const filteredCards = cardsData.filter(card => !excludedLinks.includes(card.link));
+    
+    // Se não houver cards para mostrar após a filtragem, oculta a grid
+    if (filteredCards.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+    
+    // Mostra a grid e adiciona os ícones
+    container.style.display = 'flex';
+    
+    filteredCards.forEach(card => {
+      // Seleciona o ícone adequado ou usa um padrão
+      const icon = iconMapping[card.titulo] || "fa-star";
+      
+      const iconHTML = `
+        <a href="${card.link}" class="icon-item" title="${card.texto}">
+          <div class="icon-circle">
+            <i class="fas ${icon} fa-lg"></i>
           </div>
-        </div>
+          <div class="icon-title">${card.titulo}</div>
+        </a>
       `;
-      container.innerHTML += cardHTML;
+      container.innerHTML += iconHTML;
     });
   }
 
-  function loadCards() {
+  function loadIcons() {
+    // Verifica se há dados para mostrar
+    if (cardsData.length === 0) {
+      // Se não tiver dados, esconde a grid
+      const container = document.getElementById('icon-grid');
+      if (container) container.style.display = 'none';
+      return;
+    }
+    
     if (isCacheValid(CARDS_CACHE_DATE_KEY, CARDS_CACHE_DURATION)) {
-      console.log('Usando cache dos cards');
+      console.log('Usando cache dos dados');
       const cachedCards = getCache(CARDS_CACHE_KEY);
-      if (cachedCards) {
-        createCards(cachedCards);
+      if (cachedCards && cachedCards.length > 0) {
+        createIcons(cachedCards);
         return;
       }
     }
 
-    console.log('Salvando cards no cache');
+    console.log('Salvando dados no cache');
     saveCache(CARDS_CACHE_KEY, cardsData, CARDS_CACHE_DATE_KEY);
-    createCards(cardsData);
+    createIcons(cardsData);
   }
 
-  // Inicialização
-  window.onload = function() {
-    loadCards();
-  };
+  // A inicialização agora é feita no DOMContentLoaded
 
-  // Typed.js animation (mantido igual)
+  // Typed.js animation
   var typed = new Typed('#typed-text', {
     strings: [
-      '',
-      'Descubra',
-      'Explore',
-      'Conheça',
-      'Sinta',
-      'Desvende',
-      'Celebre',
-      'Saboreie',
-      'Contemple',
-      'Curta',
-      'Viva'
+      'Explore ',
+      'Descubra ',
+      'Conheça ',
+      'Sinta ',
+      'Desvende ',
+      'Celebre ',
+      'Saboreie ',
+      'Contemple ',
+      'Curta ',
+      'Viva '
     ],
     typeSpeed: 80,
     backSpeed: 50,
-    loop: false,
+    loop: true,
     smartBackspace: true,
-    preStringTyped: function() {
-      document.getElementById('typed-text').textContent += ' João Pessoa';
-    }
+    startDelay: 500,
+    backDelay: 1500,
+    showCursor: true,
+    cursorChar: '|',
   });
 
-  // Scripts para carregar o footer
-  $(function(){
-    $("#footer-placeholder").load("footer.html");
+  // ===== INTEGRAÇÃO DE ARTISTAS COM API DO SPOTIFY =====
+  // Função para obter a data atual no formato "YYYY-MM-DD"
+  function getTodayDateString() {
+    const now = new Date();
+    return now.toISOString().split('T')[0];
+  }
+
+  // ===== INTEGRAÇÃO DE SHOWS E EVENTOS =====
+  // Este código foi movido para /shows/shows-home.js
+
+  // Função genérica para buscar e cachear dados
+  function getCachedData(cacheKey, cacheDateKey, fetchFn) {
+    if (localStorage.getItem(cacheDateKey) === getTodayDateString()) {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        return Promise.resolve(JSON.parse(cached));
+      }
+    }
+    return fetchFn().then(data => {
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheDateKey, getTodayDateString());
+      return data;
+    });
+  }
+
+  // As funções de integração com o Spotify e carregamento de artistas foram movidas para artistas/artistas-home.js
+
+  // Função para limpar o cache local
+  function clearIconCache() {
+    localStorage.removeItem(CARDS_CACHE_KEY);
+    localStorage.removeItem(CARDS_CACHE_DATE_KEY);
+    console.log('Cache de ícones limpo');
+  }
+
+  // Chamar as funções de carregamento quando a página for carregada
+  document.addEventListener('DOMContentLoaded', function() {
+    // Limpar o cache para garantir que as alterações sejam aplicadas
+    clearIconCache();
+    
+    // Inicializar ícones imediatamente
+    loadIcons();
+    
+    // Iniciar o carregamento dos filmes com um pequeno atraso para melhor UI
+    setTimeout(() => {
+      console.log('Iniciando carregamento de filmes...');
+      loadFilmes();
+    }, 300);
+    
+    // Iniciar o carregamento dos eventos com um pequeno atraso intermediário
+    setTimeout(() => {
+      console.log('Iniciando carregamento de eventos...');
+      loadEventos();
+    }, 450);
+    
+    // Iniciar o carregamento dos artistas com um pequeno atraso maior
+    setTimeout(() => {
+      console.log('Iniciando carregamento de artistas...');
+      loadArtistas();
+    }, 600);
   });
 </script>
-<script src="/clima/weather.js"></script>
-<script src="/alertas/alertas.js"></script>
+<!-- Scripts para as funcionalidades principais -->
+<script src="clima/weather.js"></script>
+<script src="alertas/alertas.js"></script>
+<script src="shows/shows-home.js"></script>
+<script src="cinema/cinema-home.js"></script>
+<script src="artistas/artistas-home.js"></script>
+<script src="bares/bares-home.js"></script>
 </body>
 </html>
