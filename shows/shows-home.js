@@ -433,8 +433,20 @@ function createEventCard(event) {
   card.className = 'evento-card';
   card.style.cursor = 'pointer';
   card.addEventListener('click', () => {
-    window.open(event.link, '_blank');
+    // Redirecionar para a página local de shows em vez de abrir link externo
+    window.location.href = "/shows/";
+    
+    // Armazenar o link original como atributo para uso futuro na página de shows,
+    // permitindo que a página de detalhes mostre informações de compra, se necessário
+    if (event.link) {
+      sessionStorage.setItem('evento-link-original', event.link);
+    }
   });
+  
+  // Armazenar o link original como atributo de dados
+  if (event.link) {
+    card.setAttribute('data-event-link', event.link);
+  }
   
   // Container para a imagem
   const imgContainer = document.createElement('div');

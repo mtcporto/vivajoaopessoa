@@ -185,16 +185,16 @@ async function loadArtistas() {
       console.log(`Usando caminho local da imagem para ${artista.nome}: ${imagePath}`);
     }
     
-    // Container para a imagem como link para o Spotify ou página do artista 
+    // Container para a imagem como link para a página local do artista
     const imageLink = document.createElement('a');
+    // Redireciona para a página local de artistas, sem passar ID
+    imageLink.href = "/artistas/";
+    // Armazena os links de canais como atributos de dados para exibir na página do artista
     if (artista.canais && artista.canais.spotify) {
-      imageLink.href = artista.canais.spotify;
-      imageLink.target = "_blank";
-    } else if (artista.canais && artista.canais.instagram) {
-      imageLink.href = artista.canais.instagram;
-      imageLink.target = "_blank";
-    } else {
-      imageLink.href = `/artistas/#${artista.id || encodeURIComponent(artista.nome)}`;
+      imageLink.setAttribute('data-spotify', artista.canais.spotify);
+    }
+    if (artista.canais && artista.canais.instagram) {
+      imageLink.setAttribute('data-instagram', artista.canais.instagram);
     }
     
     // Imagem do artista
