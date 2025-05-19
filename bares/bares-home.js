@@ -432,20 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
     clearBaresCache();
   }
   
-  // Adiciona um botão de correção no ambiente mosaico
-  if (isMosaico) {
-    setTimeout(() => {
-      const baresSection = document.querySelector('.bares-section');
-      if (baresSection) {
-        const fixButton = document.createElement('button');
-        fixButton.innerText = '🔄 Corrigir Imagens';
-        fixButton.style.cssText = 'background-color: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 4px; margin: 10px auto; display: block; cursor: pointer;';
-        fixButton.onclick = forceMosaicoImageFix;
-        
-        baresSection.insertBefore(fixButton, baresSection.firstChild);
-      }
-    }, 1000);
-  }
+  // Botão de correção removido
   
   // Log simplificado - apenas informações essenciais
   console.log('Contexto de execução:');

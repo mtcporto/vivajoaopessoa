@@ -67,7 +67,7 @@
             "sem glúten"
           ]
         },
-        "foto": "bares/imagens/nau.jpg"
+        "foto": "imagens/nau.jpg"
       },
       {
         "categoria": "bar",
@@ -132,7 +132,7 @@
             "vegano"
           ]
         },
-        "foto": "bares/imagens/emporiocafe.jpg"
+        "foto": "imagens/emporiocafe.jpg"
       },
       {
         "categoria": "restaurantes",
@@ -202,7 +202,7 @@
             "sem glúten"
           ]
         },
-        "foto": "bares/imagens/mangai.jpg"
+        "foto": "imagens/mangai.jpg"
       },
       {
         "categoria": "restaurantes",
@@ -269,7 +269,7 @@
             "vinhos importados"
           ]
         },
-        "foto": "bares/imagens/gullivermar.jpg"
+        "foto": "imagens/gullivermar.jpg"
       },
       {
         "categoria": "restaurante",
@@ -335,7 +335,7 @@
             "carta de vinhos"
           ]
         },
-        "foto": "bares/imagens/gulliver.jpg"
+        "foto": "imagens/gulliver.jpg"
       },
       {
         "categoria": "restaurante",
@@ -402,7 +402,7 @@
             "opções vegetarianas"
           ]
         },
-        "foto": "bares/imagens/ippon.jpg"
+        "foto": "imagens/ippon.jpg"
       },
       {
         "categoria": "restaurante",
@@ -467,7 +467,7 @@
             "opções vegetarianas"
           ]
         },
-        "foto": "bares/imagens/bdc.jpg"
+        "foto": "imagens/bdc.jpg"
       },
       {
         "categoria": "restaurante",
@@ -535,7 +535,7 @@
             "menu degustação"
           ]
         },
-        "foto": "bares/imagens/tramonto.jpg"
+        "foto": "imagens/tramonto.jpg"
       },
       {
         "categoria": "restaurante",
@@ -603,7 +603,7 @@
             "sobremesas caseiras"
           ]
         },
-        "foto": "bares/imagens/familiamuccini.jpg"
+        "foto": "imagens/familiamuccini.jpg"
       },
       {
         "categoria": "restaurante",
@@ -672,7 +672,7 @@
             "bebidas medievais"
           ]
         },
-        "foto": "bares/imagens/fasciniomedieval.jpg"
+        "foto": "imagens/fasciniomedieval.jpg"
       },
       {
         "categoria": "restaurante",
@@ -739,7 +739,7 @@
             "carta de vinhos"
           ]
         },
-        "foto": "bares/imagens/thew.jpg"
+        "foto": "imagens/thew.jpg"
       },
       {
         "categoria": "bar",
@@ -806,7 +806,7 @@
             "drinks autorais"
           ]
         },
-        "foto": "bares/imagens/generalstore.jpg"
+        "foto": "imagens/generalstore.jpg"
       },
       {
         "categoria": "bar",
@@ -875,7 +875,7 @@
             "drinks especiais"
           ]
         },
-        "foto": "bares/imagens/viladoporto.jpg"
+        "foto": "imagens/viladoporto.jpg"
       },
       {
         "categoria": "bar",
@@ -943,7 +943,7 @@
             "petiscos veganos"
           ]
         },
-        "foto": "bares/imagens/mangarosa.jpg"
+        "foto": "imagens/mangarosa.jpg"
       },
       {
         "categoria": "bar",
@@ -1012,7 +1012,7 @@
             "menu vegetariano"
           ]
         },
-        "foto": "bares/imagens/donabranca.jpg"
+        "foto": "imagens/donabranca.jpg"
       },
       {
         "categoria": "bar",
@@ -1080,7 +1080,7 @@
             "drinks especiais"
           ]
         },
-        "foto": "bares/imagens/atol.jpg"
+        "foto": "imagens/atol.jpg"
       },
       {
         "categoria": "bar",
@@ -1147,7 +1147,7 @@
             "festas temáticas"
           ]
         },
-        "foto": "bares/imagens/ph.jpg"
+        "foto": "imagens/ph.jpg"
       },
       {
         "categoria": "bar",
@@ -1214,7 +1214,7 @@
             "drinks temáticos"
           ]
         },
-        "foto": "bares/imagens/realidadealternativa.jpg"
+        "foto": "imagens/realidadealternativa.jpg"
       },
       {
         "categoria": "bar",
@@ -1281,7 +1281,7 @@
             "tequilas especiais"
           ]
         },
-        "foto": "bares/imagens/locacomotumadre.jpg"
+        "foto": "imagens/locacomotumadre.jpg"
       }
     ]
 }
