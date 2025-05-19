@@ -960,24 +960,7 @@
                 <a href="/shows/" class="btn-ver-todos">Ver todos os eventos</a>
             </div>
         </div>
-        
-        <!-- Seção de Bares e Restaurantes -->
-        <div id="bares" class="bares-section">
-            <div class="section-header">
-                <i class="fas fa-utensils text-vjp-green"></i>
-                <h2>Bares e Restaurantes</h2>
-            </div>
-            <div id="bares-grid" class="bares-grid">
-                <!-- Estabelecimentos serão carregados dinamicamente aqui -->
-                <div class="loading-placeholder">
-                    <i class="fas fa-utensils"></i>
-                    <p>Carregando bares e restaurantes...</p>
-                </div>
-            </div>
-            <div class="ver-todos">
-                <a href="/bares/" class="btn-ver-todos">Ver todos os estabelecimentos</a>
-            </div>
-        </div>
+
         
         <!-- Seção de Cinema -->
         <div id="cinema" class="cinema-section">
@@ -996,6 +979,24 @@
                 <a href="/cinema/" class="btn-ver-todos">Ver programação completa</a>
             </div>
         </div>
+
+        <!-- Seção de Bares e Restaurantes -->
+        <div id="bares" class="bares-section">
+            <div class="section-header">
+                <i class="fas fa-utensils text-vjp-green"></i>
+                <h2>Bares e Restaurantes</h2>
+            </div>
+            <div id="bares-grid" class="bares-grid">
+                <!-- Estabelecimentos serão carregados dinamicamente aqui -->
+                <div class="loading-placeholder">
+                    <i class="fas fa-utensils"></i>
+                    <p>Carregando bares e restaurantes...</p>
+                </div>
+            </div>
+            <div class="ver-todos">
+                <a href="/bares/" class="btn-ver-todos">Ver todos os estabelecimentos</a>
+            </div>
+        </div>        
 
         <!-- Seção de Artistas -->
         <div id="artistas" class="artistas-section">
@@ -1030,7 +1031,7 @@
                     <a href="#" aria-label="Facebook">
                         <i class="fab fa-facebook"></i>
                     </a>
-                    <a href="@viva.joaopessoa" aria-label="Instagram">
+                    <a href="https://www.instagram.com/viva.joaopessoa" aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
                     </a>
                     <a href="#" aria-label="Twitter">
@@ -1046,7 +1047,6 @@
             <div>
                 <h3>Navegação</h3>
                 <ul class="footer-links">
-                    <li><a href="clima">Clima</a></li>
                     <li><a href="shows/">Shows & Eventos</a></li>
                     <li><a href="cinema/">Cinema</a></li>
                     <li><a href="bares/">Bares & Restaurantes</a></li>
@@ -1073,9 +1073,14 @@
         
         <!-- Rodapé -->
         <div class="footer-bottom">
-            <p>© 2025 Viva João Pessoa. Todos os direitos reservados.</p>
+            <p>© <span id="current-year"></span> Viva João Pessoa. Todos os direitos reservados.</p>
         </div>
     </footer>
+
+    <script>
+        // Atualiza o ano no footer para o ano atual
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 
   
     <script>
