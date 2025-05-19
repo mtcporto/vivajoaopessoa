@@ -51,6 +51,65 @@
       padding: 15px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
+    
+    /* Estilos para o carousel de cards */
+    .card-carousel {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    
+    .carousel-indicators {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+    
+    .carousel-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .carousel-indicator.active {
+      background-color: white;
+    }
+    
+    .carousel-inner {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+    
+    .carousel-item {
+      min-width: 100%;
+      flex: 0 0 auto;
+    }
+    
+    /* Estilo específico para o card de marés */
+    .tide-card-container {
+      margin-bottom: 20px;
+      height: 100%;
+      width: 100%;
+    }
+    
+    .tide-card {
+      position: relative;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, #023a58, #48cae4);
+      color: white;
+      padding: 15px;
+      height: 100%;
+      width: 100%;
+    }
     .badge.bg-orange, .badge-yellow, .bg-warning  {
       background-color: var(--vjp-yellow);
       color: black;

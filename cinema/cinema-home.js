@@ -30,9 +30,9 @@ async function loadFilmes() {
   if (localStorage.getItem(CINEMA_CACHE_DATE_KEY) === getTodayDateString()) {
     try {
       cinemaData = JSON.parse(localStorage.getItem(CINEMA_CACHE_KEY));
-      console.log('Usando cache dos dados de cinema');
+      // console.log('Usando cache dos dados de cinema');
     } catch (error) {
-      console.error('Erro ao carregar dados do cache:', error);
+      // console.error('Erro ao carregar dados do cache:', error);
       // Se houver erro no cache, tenta buscar dados novos
       cinemaData = null;
     }
@@ -57,9 +57,9 @@ async function loadFilmes() {
       localStorage.setItem(CINEMA_CACHE_DATE_KEY, getTodayDateString());
       
       cinemaData = data;
-      console.log('Dados de cinema buscados e salvos em cache');
+      // console.log('Dados de cinema buscados e salvos em cache');
     } catch (error) {
-      console.error('Erro ao buscar dados de cinema:', error);
+      // console.error('Erro ao buscar dados de cinema:', error);
       filmesGrid.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar os filmes no momento.</div>';
       return;
     }
@@ -87,12 +87,12 @@ async function loadFilmes() {
   
   // Vamos filtrar apenas filmes que não estão em pré-venda
   const today = new Date();
-  console.log('Total de filmes recebidos da API:', moviesArray.length);
+  // console.log('Total de filmes recebidos da API:', moviesArray.length);
   
   // Filtrar excluindo os filmes em pré-venda
   const moviesWithSessions = moviesArray.filter(movie => !movie.inPreSale);
   
-  console.log('Filmes disponíveis para exibição (excluindo pré-venda):', moviesWithSessions.length);
+  // console.log('Filmes disponíveis para exibição (excluindo pré-venda):', moviesWithSessions.length);
   
   // Verificar se temos filmes disponíveis após a filtragem
   if (moviesWithSessions.length === 0) {

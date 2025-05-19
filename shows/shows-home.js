@@ -17,7 +17,7 @@ function parseEventDate(dateStr) {
     try {
       return new Date(dateStr);
     } catch (e) {
-      console.log('Erro ao converter data ISO:', e);
+      // console.log('Erro ao converter data ISO:', e);
     }
   }
   
@@ -51,7 +51,7 @@ function parseEventDate(dateStr) {
     // Pode funcionar para alguns formatos como "18/05/2025, 15:30"
     const nativeDate = new Date(dateStr.replace(/(\d+)\/(\d+)\/(\d+)/, '$3-$2-$1'));
     if (nativeDate && !isNaN(nativeDate) && nativeDate.getFullYear() > 2000) {
-      console.log('Analisada data em formato nativo:', nativeDate);
+      // console.log('Analisada data em formato nativo:', nativeDate);
       return nativeDate;
     }
   } catch (e) {
@@ -172,7 +172,7 @@ function parseEventDate(dateStr) {
       if (match) {
           const parsedDate = pattern.parse(match);
           if (parsedDate && !isNaN(parsedDate)) {
-              console.log(`Data analisada: ${dateStr} => ${parsedDate.toLocaleString('pt-BR')}`);
+              // console.log(`Data analisada: ${dateStr} => ${parsedDate.toLocaleString('pt-BR')}`);
               return parsedDate;
           }
       }
@@ -185,13 +185,13 @@ function parseEventDate(dateStr) {
       const month = parseInt(match[2], 10) - 1;
       if (day > 0 && day <= 31 && month >= 0 && month <= 11) {
           const date = new Date(currentYear, month, day);
-          console.log(`Data extraída com regex simplificado: ${dateStr} => ${date.toLocaleString('pt-BR')}`);
+          // console.log(`Data extraída com regex simplificado: ${dateStr} => ${date.toLocaleString('pt-BR')}`);
           return date;
       }
   }
   
   // Se chegou aqui, não conseguiu analisar o formato da data
-  console.log('Formato de data não reconhecido:', dateStr);
+  // console.log('Formato de data não reconhecido:', dateStr);
   return null;
 }
 
@@ -218,7 +218,7 @@ function isEventInRelevantPeriod(dateStr) {
   // Para strings de data
   const eventDate = parseEventDate(dateStr);
   if (!eventDate) {
-    console.log('Data não pôde ser analisada:', dateStr);
+    // console.log('Data não pôde ser analisada:', dateStr);
     return true; // Mantemos eventos sem data reconhecida para não perder potenciais eventos válidos
   }
   
@@ -236,9 +236,9 @@ function isEventInRelevantPeriod(dateStr) {
   const isValid = eventDateNormalized >= now && eventDateNormalized <= nextWeekEnd;
   
   if (isValid) {
-    console.log('Evento relevante incluído:', dateStr, '- Data analisada:', eventDateNormalized.toLocaleDateString());
+    // console.log('Evento relevante incluído:', dateStr, '- Data analisada:', eventDateNormalized.toLocaleDateString());
   } else {
-    console.log('Evento fora do período relevante:', dateStr, '- Data analisada:', eventDateNormalized.toLocaleDateString());
+    // console.log('Evento fora do período relevante:', dateStr, '- Data analisada:', eventDateNormalized.toLocaleDateString());
   }
   
   return isValid;
@@ -264,7 +264,7 @@ async function fetchSymplaEvents() {
     const doc = parser.parseFromString(cleanedHtml, 'text/html');
     const eventos = doc.querySelectorAll('a.sympla-card');
     
-    console.log(`Sympla: encontrados ${eventos.length} eventos inicialmente`);
+    // console.log(`Sympla: encontrados ${eventos.length} eventos inicialmente`);
     
     // Mapear todos eventos encontrados
     const todosEventos = Array.from(eventos)
@@ -285,13 +285,13 @@ async function fetchSymplaEvents() {
             source: 'Sympla'
           };
         } catch (error) {
-          console.error('Erro ao processar evento Sympla:', error);
+          // console.error('Erro ao processar evento Sympla:', error);
           return null;
         }
       })
       .filter(Boolean); // Remove eventos nulos
     
-    console.log(`Sympla: ${todosEventos.length} eventos processados`);
+    // console.log(`Sympla: ${todosEventos.length} eventos processados`);
     
     // Filtra apenas eventos em João Pessoa e dentro do período relevante
     const eventosRelevantes = todosEventos
@@ -302,7 +302,7 @@ async function fetchSymplaEvents() {
         return isJoaoPessoa && isRelevantPeriod;
       });
     
-    console.log(`Sympla: ${eventosRelevantes.length} eventos relevantes em João Pessoa esta semana`);
+    // console.log(`Sympla: ${eventosRelevantes.length} eventos relevantes em João Pessoa esta semana`);
     
     // Ordenar por data (eventos mais próximos primeiro)
     eventosRelevantes.sort((a, b) => {
@@ -315,7 +315,7 @@ async function fetchSymplaEvents() {
     // Retorna até 20 eventos após filtragem (aumentamos para ter mais opções)
     return eventosRelevantes.slice(0, 20);
   } catch (error) {
-    console.error('Erro ao carregar eventos Sympla:', error);
+    // console.error('Erro ao carregar eventos Sympla:', error);
     return [];
   }
 }
@@ -331,7 +331,7 @@ async function fetchEventimEvents() {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     
-    console.log(`Eventim: processando eventos...`);
+    // console.log(`Eventim: processando eventos...`);
     
     // Mapear todos os eventos encontrados
     const todosEventos = Array.from(doc.querySelectorAll('product-group-item'))
@@ -364,13 +364,13 @@ async function fetchEventimEvents() {
             source: 'Eventim'
           };
         } catch (error) {
-          console.error('Erro ao processar evento Eventim:', error);
+          // console.error('Erro ao processar evento Eventim:', error);
           return null;
         }
       })
       .filter(Boolean); // Remove eventos nulos
     
-    console.log(`Eventim: ${todosEventos.length} eventos processados`);
+    // console.log(`Eventim: ${todosEventos.length} eventos processados`);
     
     // Filtrar eventos dentro do período relevante (hoje, amanhã, esta semana)
     const eventosRelevantes = todosEventos.filter(evento => {
@@ -389,7 +389,7 @@ async function fetchEventimEvents() {
         const isRelevant = eventDateOnly >= now && eventDateOnly <= nextWeekEnd;
         
         if (isRelevant) {
-          console.log(`Eventim: incluindo evento relevante: ${evento.title} - ${evento.date}`);
+          // console.log(`Eventim: incluindo evento relevante: ${evento.title} - ${evento.date}`);
         }
         
         return isRelevant;
@@ -397,7 +397,7 @@ async function fetchEventimEvents() {
       return false;
     });
     
-    console.log(`Eventim: ${eventosRelevantes.length} eventos relevantes esta semana`);
+    // console.log(`Eventim: ${eventosRelevantes.length} eventos relevantes esta semana`);
     
     // Ordenar por data (eventos mais próximos primeiro)
     eventosRelevantes.sort((a, b) => {
@@ -410,7 +410,7 @@ async function fetchEventimEvents() {
     // Retorna até 15 eventos após a filtragem
     return eventosRelevantes.slice(0, 15);
   } catch (error) {
-    console.error('Erro ao carregar eventos Eventim:', error);
+    // console.error('Erro ao carregar eventos Eventim:', error);
     return [];
   }
 }
@@ -557,9 +557,9 @@ async function loadEventos() {
   if (localStorage.getItem(EVENTOS_CACHE_DATE_KEY) === getTodayDateString()) {
     try {
       eventosData = getCache(EVENTOS_CACHE_KEY);
-      console.log('Usando cache dos dados de eventos do dia atual');
+      // console.log('Usando cache dos dados de eventos do dia atual');
     } catch (error) {
-      console.error('Erro ao carregar eventos do cache:', error);
+      // console.error('Erro ao carregar eventos do cache:', error);
       eventosData = null;
     }
   }
@@ -567,7 +567,7 @@ async function loadEventos() {
   // Se não temos dados em cache ou o cache falhou, buscar dados novos
   if (!eventosData) {
     try {
-      console.log('Buscando novos dados de eventos...');
+      // console.log('Buscando novos dados de eventos...');
       
       // Carregar os scripts das fontes adicionais se necessário
       await Promise.all([
@@ -586,7 +586,7 @@ async function loadEventos() {
           if (typeof loadBilheteriaDigitalEvents === 'function') {
             loadBilheteriaDigitalEvents(events => resolve(events.filter(e => isEventInRelevantPeriod(e.date))));
           } else {
-            console.log('BilheteriaDigital não disponível');
+            // console.log('BilheteriaDigital não disponível');
             resolve([]);
           }
         }),
@@ -594,7 +594,7 @@ async function loadEventos() {
           if (typeof loadOutgoEvents === 'function') {
             loadOutgoEvents(events => resolve(events.filter(e => isEventInRelevantPeriod(e.date))));
           } else {
-            console.log('Outgo não disponível');
+            // console.log('Outgo não disponível');
             resolve([]);
           }
         }),
@@ -602,7 +602,7 @@ async function loadEventos() {
           if (typeof loadIngressoDigitalEvents === 'function') {
             loadIngressoDigitalEvents(events => resolve(events.filter(e => isEventInRelevantPeriod(e.date))));
           } else {
-            console.log('IngressoDigital não disponível');
+            // console.log('IngressoDigital não disponível');
             resolve([]);
           }
         }),
@@ -610,7 +610,7 @@ async function loadEventos() {
           if (typeof loadShotgunEvents === 'function') {
             loadShotgunEvents(events => resolve(events.filter(e => isEventInRelevantPeriod(e.date))));
           } else {
-            console.log('Shotgun não disponível');
+            // console.log('Shotgun não disponível');
             resolve([]);
           }
         })
@@ -621,13 +621,13 @@ async function loadEventos() {
       
       // Combinar eventos de diferentes fontes
       eventosData = results.flat().filter(Boolean);
-      console.log(`Total de eventos encontrados: ${eventosData.length}`);
+      // console.log(`Total de eventos encontrados: ${eventosData.length}`);
       
       // Salvar no cache com duração menor (apenas para o dia atual)
       saveCache(EVENTOS_CACHE_KEY, eventosData, EVENTOS_CACHE_DATE_KEY);
-      console.log('Dados de eventos buscados e salvos em cache');
+      // console.log('Dados de eventos buscados e salvos em cache');
     } catch (error) {
-      console.error('Erro ao buscar dados de eventos:', error);
+      // console.error('Erro ao buscar dados de eventos:', error);
       eventosGrid.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar os eventos no momento.</div>';
       return;
     }
@@ -642,7 +642,7 @@ async function loadEventos() {
     return;
   }
   
-  console.log('Total de eventos disponíveis após filtragem:', eventosData.length);
+  // console.log('Total de eventos disponíveis após filtragem:', eventosData.length);
   
   // Classificar eventos por proximidade da data (hoje, amanhã, esta semana)
   const today = new Date();
@@ -676,7 +676,7 @@ async function loadEventos() {
     }
   });
   
-  console.log(`Eventos categorizados: ${todayEvents.length} hoje, ${tomorrowEvents.length} amanhã, ${thisWeekEvents.length} esta semana`);
+  // console.log(`Eventos categorizados: ${todayEvents.length} hoje, ${tomorrowEvents.length} amanhã, ${thisWeekEvents.length} esta semana`);
   
   // Ordenar cada categoria por data (se houver múltiplos eventos no mesmo dia)
   [todayEvents, tomorrowEvents, thisWeekEvents].forEach(eventList => {

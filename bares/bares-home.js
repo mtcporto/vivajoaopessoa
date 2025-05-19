@@ -22,7 +22,7 @@ async function diagnoseImagePaths() {
   const hostname = window.location.hostname;
   if (hostname !== 'mosaico.vivajoaopessoa.com') return;
   
-  console.log('🔍 Verificando caminhos de imagens...');
+  // console.log('🔍 Verificando caminhos de imagens...');
   
   // Verifica apenas o caminho que deve estar correto
   const testImage = 'nau.jpg';
@@ -31,12 +31,12 @@ async function diagnoseImagePaths() {
   
   try {
     const correctResponse = await fetch(correctPath, { method: 'HEAD' });
-    console.log(`${correctResponse.ok ? '✅' : '❌'} Caminho correto: ${correctPath} (${correctResponse.ok ? 'EXISTE' : 'NÃO EXISTE'})`);
+    // console.log(`${correctResponse.ok ? '✅' : '❌'} Caminho correto: ${correctPath} (${correctResponse.ok ? 'EXISTE' : 'NÃO EXISTE'})`);
     
     const wrongResponse = await fetch(wrongPath, { method: 'HEAD' });
-    console.log(`${wrongResponse.ok ? '⚠️' : '✓'} Caminho errado: ${wrongPath} (${wrongResponse.ok ? 'EXISTE' : 'NÃO EXISTE'})`);
+    // console.log(`${wrongResponse.ok ? '⚠️' : '✓'} Caminho errado: ${wrongPath} (${wrongResponse.ok ? 'EXISTE' : 'NÃO EXISTE'})`);
   } catch (error) {
-    console.error('❌ Erro ao verificar caminhos:', error.message);
+    // console.error('❌ Erro ao verificar caminhos:', error.message);
   }
 }
 
@@ -93,9 +93,9 @@ async function loadBares() {
   if (usarCache) {
     try {
       baresData = JSON.parse(localStorage.getItem(BARES_CACHE_KEY));
-      console.log('Usando cache dos dados de bares e restaurantes');
+      // console.log('Usando cache dos dados de bares e restaurantes');
     } catch (error) {
-      console.error('Erro ao carregar dados do cache:', error);
+      // console.error('Erro ao carregar dados do cache:', error);
       // Se houver erro no cache, tenta buscar dados novos
       baresData = null;
     }
@@ -110,24 +110,24 @@ async function loadBares() {
       if (hostname === 'mosaico.vivajoaopessoa.com') {
         // Caminho explícito para o ambiente mosaico
         dataUrl = '/vivajoaopessoa/bares/data.json';
-        console.log('Usando caminho explícito para ambiente mosaico:', dataUrl);
+        // console.log('Usando caminho explícito para ambiente mosaico:', dataUrl);
       } else {
         // Caminho usando APP_BASE_PATH para outros ambientes
         dataUrl = `${APP_BASE_PATH}bares/data.json`;
-        console.log('Usando caminho com APP_BASE_PATH:', dataUrl);
+        // console.log('Usando caminho com APP_BASE_PATH:', dataUrl);
       }
       
       // Tenta carregar dados
-      console.log('Buscando dados de:', dataUrl);
+      // console.log('Buscando dados de:', dataUrl);
       const response = await fetch(dataUrl);
       
       if (!response.ok) {
         // Se falhar, tenta uma alternativa
-        console.warn(`Falha ao carregar de ${dataUrl}, erro: ${response.status}`);
+        // console.warn(`Falha ao carregar de ${dataUrl}, erro: ${response.status}`);
         
         // Tenta um caminho alternativo (útil durante desenvolvimento)
         const altUrl = window.location.origin + `/bares/data.json`;
-        console.log('Tentando caminho alternativo:', altUrl);
+        // console.log('Tentando caminho alternativo:', altUrl);
         const altResponse = await fetch(altUrl);
         
         if (!altResponse.ok) {
@@ -146,7 +146,7 @@ async function loadBares() {
       if (hostname !== 'mosaico.vivajoaopessoa.com') {
         localStorage.setItem(BARES_CACHE_KEY, JSON.stringify(baresData));
         localStorage.setItem(BARES_CACHE_DATE_KEY, getTodayDateString());
-        console.log('Dados de bares salvos no cache');
+        // console.log('Dados de bares salvos no cache');
       }
       
     } catch (error) {
@@ -176,8 +176,8 @@ function processarDadosBares(rawData) {
   
   // Retorna apenas os primeiros 4 estabelecimentos para a página inicial
   const estabelecimentos = rawData.estabelecimentos.slice(0, 4);
-  console.log("Dados originais dos estabelecimentos - caminhos de imagens:", estabelecimentos.map(e => e.foto));
-  console.log("São esperadas imagens em: /bares/imagens/");
+  // console.log("Dados originais dos estabelecimentos - caminhos de imagens:", estabelecimentos.map(e => e.foto));
+  // console.log("São esperadas imagens em: /bares/imagens/");
   
   return { estabelecimentos };
 }
@@ -232,28 +232,28 @@ function exibirBares(data, container) {
       // Sabemos com certeza que as imagens estão em /vivajoaopessoa/bares/imagens/
       // E não em /vivajoaopessoa/imagens/
       fotoPath = `/vivajoaopessoa/bares/imagens/${nomeArquivo}`;
-      console.log(`🌐 Ambiente mosaico: usando caminho correto: ${fotoPath}`);
+      // console.log(`🌐 Ambiente mosaico: usando caminho correto: ${fotoPath}`);
     } else if (hostname === 'vivajoaopessoa.com' || hostname === 'www.vivajoaopessoa.com') {
       // Caminho para site em produção
       fotoPath = `/bares/imagens/${nomeArquivo}`;
-      console.log(`Ambiente de produção detectado, usando caminho raiz: ${fotoPath}`);
+      // console.log(`Ambiente de produção detectado, usando caminho raiz: ${fotoPath}`);
     } else {
       // Para ambiente local ou outros ambientes
       fotoPath = `${APP_BASE_PATH}bares/imagens/${nomeArquivo}`;
-      console.log(`Usando caminho com APP_BASE_PATH: ${fotoPath}`);
+      // console.log(`Usando caminho com APP_BASE_PATH: ${fotoPath}`);
     }
     
     // Para debug/desenvolvimento
-    console.log(`Caminho de imagem para ${estabelecimento.nome}: ${fotoPath}`);
+    // console.log(`Caminho de imagem para ${estabelecimento.nome}: ${fotoPath}`);
     
     // Verificar se o arquivo existe (apenas como log, não bloqueia a execução)
     const img = new Image();
-    img.onload = () => console.log(`Imagem carregada com sucesso: ${fotoPath}`);
-    img.onerror = () => console.warn(`Imagem não encontrada: ${fotoPath}`);
+    // img.onload = () => console.log(`Imagem carregada com sucesso: ${fotoPath}`);
+    // img.onerror = () => console.warn(`Imagem não encontrada: ${fotoPath}`);
     img.src = fotoPath;
     
     // Log para debug
-    console.log(`Caminho da imagem para ${estabelecimento.nome}: ${fotoPath}`);
+    // console.log(`Caminho da imagem para ${estabelecimento.nome}: ${fotoPath}`);
     
     // Determina o caminho da imagem de backup
     let backupImagePath;
@@ -309,18 +309,18 @@ function getTodayDateString() {
 function clearBaresCache() {
   localStorage.removeItem(BARES_CACHE_KEY);
   localStorage.removeItem(BARES_CACHE_DATE_KEY);
-  console.log('Cache dos bares limpo');
+  // console.log('Cache dos bares limpo');
 }
 
 // Função simplificada para tratar erros de carregamento de imagens
 function handleImageError(img) {
-  console.error(`Erro ao carregar imagem: ${img.src}`);
+  // console.error(`Erro ao carregar imagem: ${img.src}`);
   
   const hostname = window.location.hostname;
   
   // Não tentar alternativas se já estamos usando a imagem de backup
   if (img.src.includes('logo.png')) {
-    console.log('Já estamos usando a imagem de backup');
+    // console.log('Já estamos usando a imagem de backup');
     return;
   }
   
@@ -346,7 +346,7 @@ function handleImageError(img) {
   const cacheBuster = hostname === 'mosaico.vivajoaopessoa.com' ? `?v=${new Date().getTime()}` : '';
   correctPath = `${correctPath}${cacheBuster}`;
   
-  console.log(`🔄 Tentando caminho correto: ${correctPath}`);
+  // console.log(`🔄 Tentando caminho correto: ${correctPath}`);
   img.src = correctPath;
 }
 
@@ -360,7 +360,7 @@ function getAppBasePath() {
   // IMPORTANTE: Descobrimos através de testes que as imagens realmente existem em
   // /vivajoaopessoa/bares/imagens/ no ambiente mosaico
   if (hostname === 'mosaico.vivajoaopessoa.com') {
-    console.log('🌐 Ambiente de mosaico detectado');
+    // console.log('🌐 Ambiente de mosaico detectado');
     
     // Em mosaico, independente do pathname exato, usar sempre esse caminho base
     return '/vivajoaopessoa/';
@@ -393,7 +393,7 @@ const APP_BASE_PATH = getAppBasePath();
 function forceMosaicoImageFix() {
   if (window.location.hostname !== 'mosaico.vivajoaopessoa.com') return;
   
-  console.log('🔧 Aplicando correção forçada para imagens no ambiente mosaico...');
+  // console.log('🔧 Aplicando correção forçada para imagens no ambiente mosaico...');
   
   // Procurar todas as imagens de bares
   const barImages = document.querySelectorAll('.bar-img');
@@ -407,14 +407,14 @@ function forceMosaicoImageFix() {
       
       // Aplicar caminho direto e correto
       const correctPath = `/vivajoaopessoa/bares/imagens/${filename}?nocache=${Date.now()}`;
-      console.log(`🔄 Corrigindo imagem: ${correctPath}`);
+      // console.log(`🔄 Corrigindo imagem: ${correctPath}`);
       
       img.src = correctPath;
       fixed++;
     }
   });
   
-  console.log(`✅ ${fixed} imagens corrigidas`);
+  // console.log(`✅ ${fixed} imagens corrigidas`);
   
   if (fixed > 0) {
     alert(`Foram corrigidas ${fixed} imagens. Se ainda houver problemas, limpe o cache do navegador.`);
@@ -428,17 +428,17 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Limpar cache para ambiente de desenvolvimento/mosaico
   if (isMosaico || window.location.hostname.includes('localhost')) {
-    console.log('🧹 Limpando cache local');
+    // console.log('🧹 Limpando cache local');
     clearBaresCache();
   }
   
   // Botão de correção removido
   
   // Log simplificado - apenas informações essenciais
-  console.log('Contexto de execução:');
-  console.log('- Hostname:', window.location.hostname);
-  console.log('- Pathname:', window.location.pathname);
-  console.log('- Caminho base:', APP_BASE_PATH);
+  // console.log('Contexto de execução:');
+  // console.log('- Hostname:', window.location.hostname);
+  // console.log('- Pathname:', window.location.pathname);
+  // console.log('- Caminho base:', APP_BASE_PATH);
   
   // Executar diagnóstico no ambiente mosaico
   if (window.location.hostname === 'mosaico.vivajoaopessoa.com') {
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Listener global para erros de imagem
   document.addEventListener('error', function(e) {
     if (e.target.tagName === 'IMG') {
-      console.error('Erro ao carregar imagem:', e.target.src);
+      // console.error('Erro ao carregar imagem:', e.target.src);
       // Tenta corrigir automaticamente
       handleImageError(e.target);
     }

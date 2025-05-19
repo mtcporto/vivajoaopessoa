@@ -68,7 +68,7 @@ function loadNoticias() {
       renderNoticias(newsPerSource);
     })
     .catch(error => {
-      console.error('Erro ao carregar notícias:', error);
+      // console.error('Erro ao carregar notícias:', error);
       renderError();
     });
   
@@ -80,23 +80,23 @@ function loadNoticias() {
     const selectedNews = [];
     const fontes = ['G1', 'ClickPB', 'WSCOM'];
     
-    console.log('Status das notícias por fonte:', {
-      'G1': noticiasPerSource['G1'].length,
-      'ClickPB': noticiasPerSource['ClickPB'].length,
-      'WSCOM': noticiasPerSource['WSCOM'].length
-    });
+    // console.log('Status das notícias por fonte:', {
+    //   'G1': noticiasPerSource['G1'].length,
+    //   'ClickPB': noticiasPerSource['ClickPB'].length,
+    //   'WSCOM': noticiasPerSource['WSCOM'].length
+    // });
     
     // Pega exatamente uma notícia de cada fonte disponível
     fontes.forEach(fonte => {
       if (noticiasPerSource[fonte] && noticiasPerSource[fonte].length > 0) {
         // Pegue a primeira (mais recente) notícia desta fonte
         selectedNews.push(noticiasPerSource[fonte][0]);
-        console.log(`Adicionou notícia de ${fonte}:`, noticiasPerSource[fonte][0].title);
+        // console.log(`Adicionou notícia de ${fonte}:`, noticiasPerSource[fonte][0].title);
       }
     });
     
     // Se tivermos menos de 3 notícias, mostra apenas o que temos
-    console.log('Total de notícias selecionadas:', selectedNews.length);
+    // console.log('Total de notícias selecionadas:', selectedNews.length);
     
     if (selectedNews.length === 0) {
       renderError();

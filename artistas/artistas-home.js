@@ -37,7 +37,7 @@ function extractSpotifyArtistId(url) {
 
 // Buscar imagem do artista no Spotify
 async function fetchArtistImage(artistId, token) {
-  console.log(`Buscando imagem do Spotify para artista ID: ${artistId}`);
+  // console.log(`Buscando imagem do Spotify para artista ID: ${artistId}`);
   try {
     const response = await fetch(`${SPOTIFY_API_BASE}${artistId}`, {
       headers: { "Authorization": `Bearer ${token}` }
@@ -51,24 +51,24 @@ async function fetchArtistImage(artistId, token) {
     
     // Extrair imagem
     if (data.images && data.images.length > 0) {
-      console.log(`Imagem encontrada para ${artistId}:`, data.images[0].url);
+      // console.log(`Imagem encontrada para ${artistId}:`, data.images[0].url);
       return data.images[0].url;
     } else {
-      console.log(`Nenhuma imagem encontrada para ${artistId}`);
+      // console.log(`Nenhuma imagem encontrada para ${artistId}`);
       return null;
     }
   } catch (error) {
-    console.error('Erro ao buscar imagem do artista:', error);
+    // console.error('Erro ao buscar imagem do artista:', error);
     return null;
   }
 }
 
 // Carregar dados dos artistas
 async function loadArtistas() {
-  console.log('Carregando artistas...');
+  // console.log('Carregando artistas...');
   const artistasGrid = document.getElementById('artistas-grid');
   if (!artistasGrid) {
-    console.error('Elemento artistasGrid não encontrado');
+    // console.error('Elemento artistasGrid não encontrado');
     return;
   }
   
@@ -80,7 +80,7 @@ async function loadArtistas() {
   // Tenta usar cache para o data.json
   if (localStorage.getItem(ARTISTAS_CACHE_DATE_KEY) === getTodayDateString()) {
     artistasData = JSON.parse(localStorage.getItem(ARTISTAS_CACHE_KEY));
-    console.log('Usando cache dos dados de artistas');
+    // console.log('Usando cache dos dados de artistas');
   } else {
     try {
       // Busca os dados do arquivo data.json
@@ -91,9 +91,9 @@ async function loadArtistas() {
       localStorage.setItem(ARTISTAS_CACHE_KEY, JSON.stringify(artistasData));
       localStorage.setItem(ARTISTAS_CACHE_DATE_KEY, getTodayDateString());
       
-      console.log('Dados de artistas buscados e salvos em cache');
+      // console.log('Dados de artistas buscados e salvos em cache');
     } catch (error) {
-      console.error('Erro ao buscar dados de artistas:', error);
+      // console.error('Erro ao buscar dados de artistas:', error);
       artistasGrid.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Não foi possível carregar os artistas no momento.</div>';
       return;
     }
@@ -127,14 +127,14 @@ async function loadArtistas() {
     selectedArtistas = [...artistasComSpotify, ...complemento];
   }
   
-  console.log(`Artistas selecionados: ${selectedArtistas.map(a => a.nome).join(', ')}`);
+  // console.log(`Artistas selecionados: ${selectedArtistas.map(a => a.nome).join(', ')}`);
   
   // Obter token do Spotify para buscar imagens
   let spotifyToken;
   try {
     spotifyToken = await getSpotifyToken();
   } catch (error) {
-    console.error('Erro ao obter token do Spotify:', error);
+    // console.error('Erro ao obter token do Spotify:', error);
   }
   
   // Criar cards para os artistas selecionados
@@ -150,7 +150,7 @@ async function loadArtistas() {
       const artistId = extractSpotifyArtistId(artista.canais.spotify);
       if (artistId) {
         try {
-          console.log(`Buscando imagem para artista ${artista.nome} com ID: ${artistId}`);
+          // console.log(`Buscando imagem para artista ${artista.nome} com ID: ${artistId}`);
           
           // Obter diretamente a imagem do artista 
           const response = await fetch(`${SPOTIFY_API_BASE}${artistId}`, {
@@ -161,13 +161,13 @@ async function loadArtistas() {
             const data = await response.json();
             if (data.images && data.images.length > 0) {
               imagePath = data.images[0].url;
-              console.log(`Imagem do Spotify obtida para ${artista.nome}: ${imagePath}`);
+              // console.log(`Imagem do Spotify obtida para ${artista.nome}: ${imagePath}`);
             }
           } else {
-            console.warn(`Erro ao buscar imagem do Spotify: ${response.status}`);
+            // console.warn(`Erro ao buscar imagem do Spotify: ${response.status}`);
           }
         } catch (error) {
-          console.warn(`Não foi possível buscar imagem do Spotify para ${artista.nome}:`, error);
+          // console.warn(`Não foi possível buscar imagem do Spotify para ${artista.nome}:`, error);
         }
       }
     }
@@ -182,7 +182,7 @@ async function loadArtistas() {
       } else {
         imagePath = '/artistas/' + artista.imagem;
       }
-      console.log(`Usando caminho local da imagem para ${artista.nome}: ${imagePath}`);
+      // console.log(`Usando caminho local da imagem para ${artista.nome}: ${imagePath}`);
     }
     
     // Container para a imagem como link para a página local do artista
