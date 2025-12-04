@@ -1,5 +1,5 @@
 function loadIngressoDigitalEvents(callback) {
-    const url = 'https://cors.mosaicoworkers.workers.dev/ingressodigital.com/list.php?busca=S&txt_busca=joao+pessoa&txt_busca_m=';
+    const url = 'https://cors.mosaicoworkers.workers.dev/ingressodigital.com/pesquisa.php?busca=S&pg=1&txt_busca=joao+pessoa';
 
     fetch(url)
         .then(response => response.text())
