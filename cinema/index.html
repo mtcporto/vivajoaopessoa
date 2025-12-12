@@ -81,25 +81,55 @@
       margin: 20px auto;
       margin-top: 0px;
     }
-    body {
-      font-family: Inter, sans-serif;
-      font-weight: 400;
-      background-color: #F5F5DC;
-      padding-bottom: 10px;
+    :root {
+      --vjp-teal: rgb(27, 131, 122);
+      --vjp-blue: rgb(0, 117, 201);
+      --vjp-yellow: rgb(255, 192, 102);
+      --vjp-pink: rgb(237, 55, 103);
+      --vjp-green: rgb(50, 183, 154);
+      --vjp-dark: #121212;
     }
+    
+    body {
+      font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      font-weight: 400;
+      background-color: #fafafa;
+      padding-bottom: 0;
+      color: #333;
+    }
+    
     header {
-      background-color: #000;
-      color: #fff;
-      padding: 10px;
+      background-color: white;
+      color: var(--vjp-teal);
+      padding: 15px 0;
       text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    
+    header h1 {
+      margin: 0;
+      font-size: 2em;
     }
     .event-container {
-      border: none;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       margin-bottom: 20px;
       display: inline-block;
       text-align: center;
       background-color: #fff;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .event-container:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      border-color: var(--vjp-blue);
     }
     .event-image {
       width: 300px;
@@ -128,15 +158,32 @@
       width: 350px;
       margin: 10px;
       display: inline-block;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 0, 0, 0.05);
     }
+    
+    .card.top-level:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      border-color: var(--vjp-blue);
+    }
+    
     .card-container {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .badge-orange {
       color: #000000;
-      background-color: #ff7f00;
+      background-color: var(--vjp-yellow);
     }
     @media (min-width: 992px) {
       .accordion {
@@ -150,10 +197,15 @@
       margin-bottom: 5px;
       padding: 3px 8px;
       border-radius: 5px;
-      background-color: #f0ad4e;
+      background-color: var(--vjp-yellow);
       color: #000000;
       font-size: 0.85rem;
       font-weight: bold;
+    }
+    
+    .event-title {
+      font-weight: 600;
+      color: var(--vjp-dark);
     }
     /* Justificar texto da sinopse */
     #synopsisText {
