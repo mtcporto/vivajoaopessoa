@@ -1,16 +1,37 @@
+:root {
+    --vjp-teal: rgb(27, 131, 122);
+    --vjp-blue: rgb(0, 117, 201);
+    --vjp-yellow: rgb(255, 192, 102);
+    --vjp-pink: rgb(237, 55, 103);
+    --vjp-green: rgb(50, 183, 154);
+    --vjp-dark: #121212;
+}
+
 /* General Styles */
 body {
-    font-family: Arial, sans-serif;
-    padding-bottom: 10px;
-    background-color: #F5F5DC; /* Cor de fundo offwhite */
+    font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    padding-bottom: 0;
+    background-color: #fafafa;
+    color: #333;
 }
 
 .header {
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: var(--vjp-teal);
     text-align: center;
-    padding: 10px;
+    padding: 15px 0;
     margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2em;
 }
 
 /* Carousel Styles */
@@ -128,14 +149,17 @@ body {
 /* Card Styles */
 .card {
     margin: 20px 0;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    transition: box-shadow 0.3s ease;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: white;
 }
 
 .card:hover {
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-    transform: translateY(-5px); /* Adicionar esta linha */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px) scale(1.02);
+    border-color: var(--vjp-yellow);
 }
 
 .card img {
@@ -148,6 +172,8 @@ body {
 .card-title {
     font-size: 1.5em;
     margin: 10px 0;
+    font-weight: 600;
+    color: var(--vjp-dark);
 }
 
 .icon-list a {
@@ -167,10 +193,18 @@ body {
 
 .artist-card {
     padding: 0px;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    color: #343a40;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+    background-color: white;
+    color: var(--vjp-dark);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.artist-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    border-color: var(--vjp-yellow);
 }
 
 .artist-card img {
@@ -195,7 +229,7 @@ body {
 }
 
 .artist-card a:hover {
-    color: #cf201a;
+    color: var(--vjp-yellow);
 }
 
 .artist-card i {
@@ -218,6 +252,12 @@ body {
 
 #artistCards {
     margin-top: 20px;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .card-body {
