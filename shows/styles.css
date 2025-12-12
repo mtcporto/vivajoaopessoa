@@ -39,8 +39,10 @@ body {
   height: 70px;
   display: flex;
   align-items: center;
+  justify-content: center;
   text-align: center;
   font-weight: 700;
+  width: 100%;
 }
   .card {
     background-color: white;
