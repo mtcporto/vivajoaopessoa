@@ -7,6 +7,15 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
+    :root {
+      --vjp-teal: rgb(27, 131, 122);
+      --vjp-blue: rgb(0, 117, 201);
+      --vjp-yellow: rgb(255, 192, 102);
+      --vjp-pink: rgb(237, 55, 103);
+      --vjp-green: rgb(50, 183, 154);
+      --vjp-dark: #121212;
+    }
+
     /* Carousel de destaque */
     .carousel-video {
       position: relative;
@@ -58,17 +67,28 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 20px;
       padding: 0 15px;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Card styles */
     .card.estabelecimento {
       height: 100%;
-      transition: transform 0.3s ease;
+      transition: all 0.3s ease;
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     .card.estabelecimento:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      border-color: var(--vjp-green);
     }
 
     .card-img-container {
@@ -109,16 +129,28 @@
     }
 
     body {
-      font-family: Arial, sans-serif;
-      padding-bottom: 10px;
-      background-color: #F5F5DC;
+      font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      padding-bottom: 0;
+      background-color: #fafafa;
+      color: #333;
     }
 
     header {
-      background-color: black;
-      color: white;
-      padding: 10px;
+      background-color: white;
+      color: var(--vjp-teal);
+      padding: 15px 0;
       text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2em;
     }
 
     /* Facility Icons */
@@ -145,11 +177,11 @@
     }
 
     .facility-icon.active {
-      color: #28a745;
+      color: var(--vjp-green);
     }
 
     .facility-icon.inactive {
-      color: #b31c2b;
+      color: var(--vjp-pink);
     }
 
     /* Action Buttons */
